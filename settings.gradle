@@ -1,2 +1,2 @@
-include ':app'
+include ':app', ':intl_sdk'
 rootProject.name='android_intl_sdk'
