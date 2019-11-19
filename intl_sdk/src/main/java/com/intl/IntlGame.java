@@ -37,34 +37,39 @@ public class IntlGame extends Activity {
     {
         GoogleClientId = googleClientId;
         UserCenter.init(activity, Uri.parse(url),414,319);
-        AppsFlyerConversionListener conversionDataListener = new AppsFlyerConversionListener(){
+        if(devKey != null)
+        {
+            AppsFlyerConversionListener conversionDataListener = new AppsFlyerConversionListener(){
 
-            @Override
-            public void onInstallConversionDataLoaded(Map<String, String> map) {
+                @Override
+                public void onInstallConversionDataLoaded(Map<String, String> map) {
 
-            }
+                }
 
-            @Override
-            public void onInstallConversionFailure(String s) {
+                @Override
+                public void onInstallConversionFailure(String s) {
 
-            }
+                }
 
-            @Override
-            public void onAppOpenAttribution(Map<String, String> map) {
+                @Override
+                public void onAppOpenAttribution(Map<String, String> map) {
 
-            }
+                }
 
-            @Override
-            public void onAttributionFailure(String s) {
+                @Override
+                public void onAttributionFailure(String s) {
 
-            }
-        };
-        AppsFlyerLib.getInstance().init(devKey, conversionDataListener, activity);
-        AppsFlyerLib.getInstance().setAndroidIdData(IntlGameUtil.getLocalAndroidId(activity));
-        AppsFlyerLib.getInstance().setDebugLog(true);
-        Map<String, Object> mapa = new HashMap<>();
-        mapa.put("Start", "1");
-        AfEvent(activity, "Start_AppLaunch", mapa);
+                }
+            };
+            AppsFlyerLib.getInstance().init(devKey, conversionDataListener, activity);
+            AppsFlyerLib.getInstance().setAndroidIdData(IntlGameUtil.getLocalAndroidId(activity));
+            AppsFlyerLib.getInstance().setDebugLog(true);
+            Map<String, Object> mapa = new HashMap<>();
+            mapa.put("Start", "1");
+            AfEvent(activity, "Start_AppLaunch", mapa);
+
+        }
+
         IntlGameUtil.getLocalGoogleAdID(activity, new IntlGameUtil.IGgetLocalGoogleAdIdListener() {
             @Override
             public void onComplete(int code, String ID) {
