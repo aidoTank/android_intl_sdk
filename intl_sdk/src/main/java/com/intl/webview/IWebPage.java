@@ -1,6 +1,8 @@
-package com.intl;
+package com.intl.webview;
 
 import android.content.Context;
+
+import com.intl.webview.WebSession;
 
 /**
  * Created by jerry on 2017/8/19.

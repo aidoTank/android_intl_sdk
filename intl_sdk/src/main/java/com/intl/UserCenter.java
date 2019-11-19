@@ -4,7 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
+
+import com.intl.channel.FaceBookSDK;
+import com.intl.channel.GoogleSDK;
+import com.intl.webview.WebCommandSender;
+import com.intl.webview.WebSession;
 
 import java.util.Dictionary;
 
@@ -19,19 +23,19 @@ public class UserCenter {
     private  int _dialogWidth;
     private  int _dialogHeight;
     private WebSession _webSession;
-    private Context context;
-    public static void init(Context context,Uri uri, int  width, int height){
+    private Activity activity;
+    public static void init(Activity activity,Uri uri, int  width, int height){
 
         if (_instance == null)
-            _instance = new UserCenter( context,uri, width, height);
+            _instance = new UserCenter( activity,uri, width, height);
     }
     public static UserCenter getInstance() {
 
         return _instance;
     }
-    private UserCenter(Context context, Uri uri,int width,int height)
+    private UserCenter(Activity activity, Uri uri,int width,int height)
     {
-        this.context = context;
+        this.activity = activity;
         _uri = uri;
         _dialogWidth = width;
         _dialogHeight = height;
@@ -53,14 +57,7 @@ public class UserCenter {
                     public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
                         Log.d("UserCenter", "handleCommand: "+command);
                         WebSession.currentWebSession().forceCloseSession();
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                GoogleSDK googleSDK = new GoogleSDK((Activity) context);
-                                googleSDK.SignIn();
-                            }
-                        }).start();
-
+                        GoogleSDK.login(activity);
                     }
                 }
 
@@ -72,14 +69,7 @@ public class UserCenter {
                     public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
                         Log.d("UserCenter", "handleCommand: "+command);
                         WebSession.currentWebSession().forceCloseSession();
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                FaceBookSDK faceBookSDK = new FaceBookSDK((Activity) context);
-                                faceBookSDK.login();
-                            }
-                        }).start();
-
+                        FaceBookSDK.login(activity);
                     }
                 }
 

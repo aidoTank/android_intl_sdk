@@ -3,11 +3,18 @@ package com.intl;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 
+import com.appsflyer.AppsFlyerConversionListener;
 import com.appsflyer.AppsFlyerLib;
+import com.intl.channel.FaceBookSDK;
+import com.intl.channel.GoogleSDK;
 
+import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -16,32 +23,59 @@ import java.util.Map;
  * @Date: 2019/11/18
  */
 public class IntlGame extends Activity {
+    public static ILoginListener iLoginListener;
+    public static ILogoutListener iLogoutListener;
     public static Handler IGonGameHandler;
     public static String GooggleID = "";
-    public static String devKey = "";
-    public static String GoogleAppId = "883426973649-jqul09g64m0too4adsbscat6i2b6lptf.apps.googleusercontent.com";
+    // public static url = "http://10.0.2.2:8080/app/logincenter.html"
+    //public static String devKey = "";
+    //public static String GoogleAppId = "883426973649-jqul09g64m0too4adsbscat6i2b6lptf.apps.googleusercontent.com";
+    public static String GoogleClientId;
     public static Application application;
-    public static void init(final Context context,IInitListener iInitListener)
+    public static String url;
+    public static void init(final Activity activity, String devKey,String googleClientId, String url,IInitListener iInitListener)
     {
-        IntlGameHandlerManage.IntlGame_HandlerManage(context);
-        if(devKey != null)
-        {
-            Message afInitMsg = new Message();
-            afInitMsg.what = IntlGameHandlerManageNum.appsflyMsg;
-            IGonGameHandler.sendMessage(afInitMsg);
-        }
-        Message initMsg = new Message();
-        initMsg.what = IntlGameHandlerManageNum.init;
-        IGonGameHandler.sendMessage(initMsg);
-        IntlGameUtil.getLocalGoogleAdID(context, new IntlGameUtil.IGgetLocalGoogleAdIdListener() {
+        GoogleClientId = googleClientId;
+        UserCenter.init(activity, Uri.parse(url),414,319);
+        AppsFlyerConversionListener conversionDataListener = new AppsFlyerConversionListener(){
+
+            @Override
+            public void onInstallConversionDataLoaded(Map<String, String> map) {
+
+            }
+
+            @Override
+            public void onInstallConversionFailure(String s) {
+
+            }
+
+            @Override
+            public void onAppOpenAttribution(Map<String, String> map) {
+
+            }
+
+            @Override
+            public void onAttributionFailure(String s) {
+
+            }
+        };
+        AppsFlyerLib.getInstance().init(devKey, conversionDataListener, activity);
+        AppsFlyerLib.getInstance().setAndroidIdData(IntlGameUtil.getLocalAndroidId(activity));
+        AppsFlyerLib.getInstance().setDebugLog(true);
+        Map<String, Object> mapa = new HashMap<>();
+        mapa.put("Start", "1");
+        AfEvent(activity, "Start_AppLaunch", mapa);
+        IntlGameUtil.getLocalGoogleAdID(activity, new IntlGameUtil.IGgetLocalGoogleAdIdListener() {
             @Override
             public void onComplete(int code, String ID) {
                 IntlGame.GooggleID = ID;
+
             }
         });
     }
-    public static void OpenLoginCenter(Activity activity)
+    public static void OpenLoginCenter(Activity activity, ILoginListener _iLoginListener)
     {
+        iLoginListener = _iLoginListener;
         UserCenter.getInstance().showLoginWebView(activity);
     }
     public interface IInitListener {
@@ -53,5 +87,18 @@ public class IntlGame extends Activity {
     }
     public static void AfEvent(Context context, String eventname, Map<String, Object> map) {
         AppsFlyerLib.getInstance().trackEvent(context, eventname, map);
+    }
+
+    public static void onActivityResults(int requestCode, int resultCode, Intent intent)
+    {
+        GoogleSDK.onActivityResult(requestCode,resultCode,intent);
+        FaceBookSDK.onActivityResult(requestCode,resultCode,intent);
+    }
+
+    public interface ILoginListener{
+        void onComplete(int code,String token);
+    }
+    public interface ILogoutListener{
+        void onComplete();
     }
 }

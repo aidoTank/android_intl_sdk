@@ -1,9 +1,11 @@
-package com.intl;
+package com.intl.webview;
 
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
+
+import com.intl.IntlDefine;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -43,9 +45,9 @@ public class WebSession {
                                 dialog.close();
                             }
                         }
-                        sender.onWebCommandResponse(CommonDefine.YC_SDK_WEB_VIEW_DOMAIN |
-                                        CommonDefine.YC_SDK_GENERAL_WEB_COMMAND_MODULE |
-                                        CommonDefine.YC_SDK_MSG,
+                        sender.onWebCommandResponse(IntlDefine.YC_SDK_WEB_VIEW_DOMAIN |
+                                        IntlDefine.YC_SDK_GENERAL_WEB_COMMAND_MODULE |
+                                        IntlDefine.YC_SDK_MSG,
                                 "success", null);
                     }
                 });
@@ -161,7 +163,7 @@ public class WebSession {
         } else {
             Hashtable<String, IWebCommandListener> commandTable = null;
             if (!_regedCommandDomain.containsKey(commandDomain)) {
-                commandTable = new Hashtable<String, IWebCommandListener>();
+                commandTable = new Hashtable<>();
                 _regedCommandDomain.put(commandDomain, commandTable);
             } else {
                 commandTable = _regedCommandDomain.get(commandDomain);

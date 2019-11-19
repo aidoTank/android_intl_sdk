@@ -1,4 +1,4 @@
-package com.intl;
+package com.intl.webview;
 
 import android.content.Context;
 import android.net.Uri;

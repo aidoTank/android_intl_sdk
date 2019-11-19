@@ -1,8 +1,10 @@
-package com.intl;
+package com.intl.channel;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.facebook.AccessToken;
@@ -14,9 +16,12 @@ import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.intl.IntlDefine;
+import com.intl.IntlGame;
 
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,16 +31,17 @@ import java.util.List;
  */
 public class FaceBookSDK {
 
-    private Activity activity;
-    private CallbackManager callbackManager;
-    private FacebookListener facebookListener;
-    private List<String> permissions;
-    private LoginManager loginManager;
+    private static WeakReference<Activity> act;
+    private static CallbackManager callbackManager;
+    private static List<String> permissions;
+    private static LoginManager loginManager;
 
-    public FaceBookSDK(Activity activity)
-    {
-        this.activity = activity;
-        //初始化facebook登录服务
+
+    /**
+     * 登录
+     */
+    public static void login(Activity activity) {
+        act = new WeakReference<>(activity);
         callbackManager = CallbackManager.Factory.create();
         getLoginManager().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
@@ -62,13 +68,6 @@ public class FaceBookSDK {
 
         permissions = Arrays
                 .asList("email", "user_likes", "user_status", "user_photos", "user_birthday", "public_profile", "user_friends");
-    }
-
-    /**
-     * 登录
-     */
-    public void login() {
-
         getLoginManager().logInWithReadPermissions(
                 activity, permissions);
     }
@@ -76,29 +75,29 @@ public class FaceBookSDK {
     /**
      * 退出
      */
-    public void logout() {
-        String logout = activity.getResources().getString(
+    public static void logout() {
+        String logout = act.get().getResources().getString(
                 com.facebook.R.string.com_facebook_loginview_log_out_action);
-        String cancel = activity.getResources().getString(
+        String cancel = act.get().getResources().getString(
                 com.facebook.R.string.com_facebook_loginview_cancel_action);
         String message;
         Profile profile = Profile.getCurrentProfile();
         if (profile != null && profile.getName() != null) {
             message = String.format(
-                    activity.getResources().getString(
+                    act.get().getResources().getString(
                             com.facebook.R.string.com_facebook_loginview_logged_in_as),
                     profile.getName());
         } else {
-            message = activity.getResources().getString(
+            message = act.get().getResources().getString(
                     com.facebook.R.string.com_facebook_loginview_logged_in_using_facebook);
         }
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        AlertDialog.Builder builder = new AlertDialog.Builder(act.get());
         builder.setMessage(message)
                 .setCancelable(true)
                 .setPositiveButton(logout, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        FaceBookSDK.this.getLoginManager().logOut();
+                        getLoginManager().logOut();
                     }
                 })
                 .setNegativeButton(cancel, null);
@@ -110,34 +109,13 @@ public class FaceBookSDK {
      *
      * @param accessToken
      */
-    public void getLoginInfo(AccessToken accessToken) {
+    private static void getLoginInfo(final AccessToken accessToken) {
 
         GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
             @Override
             public void onCompleted(JSONObject object, GraphResponse response) {
                 if (object != null) {
-                    //比如:1565455221565
-                    String id = object.optString("id");
-                    //比如：Zhang San
-                    String name = object.optString("name");
-                    //性别：比如 male （男）  female （女）
-                    String gender = object.optString("gender");
-                    //邮箱：比如：56236545@qq.com
-                    String emali = object.optString("email");
-
-                    //获取用户头像
-                    JSONObject object_pic = object.optJSONObject("picture");
-                    JSONObject object_data = object_pic.optJSONObject("data");
-                    String photo = object_data.optString("url");
-
-                    //获取地域信息
-                    //zh_CN 代表中文简体
-                    String locale = object.optString("locale");
-
-
-                    if (facebookListener != null) {
-                        facebookListener.facebookLoginSuccess(object);
-                    }
+                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,accessToken.getToken());
                 }
             }
         });
@@ -157,34 +135,16 @@ public class FaceBookSDK {
      *
      * @return
      */
-    private LoginManager getLoginManager() {
+    private static LoginManager getLoginManager() {
         if (loginManager == null) {
             loginManager = LoginManager.getInstance();
         }
         return loginManager;
     }
 
-    public CallbackManager getCallbackManager() {
-        return callbackManager;
-    }
-    /**
-     * 设置登录监听器
-     *
-     * @param facebookListener
-     */
-    public void setFacebookListener(FacebookListener facebookListener) {
-
-        this.facebookListener = facebookListener;
-    }
-    public interface FacebookListener {
-
-        /**
-         * 登录成功
-         *
-         * @param object 用户信息 JSONObject
-         */
-        void facebookLoginSuccess(JSONObject object);
-
-
+    public static void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if(callbackManager != null)
+            callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 }

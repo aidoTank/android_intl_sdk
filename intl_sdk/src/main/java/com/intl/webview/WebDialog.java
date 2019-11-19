@@ -1,4 +1,4 @@
-package com.intl;
+package com.intl.webview;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -16,6 +16,7 @@ import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+
 import java.lang.ref.WeakReference;
 
 /**
@@ -26,15 +27,15 @@ import java.lang.ref.WeakReference;
 public class WebDialog extends Dialog implements IWebPage {
 
 
-    protected WebView _webView;
-    boolean _isEnableBackKey;
+    private WebView _webView;
+    private boolean _isEnableBackKey;
 
-    RelativeLayout _symbolView = null;
-    LinearLayout _containerLayout  = null;
+    private RelativeLayout _symbolView = null;
+    private LinearLayout _containerLayout  = null;
 
-    boolean _isFullScreen = false;
-    int hightPixels;
-    int widthPixels;
+    private boolean _isFullScreen = false;
+    private int hightPixels;
+    private int widthPixels;
 
     WeakReference<WebSession> _hostWebSession;
 

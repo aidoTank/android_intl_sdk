@@ -2,8 +2,10 @@ package com.intl.demo;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -35,12 +37,12 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        IntlGame.init(MainActivity.this, new IntlGame.IInitListener() {
-            @Override
-            public void onComplete(int var1, String var2) {
-
-            }
-        });
+//        IntlGame.init(MainActivity.this, new IntlGame.IInitListener() {
+//            @Override
+//            public void onComplete(int var1, String var2) {
+//
+//            }
+//        });
 
         //setContentView(R.layout.activity_main);
         LinearLayout outer = new LinearLayout(this);
@@ -65,6 +67,18 @@ public class MainActivity extends Activity {
     }
     private void login()
     {
-        IntlGame.OpenLoginCenter(MainActivity.this);
+        IntlGame.OpenLoginCenter(MainActivity.this,new IntlGame.ILoginListener(){
+
+            @Override
+            public void onComplete(int code,String token) {
+                Log.d("Google", "onComplete: login success===>"+token);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode,resultCode,data);
+        IntlGame.onActivityResults(requestCode,resultCode,data);
     }
 }

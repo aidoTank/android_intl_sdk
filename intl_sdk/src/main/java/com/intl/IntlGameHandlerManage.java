@@ -1,5 +1,6 @@
 package com.intl;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
@@ -27,7 +28,7 @@ public class IntlGameHandlerManage {
         }
 
     }
-    public static void IntlGame_HandlerManage(final Context context)
+    public static void IntlGame_HandlerManage(final Activity activity)
     {
         if(IntlGame.IGonGameHandler == null)
         {
@@ -39,7 +40,7 @@ public class IntlGameHandlerManage {
                     switch (msg.what)
                     {
                         case IntlGameHandlerManageNum.init:
-                            UserCenter.init(context, Uri.parse("http://10.0.2.2:8080/app/logincenter.html"),414,319);
+                            UserCenter.init(activity, Uri.parse("http://10.0.2.2:8080/app/logincenter.html"),414,319);
                             break;
                         case IntlGameHandlerManageNum.appsflyMsg:
                             AppsFlyerConversionListener conversionDataListener = new AppsFlyerConversionListener(){
@@ -64,12 +65,12 @@ public class IntlGameHandlerManage {
 
                                 }
                             };
-                            AppsFlyerLib.getInstance().init(IntlGame.devKey, conversionDataListener, context);
-                            AppsFlyerLib.getInstance().setAndroidIdData(IntlGameUtil.getLocalAndroidId(context));
+                            AppsFlyerLib.getInstance().init(IntlGame.devKey, conversionDataListener, activity);
+                            AppsFlyerLib.getInstance().setAndroidIdData(IntlGameUtil.getLocalAndroidId(activity));
                             AppsFlyerLib.getInstance().setDebugLog(true);
                             Map<String, Object> mapa = new HashMap<>();
                             mapa.put("Start", "1");
-                            IntlGame.AfEvent(context, "Start_AppLaunch", mapa);
+                            IntlGame.AfEvent(activity, "Start_AppLaunch", mapa);
                             break;
                     }
                 }
