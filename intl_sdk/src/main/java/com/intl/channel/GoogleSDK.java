@@ -38,7 +38,7 @@ public class GoogleSDK {
         googlemSpinner.setMessage("Loading...");
         googlemSpinner.show();
         activity = new WeakReference<>(_activity);
-        if(IntlGame.GoogleAppId == null)
+        if(IntlGame.GoogleClientId == null)
         {
             Toast.makeText(_activity, "googleClientId erre", Toast.LENGTH_SHORT).show();
             googlemSpinner.dismiss();
@@ -47,7 +47,7 @@ public class GoogleSDK {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestProfile()
-                .requestIdToken(IntlGame.GoogleAppId)
+                .requestIdToken(IntlGame.GoogleClientId)
                 .build();
         mGoogleSignInClient = new WeakReference<>( GoogleSignIn.getClient(_activity, gso));
         Intent signInIntent = mGoogleSignInClient.get().getSignInIntent();

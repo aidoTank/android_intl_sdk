@@ -37,12 +37,12 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        IntlGame.init(MainActivity.this, new IntlGame.IInitListener() {
-//            @Override
-//            public void onComplete(int var1, String var2) {
-//
-//            }
-//        });
+        IntlGame.init(MainActivity.this,null,"883426973649-jqul09g64m0too4adsbscat6i2b6lptf.apps.googleusercontent.com","http://10.0.2.2:8080/app/logincenter.html", new IntlGame.IInitListener() {
+            @Override
+            public void onComplete(int var1, String var2) {
+
+            }
+        });
 
         //setContentView(R.layout.activity_main);
         LinearLayout outer = new LinearLayout(this);
