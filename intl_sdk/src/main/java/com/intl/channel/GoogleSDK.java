@@ -15,10 +15,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.intl.IntlDefine;
+import com.intl.GFLoginActivity;
+import com.intl.entity.IntlDefine;
 import com.intl.IntlGame;
-
-import java.lang.ref.WeakReference;
 
 
 /**
@@ -27,21 +26,21 @@ import java.lang.ref.WeakReference;
  */
 public class GoogleSDK {
     private static final String TAG = "GoogleSDK" ;
-    private static WeakReference<GoogleSignInClient> mGoogleSignInClient;
+    private static GoogleSignInClient mGoogleSignInClient;
     private static ProgressDialog googlemSpinner;
     private static final int RC_SIGN_IN = 9001;
-    private static WeakReference<Activity> activity;
+    private static Activity activity;
 
     public static void login(Activity _activity)
     {
         googlemSpinner = new ProgressDialog(_activity);
         googlemSpinner.setMessage("Loading...");
         googlemSpinner.show();
-        activity = new WeakReference<>(_activity);
+        activity = _activity;
         if(IntlGame.GoogleClientId == null)
         {
             Toast.makeText(_activity, "googleClientId erre", Toast.LENGTH_SHORT).show();
-            googlemSpinner.dismiss();
+            diss();
             return;
         }
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -49,24 +48,32 @@ public class GoogleSDK {
                 .requestProfile()
                 .requestIdToken(IntlGame.GoogleClientId)
                 .build();
-        mGoogleSignInClient = new WeakReference<>( GoogleSignIn.getClient(_activity, gso));
-        Intent signInIntent = mGoogleSignInClient.get().getSignInIntent();
+        mGoogleSignInClient = GoogleSignIn.getClient(_activity, gso);
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         _activity.startActivityForResult(signInIntent, RC_SIGN_IN);
     }
     public static void logout()
     {
-        mGoogleSignInClient.get().signOut()
-                .addOnCompleteListener( activity.get(), new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful())
-                        {
-                            Log.d(TAG, "Google logout: success");
-                        }else{
-                            Log.d(TAG, "Google logout: failed");
+        if (activity == null)
+        {
+            return;
+        }
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(activity);
+        if (acct != null) {
+            Log.d("GoogleSDK", "logout");
+            mGoogleSignInClient.signOut()
+                    .addOnCompleteListener( activity, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful())
+                            {
+                                Log.d(TAG, "Google logout: success");
+                            }else{
+                                Log.d(TAG, "Google logout: failed");
+                            }
                         }
-                    }
-                });
+                    });
+        }
     }
     public static void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -82,11 +89,11 @@ public class GoogleSDK {
     {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            googlemSpinner.dismiss();
+            diss();
             // Signed in successfully, show authenticated UI.
             IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,account.getIdToken());
         } catch (ApiException e) {
-            googlemSpinner.dismiss();
+            diss();
             if(e.getStatusCode() == 12501){
                 IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_CANCEL,e.getMessage());
             }else{
@@ -97,4 +104,11 @@ public class GoogleSDK {
             Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
         }
     }
+
+    private static void diss()
+    {
+        googlemSpinner.dismiss();
+        GFLoginActivity.dissRootView();
+    }
+
 }

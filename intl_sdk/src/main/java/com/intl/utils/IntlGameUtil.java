@@ -1,4 +1,4 @@
-package com.intl;
+package com.intl.utils;
 
 import android.content.Context;
 import android.provider.Settings;

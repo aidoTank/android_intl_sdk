@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
 
-import com.intl.IntlDefine;
+import com.intl.entity.IntlDefine;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -51,6 +51,8 @@ public class WebSession {
                                 "success", null);
                     }
                 });
+
+
     }
     public static void setDialogVisiable(boolean visiable) {
         WebSession currentWebSession = getCurrentWebSession();

@@ -6,14 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Handler;
-import android.os.Message;
 
 import com.appsflyer.AppsFlyerConversionListener;
 import com.appsflyer.AppsFlyerLib;
 import com.intl.channel.FaceBookSDK;
 import com.intl.channel.GoogleSDK;
+import com.intl.utils.IntlGameUtil;
 
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,11 +31,15 @@ public class IntlGame extends Activity {
     //public static String GoogleAppId = "883426973649-jqul09g64m0too4adsbscat6i2b6lptf.apps.googleusercontent.com";
     public static String GoogleClientId;
     public static Application application;
-    public static String url;
+    public static String Url;
     public static void init(final Activity activity, String devKey,String googleClientId, String url,IInitListener iInitListener)
     {
         GoogleClientId = googleClientId;
-        UserCenter.init(activity, Uri.parse(url),414,319);
+        Url = url;
+        if(url != null)
+        {
+            IntlGameLoginCenter.init(activity, Uri.parse(url),414,319);
+        }
         if(devKey != null)
         {
             AppsFlyerConversionListener conversionDataListener = new AppsFlyerConversionListener(){
@@ -78,10 +81,19 @@ public class IntlGame extends Activity {
             }
         });
     }
-    public static void OpenLoginCenter(Activity activity, ILoginListener _iLoginListener)
+    public static void Login(Activity activity, ILoginListener _iLoginListener)
     {
         iLoginListener = _iLoginListener;
-        UserCenter.getInstance().showLoginWebView(activity);
+        if(Url !=null) {
+            IntlGameLoginCenter.getInstance().showLoginWebView(activity);
+        }else{
+            GFLoginActivity.LoginCenter(activity);
+        }
+    }
+    public static void LogOut()
+    {
+        FaceBookSDK.logout();
+        GoogleSDK.logout();
     }
     public interface IInitListener {
         void onComplete(int var1, String var2);

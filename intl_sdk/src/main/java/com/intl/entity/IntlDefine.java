@@ -1,4 +1,4 @@
-package com.intl;
+package com.intl.entity;
 
 /**
  * @Author: yujingliang

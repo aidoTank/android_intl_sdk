@@ -1,11 +1,10 @@
 package com.intl.channel;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -13,15 +12,14 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
-import com.intl.IntlDefine;
+import com.intl.GFLoginActivity;
+import com.intl.entity.IntlDefine;
 import com.intl.IntlGame;
 
 import org.json.JSONObject;
 
-import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,17 +29,20 @@ import java.util.List;
  */
 public class FaceBookSDK {
 
-    private static WeakReference<Activity> act;
+    private static Activity act;
     private static CallbackManager callbackManager;
     private static List<String> permissions;
     private static LoginManager loginManager;
-
+    private static ProgressDialog fbprogressDialog;
 
     /**
      * 登录
      */
     public static void login(Activity activity) {
-        act = new WeakReference<>(activity);
+        fbprogressDialog = new ProgressDialog(activity);
+        fbprogressDialog.setMessage("Loading...");
+        fbprogressDialog.show();
+        act = activity;
         callbackManager = CallbackManager.Factory.create();
         getLoginManager().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
@@ -62,7 +63,6 @@ public class FaceBookSDK {
             public void onError(FacebookException error) {
 
                 //登录错误
-
             }
         });
 
@@ -70,38 +70,39 @@ public class FaceBookSDK {
                 .asList("email", "user_likes", "user_status", "user_photos", "user_birthday", "public_profile", "user_friends");
         getLoginManager().logInWithReadPermissions(
                 activity, permissions);
+        diss();
+
+    }
+
+    public static void logout() {
+        if (IsLoggedIn(act))
+        {
+            Log.d("FacebookSDK", "logout");
+            getLoginManager().logOut();
+        }
     }
 
     /**
-     * 退出
+     * 是否登录成功
+     * @param activity
+     * @return
      */
-    public static void logout() {
-        String logout = act.get().getResources().getString(
-                com.facebook.R.string.com_facebook_loginview_log_out_action);
-        String cancel = act.get().getResources().getString(
-                com.facebook.R.string.com_facebook_loginview_cancel_action);
-        String message;
-        Profile profile = Profile.getCurrentProfile();
-        if (profile != null && profile.getName() != null) {
-            message = String.format(
-                    act.get().getResources().getString(
-                            com.facebook.R.string.com_facebook_loginview_logged_in_as),
-                    profile.getName());
-        } else {
-            message = act.get().getResources().getString(
-                    com.facebook.R.string.com_facebook_loginview_logged_in_using_facebook);
+    public static boolean IsLoggedIn(Activity activity)
+    {
+        if (activity == null)
+        {
+            return false;
         }
-        AlertDialog.Builder builder = new AlertDialog.Builder(act.get());
-        builder.setMessage(message)
-                .setCancelable(true)
-                .setPositiveButton(logout, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        getLoginManager().logOut();
-                    }
-                })
-                .setNegativeButton(cancel, null);
-        builder.create().show();
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+        if (isLoggedIn)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     /**
@@ -116,6 +117,8 @@ public class FaceBookSDK {
             public void onCompleted(JSONObject object, GraphResponse response) {
                 if (object != null) {
                     IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,accessToken.getToken());
+                }else{
+                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,response.getRawResponse());
                 }
             }
         });
@@ -146,5 +149,11 @@ public class FaceBookSDK {
     {
         if(callbackManager != null)
             callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private static void diss()
+    {
+        fbprogressDialog.dismiss();
+        GFLoginActivity.dissRootView();
     }
 }

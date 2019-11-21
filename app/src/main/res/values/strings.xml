@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">android_intl_sdk</string>
+    <string name="login_btn">login</string>
+    <string name="logout_btn">logout</string>
+    <string name="pay_btn">pay</string>
 </resources>
