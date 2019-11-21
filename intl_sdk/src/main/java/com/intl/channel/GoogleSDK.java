@@ -12,7 +12,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.intl.GFLoginActivity;
@@ -44,9 +46,10 @@ public class GoogleSDK {
             return;
         }
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestScopes(new Scope(Scopes.DRIVE_APPFOLDER))
                 .requestEmail()
                 .requestProfile()
-                .requestIdToken(IntlGame.GoogleClientId)
+                .requestServerAuthCode(IntlGame.GoogleClientId)
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(_activity, gso);
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
@@ -89,9 +92,11 @@ public class GoogleSDK {
     {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            String authCode = account.getServerAuthCode();
+            Log.d(TAG, "handleSignInResult: authCode "+authCode);
             diss();
             // Signed in successfully, show authenticated UI.
-            IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,account.getIdToken());
+            IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,authCode);
         } catch (ApiException e) {
             diss();
             if(e.getStatusCode() == 12501){

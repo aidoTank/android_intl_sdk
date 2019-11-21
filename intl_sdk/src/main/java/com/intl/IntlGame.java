@@ -1,11 +1,13 @@
 package com.intl;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Handler;
+import android.provider.Settings;
 
 import com.appsflyer.AppsFlyerConversionListener;
 import com.appsflyer.AppsFlyerLib;
@@ -26,19 +28,20 @@ public class IntlGame extends Activity {
     public static ILogoutListener iLogoutListener;
     public static Handler IGonGameHandler;
     public static String GooggleID = "";
-    // public static url = "http://10.0.2.2:8080/app/logincenter.html"
-    //public static String devKey = "";
-    //public static String GoogleAppId = "883426973649-jqul09g64m0too4adsbscat6i2b6lptf.apps.googleusercontent.com";
     public static String GoogleClientId;
     public static Application application;
-    public static String Url;
-    public static void init(final Activity activity, String devKey,String googleClientId, String url,IInitListener iInitListener)
+    public static String UUID = "";
+    //public static String Url;
+    @SuppressLint("HardwareIds")
+    public static void init(final Activity activity, String devKey, String googleClientId, String url, IInitListener iInitListener)
     {
         GoogleClientId = googleClientId;
-        Url = url;
-        if(url != null)
-        {
-            IntlGameLoginCenter.init(activity, Uri.parse(url),414,319);
+        UUID = Settings.Secure.getString(activity.getContentResolver(), "android_id");
+        try{
+            Uri uri = Uri.parse(url);
+            IntlGameLoginCenter.init(activity, uri,414,319);
+        }catch (Exception e){
+
         }
         if(devKey != null)
         {
@@ -84,11 +87,11 @@ public class IntlGame extends Activity {
     public static void Login(Activity activity, ILoginListener _iLoginListener)
     {
         iLoginListener = _iLoginListener;
-        if(Url !=null) {
+//        if(Url !=null) {
             IntlGameLoginCenter.getInstance().showLoginWebView(activity);
-        }else{
-            GFLoginActivity.LoginCenter(activity);
-        }
+//        }else{
+//            GFLoginActivity.LoginCenter(activity);
+//        }
     }
     public static void LogOut()
     {
