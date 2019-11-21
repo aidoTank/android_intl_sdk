@@ -24,7 +24,25 @@ public class WebSession {
         super();
         _webDailog = null;//new WeakReference<IWebPage>(null);
         _webActivity = null;//new WeakReference<IWebPage>(null);
+        registClose();
         registCloseAll();
+    }
+    private void registClose()
+    {
+        this.regisetCommandListener(YC_WEB_GENERAL_COMMAND_DOMAIN,
+                "close",
+                new IWebCommandListener() {
+                    @Override
+                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
+                        if (sender.getWebPage() != null) {
+                            sender.getWebPage().close();
+                            sender.onWebCommandResponse(IntlDefine.YC_SDK_WEB_VIEW_DOMAIN |
+                                            IntlDefine.YC_SDK_GENERAL_WEB_COMMAND_MODULE |
+                                            IntlDefine.YC_SDK_MSG,
+                                    "success", null);
+                        }
+                    }
+                });
     }
     private void registCloseAll()
     {
