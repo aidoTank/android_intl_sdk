@@ -13,6 +13,7 @@ import com.appsflyer.AppsFlyerConversionListener;
 import com.appsflyer.AppsFlyerLib;
 import com.intl.channel.FaceBookSDK;
 import com.intl.channel.GoogleSDK;
+import com.intl.sqlite.IntlGameDBHelper;
 import com.intl.utils.IntlGameUtil;
 
 import java.util.HashMap;
@@ -24,6 +25,8 @@ import java.util.Map;
  * @Date: 2019/11/18
  */
 public class IntlGame extends Activity {
+    public static Handler IntlGameHandler;
+    public static IntlGameDBHelper db;
     public static ILoginListener iLoginListener;
     public static ILogoutListener iLogoutListener;
     public static Handler IGonGameHandler;

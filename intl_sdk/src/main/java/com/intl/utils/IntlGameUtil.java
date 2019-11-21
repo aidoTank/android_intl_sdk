@@ -43,6 +43,9 @@ import javax.crypto.spec.DESKeySpec;
  * @Date: 2019/11/18
  */
 public class IntlGameUtil {
+    private static final String TAG = "LemonGameUtil";
+    public static boolean ENABLE_LOG = true;
+
     public static void getLocalGoogleAdID(final Context context, final IGgetLocalGoogleAdIdListener iGgetLocalGoogleAdIdListener){
         (new Thread(){
             public void run(){
@@ -150,12 +153,12 @@ public class IntlGameUtil {
         return jsonObject;
     }
 
-//    public static void logd(String tag, String msg) {
-//        if (ENABLE_LOG && msg != null && !msg.equals("")) {
-//            Log.d(tag, msg);
-//        }
-//
-//    }
+    public static void logd(String tag, String msg) {
+        if (ENABLE_LOG && msg != null && !msg.equals("")) {
+            Log.d(tag, msg);
+        }
+
+    }
 
     public static byte[] desEncrypt(byte[] plainText, String KEY) throws Exception {
         SecureRandom sr = new SecureRandom();
