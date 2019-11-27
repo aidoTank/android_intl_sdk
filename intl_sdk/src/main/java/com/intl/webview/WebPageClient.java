@@ -26,7 +26,7 @@ class WebPageClient extends android.webkit.WebViewClient {
         _webBase = new WeakReference<>(ycWebPage);
         _progressDialog = new ProgressDialog(_webBase.get().getContext());
         _progressDialog.setCanceledOnTouchOutside(false);
-        _progressDialog.setMessage("正在加载...");
+        _progressDialog.setMessage("Loading...");
     }
 
     @Deprecated
@@ -68,11 +68,7 @@ class WebPageClient extends android.webkit.WebViewClient {
         _progressDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
             @Override
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_BACK) {
-                    return false;
-                } else  {
-                    return true;
-                }
+                return keyCode != KeyEvent.KEYCODE_BACK;
             }
         });
         _progressDialog.setCanceledOnTouchOutside(false);
@@ -82,18 +78,6 @@ class WebPageClient extends android.webkit.WebViewClient {
     @Override
     public void onPageFinished(android.webkit.WebView view, String url) {
         _progressDialog.dismiss();
-        String jsString = "document.documentElement.style.webkitUserSelect='none';";
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            view.evaluateJavascript(jsString, null);
-        } else {
-            view.loadUrl("javascript:" + jsString);
-        }
-        jsString = "document.documentElement.style.webkitTouchCallout='none';";
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            view.evaluateJavascript(jsString, null);
-        } else {
-            view.loadUrl("javascript:" + jsString);
-        }
     }
 
     @Override
@@ -102,7 +86,6 @@ class WebPageClient extends android.webkit.WebViewClient {
         // 出错
         _progressDialog.dismiss();
 
-        //Repoter.RepoterError(CommonDefine.YC_WEB_PAGE_LOAD_FAILED, "WebViewErrorCode:" + errorCode +  "Descripton:"+ description+ " +url:"+ failingUrl, null);
         WebCommandSender sender = new WebCommandSender(_webBase.get(), view, null);
 
         if (_webBase.get() != null && _webBase.get().getHostWebSession() != null ) {

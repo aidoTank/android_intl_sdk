@@ -1,15 +1,22 @@
-package com.intl;
+package com.intl.usercenter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
+import com.intl.IntlGame;
 import com.intl.channel.FaceBookSDK;
 import com.intl.channel.GoogleSDK;
+import com.intl.entity.IntlDefine;
 import com.intl.webview.WebCommandSender;
 import com.intl.webview.WebSession;
 
 import java.util.Dictionary;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @Author: yujingliang
@@ -17,13 +24,16 @@ import java.util.Dictionary;
  */
 public class IntlGameLoginCenter {
     private static final String LOGIN_CENTER_WEB_COMMAND_DOMAIN = "yc.mobilesdk.logincenter";
+    @SuppressLint("StaticFieldLeak")
     private static IntlGameLoginCenter _instance;
     private Uri _uri;
     private  int _dialogWidth;
     private  int _dialogHeight;
     private WebSession _webSession;
     private Activity activity;
-    public static void init(Activity activity,Uri uri, int  width, int height){
+    ProgressDialog _progressDialog;
+
+    public static void init(Activity activity, Uri uri, int width, int height){
 
         if (_instance == null)
             _instance = new IntlGameLoginCenter( activity,uri, width, height);
@@ -46,6 +56,32 @@ public class IntlGameLoginCenter {
                 _dialogWidth,
                 _dialogHeight,
                 _uri, false);
+    }
+
+    public void autoLogin(Activity activity)
+    {
+        if (_progressDialog != null && _progressDialog.isShowing()) {
+            return;
+        } else {
+            Log.d("WEB", "AutoLoginBusy");
+        }
+        if (WebSession.getIsShwoingWebPage()) {
+            return;
+        }
+        Account account = loadAccounts(activity.getApplicationContext());
+        if (account == null) {
+            showLoginWebView(activity);
+            return;
+        }
+//        AutoLoginAPI autoLoginAPI = new AutoLoginAPI(account);
+//        autoLoginAPI.setListener(new )
+
+    }
+    private Account loadAccounts(Context context) {
+        return SessionCache.loadAccount(context);
+    }
+    private void setAccount(Context context, Account account) {
+        SessionCache.saveAccounts(context, account);
     }
     private void registCommand()
     {
@@ -83,6 +119,19 @@ public class IntlGameLoginCenter {
                 }
 
         );
+        _webSession.regisetCommandListener(LOGIN_CENTER_WEB_COMMAND_DOMAIN,"closeerror",
+                new WebSession.IWebCommandListener() {
+
+                    @Override
+                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
+                        Log.d("IntlGameLoginCenter", "handleCommand: "+command);
+                        WebSession.currentWebSession().forceCloseSession();
+                        //GoogleSDK.login(activity);
+                        IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,"onWebPlageLoadFailed");
+                    }
+                }
+
+        );
 
         _webSession.setWebSessionListener(new WebSession.IWebSessionListener() {
             @Override
@@ -93,7 +142,6 @@ public class IntlGameLoginCenter {
 
             @Override
             public void onWebSessionClosed() {
-
             }
         });
 

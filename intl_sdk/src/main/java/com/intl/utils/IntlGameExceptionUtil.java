@@ -9,10 +9,6 @@ import java.io.StringWriter;
 
 public class IntlGameExceptionUtil {
     private static final String TAG = "IntlGameExceptionUtil";
-    private static boolean show = true;
-
-    public IntlGameExceptionUtil() {
-    }
 
     public static void handle(Exception e) {
         try {
@@ -21,11 +17,9 @@ public class IntlGameExceptionUtil {
             e.printStackTrace(pw);
             String string = e.toString();
             IntlGameLogUtil.i(TAG, "Exception:" + string);
-            show = true;
-            if (true) {
-                e.printStackTrace();
-            }
-        } catch (Exception var4) {
+            e.printStackTrace();
+        } catch (Exception e1) {
+            e1.printStackTrace();
         }
 
     }

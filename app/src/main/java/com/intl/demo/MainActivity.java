@@ -4,13 +4,14 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.intl.IntlGame;
+import com.intl.entity.IntlDefine;
 import com.ycgame.test.R;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,13 +22,13 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        IntlGame.init(MainActivity.this,"YGAaFkq3vf753xo3JeZLvX","883426973649-ik34obtorst3iug0p43jpae4q80l9usk.apps.googleusercontent.com","http://10.0.2.2:8080/app/logincenter.html", new IntlGame.IInitListener() {
+        IntlGame.init(MainActivity.this,"YGAaFkq3vf753xo3JeZLvX","883426973649-ik34obtorst3iug0p43jpae4q80l9usk.apps.googleusercontent.com","","http://10.0.2.2:8080/app/logincenter.html", new IntlGame.IInitListener() {
             @Override
             public void onComplete(int var1, String var2) {
 
             }
         });
-final int level = 0;
+        final int level = 0;
         setContentView(R.layout.activity_main);
         textView = findViewById(R.id.result_View);
         Button loginbtn = findViewById(R.id.btn_login);
@@ -112,11 +113,11 @@ final int level = 0;
     @SuppressLint("SetTextI18n")
     private void initResultView()
     {
-        textView.setText("Token : null");
+        textView.setText("未登录");
     }
     @SuppressLint("SetTextI18n")
-    private void UpdateUI(String channel_token){
-        textView.setText("Token: "+channel_token);
+    private void UpdateUI(String msg){
+        textView.setText(msg);
 
     }
     private void login()
@@ -125,8 +126,16 @@ final int level = 0;
 
             @Override
             public void onComplete(int code,String token) {
-                Log.d("Google", "onComplete: login success===>"+token);
-                UpdateUI(token);
+                if(code == IntlDefine.LOGIN_SUCCESS)
+                {
+                    UpdateUI("Login success: authCode==>"+token);
+                }else if(code == IntlDefine.LOGIN_CANCEL)
+                {
+                    UpdateUI("Login cancel");
+                }else {
+                    UpdateUI("Login failed: errorMsg==>"+token);
+                }
+
             }
         });
     }
@@ -139,9 +148,20 @@ final int level = 0;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode,resultCode,data);
-        IntlGame.onActivityResults(requestCode,resultCode,data);
+        IntlGame.IntlonActivityResults(requestCode,resultCode,data);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntlGame.IntlonResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        IntlGame.IntlonPause();
+    }
     private void registeredEvent()
     {
         Map<String,Object> map = new HashMap<>();

@@ -37,7 +37,7 @@ public class WebDialog extends Dialog implements IWebPage {
     private int hightPixels;
     private int widthPixels;
 
-    WeakReference<WebSession> _hostWebSession;
+    private WeakReference<WebSession> _hostWebSession;
 
     public WebDialog(Context context, Uri uri, int with, int hight, boolean enableBackKey, WebSession hostWebSession) {
         super(context, android.R.style.Theme_Dialog);
@@ -132,15 +132,6 @@ public class WebDialog extends Dialog implements IWebPage {
         this.getWindow().getWindowManager().getDefaultDisplay().getMetrics(dm);
         setSize(dm.widthPixels, dm.heightPixels);
         _isFullScreen = true;
-    }
-
-    public void sendEvent(String event, String evntData) {
-        String jsString = "OnYCEvent("+ event +", "+ evntData+")";
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            _webView.evaluateJavascript(jsString, null);
-        } else {
-            _webView.loadUrl("javascript:" + jsString);
-        }
     }
 
     public void close() {

@@ -2,7 +2,7 @@ package com.intl.utils;
 
 import android.util.Log;
 
-import com.intl.ad.IntlGameAdstrack;
+import com.intl.IntlGame;
 
 /**
  * @Author: yujingliang
@@ -10,14 +10,12 @@ import com.intl.ad.IntlGameAdstrack;
  */
 public class IntlGameLogUtil {
     private static String TAG = "IntlGameLogUtil";
-    private static final int noPrint = 0;
-    private static final int Print = 1;
 
     public IntlGameLogUtil() {
     }
 
     public static void i(String tag, String msg) {
-        if (IntlGameAdstrack.LemonLogMode != 0) {
+        if (IntlGame.LogMode != 0) {
             Log.i(tag, msg);
         }
     }

@@ -15,8 +15,6 @@ interface IWebPage {
 
     void close();
 
-    void sendEvent(String event, String evntData);
-
     Context getContext();
 
     WebSession getHostWebSession();

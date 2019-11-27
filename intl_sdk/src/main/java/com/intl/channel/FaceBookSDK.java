@@ -12,9 +12,9 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
-import com.intl.GFLoginActivity;
 import com.intl.entity.IntlDefine;
 import com.intl.IntlGame;
 
@@ -56,6 +56,7 @@ public class FaceBookSDK {
             public void onCancel() {
 
                 //取消登录
+                IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_CANCEL,"");
 
             }
 
@@ -63,13 +64,19 @@ public class FaceBookSDK {
             public void onError(FacebookException error) {
 
                 //登录错误
+                IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,error.getMessage());
             }
         });
 
-        permissions = Arrays
-                .asList("email", "user_likes", "user_status", "user_photos", "user_birthday", "public_profile", "user_friends");
-        getLoginManager().logInWithReadPermissions(
-                activity, permissions);
+        //判断当前token，如果不为空，则已经获取过权限，否则读取权限走registerCallback回调
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        Profile profile = Profile.getCurrentProfile();
+        if (accessToken == null || accessToken.isExpired() || profile == null) {
+            LoginManager.getInstance().logInWithReadPermissions(activity, Arrays.asList("public_profile, email, user_birthday, user_friends"));
+        } else {
+            getLoginInfo(accessToken);
+        }
+
         diss();
 
     }
@@ -94,15 +101,7 @@ public class FaceBookSDK {
             return false;
         }
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
-        if (isLoggedIn)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return accessToken != null && !accessToken.isExpired();
     }
 
     /**
@@ -151,9 +150,9 @@ public class FaceBookSDK {
             callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
+
     private static void diss()
     {
         fbprogressDialog.dismiss();
-        GFLoginActivity.dissRootView();
     }
 }

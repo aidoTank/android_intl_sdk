@@ -23,27 +23,19 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.DESKeySpec;
 
 /**
  * @Author: yujingliang
  * @Date: 2019/11/18
  */
 public class IntlGameUtil {
-    private static final String TAG = "LemonGameUtil";
+    private static final String TAG = "IntlGameUtil";
     public static boolean ENABLE_LOG = true;
 
     public static void getLocalGoogleAdID(final Context context, final IGgetLocalGoogleAdIdListener iGgetLocalGoogleAdIdListener){
@@ -139,8 +131,8 @@ public class IntlGameUtil {
                     }
                 }
             }
-        } catch (SocketException var5) {
-            Log.e("WifiPreference IpAddress", var5.toString());
+        } catch (SocketException e) {
+            Log.e("WifiPreference IpAddress", e.toString());
         }
 
         return null;
@@ -149,8 +141,7 @@ public class IntlGameUtil {
 
     public static JSONObject parseJson(String jsonstring) throws JSONException {
         JSONTokener jsonParser = new JSONTokener(jsonstring);
-        JSONObject jsonObject = (JSONObject)jsonParser.nextValue();
-        return jsonObject;
+        return (JSONObject)jsonParser.nextValue();
     }
 
     public static void logd(String tag, String msg) {
@@ -160,27 +151,6 @@ public class IntlGameUtil {
 
     }
 
-    public static byte[] desEncrypt(byte[] plainText, String KEY) throws Exception {
-        SecureRandom sr = new SecureRandom();
-        DESKeySpec dks = new DESKeySpec(KEY.getBytes());
-        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
-        SecretKey key = keyFactory.generateSecret(dks);
-        Cipher cipher = Cipher.getInstance("DES");
-        cipher.init(1, key, sr);
-        byte[] encryptedData = cipher.doFinal(plainText);
-        return encryptedData;
-    }
-
-    public static byte[] desDecrypt(byte[] encryptText, String KEY) throws Exception {
-        SecureRandom sr = new SecureRandom();
-        DESKeySpec dks = new DESKeySpec(KEY.getBytes());
-        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
-        SecretKey key = keyFactory.generateSecret(dks);
-        Cipher cipher = Cipher.getInstance("DES");
-        cipher.init(2, key, sr);
-        byte[] decryptedData = cipher.doFinal(encryptText);
-        return decryptedData;
-    }
 
     public static String objectToJson(Object object) {
         StringBuilder json = new StringBuilder();
@@ -197,10 +167,8 @@ public class IntlGameUtil {
         StringBuilder json = new StringBuilder();
         json.append("{");
         if (list != null && list.size() > 0) {
-            Iterator var3 = list.iterator();
 
-            while(var3.hasNext()) {
-                Object obj = var3.next();
+            for (Object obj : list) {
                 json.append(objectToJson(obj));
                 json.append(",");
             }
@@ -223,34 +191,17 @@ public class IntlGameUtil {
         return true;
     }
 
-    public static String RandomString(int length) {
-        String str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        Random random = new Random();
-        StringBuffer buf = new StringBuffer();
-
-        for(int i = 0; i < length; ++i) {
-            int num = random.nextInt(62);
-            buf.append(str.charAt(num));
-        }
-
-        return buf.toString();
-    }
-
     public static String getNowTime() {
         SimpleDateFormat fomat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date curdate = new Date(System.currentTimeMillis());
-        String str = fomat.format(curdate);
-        return str;
+        return fomat.format(curdate);
     }
 
     public static boolean isEmail(String email) {
-        String str = "^([a-zA-Z0-9_\\-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$";
+        String str = "^([a-zA-Z0-9_\\-.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(]?)$";
         Pattern p = Pattern.compile(str);
         Matcher m = p.matcher(email.trim());
         return m.matches();
     }
 
-    public interface LMgetLocalGoogleAdIdListener {
-        void onComplete(int var1, String var2);
-    }
 }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
 
+import com.intl.IntlGame;
 import com.intl.entity.IntlDefine;
 
 import java.util.Dictionary;
@@ -36,10 +37,6 @@ public class WebSession {
                     public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
                         if (sender.getWebPage() != null) {
                             sender.getWebPage().close();
-                            sender.onWebCommandResponse(IntlDefine.YC_SDK_WEB_VIEW_DOMAIN |
-                                            IntlDefine.YC_SDK_GENERAL_WEB_COMMAND_MODULE |
-                                            IntlDefine.YC_SDK_MSG,
-                                    "success", null);
                         }
                     }
                 });
@@ -63,10 +60,7 @@ public class WebSession {
                                 dialog.close();
                             }
                         }
-                        sender.onWebCommandResponse(IntlDefine.YC_SDK_WEB_VIEW_DOMAIN |
-                                        IntlDefine.YC_SDK_GENERAL_WEB_COMMAND_MODULE |
-                                        IntlDefine.YC_SDK_MSG,
-                                "success", null);
+                        IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_CANCEL,"login cancel");
                     }
                 });
 

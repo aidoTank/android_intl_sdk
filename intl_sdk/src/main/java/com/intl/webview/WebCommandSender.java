@@ -42,36 +42,6 @@ public class WebCommandSender {
         return _webPage.get().getContext().getApplicationContext();
     }
 
-    public void onWebCommandResponse(int code, String message, JSONObject resultData) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("code", code);
-            jsonObject.put("message", message);
-            if (resultData != null) {
-                Iterator<String> keys = resultData.keys();
-                while ( keys.hasNext()) {
-                    String key = keys.next();
-                    jsonObject.put(key, resultData.get(key));
-                }
-            }
-
-            String jsonString = jsonObject.toString();
-            String jsString = "OnYCCommandResponse("+ _commandIdentity +", "+ jsonString+")";
-            Log.d("WEB_PAGE", jsonString);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                if (_webView.get() != null) {
-                    _webView.get().evaluateJavascript(jsString, null);
-                }
-            } else {
-                if (_webView.get() != null) {
-                    _webView.get().loadUrl("javascript:" + jsString);
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-    }
 
     public void redirectUri(Uri uri) {
         _webView.get().loadUrl(uri.toString());
