@@ -37,9 +37,13 @@ public class SessionCache {
             }
             if(jsonObj != null)
             {
+                String channel = jsonObj.optString("channel");
+                String refresh_token = jsonObj.optString("refresh_token");
+                int refresh_token_expire = jsonObj.optInt("refresh_token_expire");
                 String openid = jsonObj.optString("openid");
                 String access_token = jsonObj.optString("access_token");
-                return new Account(openid,access_token);
+                int access_token_expire = jsonObj.optInt("access_token_expire");
+                return new Account(channel,refresh_token,refresh_token_expire,openid,access_token,access_token_expire);
             }
             return null;
 

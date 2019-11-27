@@ -4,8 +4,10 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.util.Log;
+import android.view.KeyEvent;
 
 import com.intl.IntlGame;
 import com.intl.channel.FaceBookSDK;
@@ -73,6 +75,28 @@ public class IntlGameLoginCenter {
             showLoginWebView(activity);
             return;
         }
+        if(account.getAccessTokenExpire()>System.currentTimeMillis())
+        {
+            //TODO:验证AccessToken的有效性
+        }
+        else{
+            //TODO:刷新令牌
+            //TODO：如果refreshToken无效则重新调起登录
+        }
+        _progressDialog = new ProgressDialog(activity);
+        _progressDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    return false;
+                } else  {
+                    return true;
+                }
+            }
+        });
+        _progressDialog.setCanceledOnTouchOutside(false);
+        _progressDialog.setMessage("login...");
+        _progressDialog.show();
 //        AutoLoginAPI autoLoginAPI = new AutoLoginAPI(account);
 //        autoLoginAPI.setListener(new )
 

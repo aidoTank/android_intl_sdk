@@ -19,26 +19,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.intl.entity.IntlDefine;
 import com.intl.IntlGame;
+import com.intl.usercenter.Account;
 import com.intl.usercenter.GetAccessTokeAPI;
 import com.intl.usercenter.Session;
-import com.intl.utils.IntlGameExceptionUtil;
+import com.intl.usercenter.SessionCache;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.params.HttpClientParams;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 
 /**
@@ -116,9 +102,15 @@ public class GoogleSDK {
             diss();
             // Signed in successfully, show authenticated UI.
             IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,authCode);
-            Session session = new Session("google","7453817292517158",authCode,"code");
+            Session session = new Session("google",authCode,"code");
             GetAccessTokeAPI accessTokeAPI = new GetAccessTokeAPI(session);
-            accessTokeAPI.asyncExcute();
+            accessTokeAPI.setListener(new GetAccessTokeAPI.IgetAccessToken() {
+                @Override
+                public void AfterGetAccessToken(String channel,JSONObject accountJson) {
+                    SessionCache.saveAccounts(activity,new Account(channel,accountJson));
+                }
+            });
+            accessTokeAPI.Excute();
 //
 //            final JSONObject jsonObject = new JSONObject();
 //            jsonObject.put("request_type","code");

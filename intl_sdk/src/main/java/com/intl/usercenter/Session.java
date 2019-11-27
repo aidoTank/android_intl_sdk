@@ -10,20 +10,13 @@ import org.json.JSONObject;
 public class Session {
 
     private String _channel;
-    private String _clientid;
     private String _authcode;
     private String _request_type;
-    private String _sign;
-    public Session(String channel,String clientid,String authcode,String request_type)
+    public Session(String channel,String authcode,String request_type)
     {
-        _clientid = clientid;
         _channel = channel;
         _authcode = authcode;
         _request_type = request_type;
-    }
-    public String getClientid()
-    {
-        return _clientid;
     }
     public String getChannel()
     {

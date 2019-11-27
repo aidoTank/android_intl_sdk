@@ -22,7 +22,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        IntlGame.init(MainActivity.this,"YGAaFkq3vf753xo3JeZLvX","883426973649-ik34obtorst3iug0p43jpae4q80l9usk.apps.googleusercontent.com","","http://10.0.2.2:8080/app/logincenter.html", new IntlGame.IInitListener() {
+        IntlGame.init(MainActivity.this,"YGAaFkq3vf753xo3JeZLvX","883426973649-ik34obtorst3iug0p43jpae4q80l9usk.apps.googleusercontent.com","","http://10.0.2.2:8080/app/logincenter.html", "7453817292517158",new IntlGame.IInitListener() {
             @Override
             public void onComplete(int var1, String var2) {
 

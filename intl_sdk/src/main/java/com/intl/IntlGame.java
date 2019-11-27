@@ -29,16 +29,18 @@ public class IntlGame extends Activity {
     public static int LogMode = 1;
     public static ILoginListener iLoginListener;
     public static ILogoutListener iLogoutListener;
+    public static String GPclientid;
     public static String GooggleID = "";
     public static String GoogleClientId;
     public static String FacebookClientId;
     public static Application application;
     public static String UUID = "";
     @SuppressLint("HardwareIds")
-    public static void init(final Activity activity, String devKey, final String googleClientId,final String fbClientId, String url, IInitListener iInitListener)
+    public static void init(final Activity activity, String devKey, final String googleClientId,final String fbClientId, String url,String clientid, IInitListener iInitListener)
     {
         GoogleClientId = googleClientId;
         FacebookClientId = fbClientId;
+        GPclientid = clientid;
         UUID = Settings.Secure.getString(activity.getContentResolver(), "android_id");
         try{
             Uri uri = Uri.parse(url);
