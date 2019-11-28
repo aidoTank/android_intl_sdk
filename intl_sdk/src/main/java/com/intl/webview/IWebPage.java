@@ -9,13 +9,13 @@ import com.intl.webview.WebSession;
  */
 
 interface IWebPage {
-    void setSize(int width, int height);
+    public void setSize(int width, int height);
 
-    void setFullScreen();
+    public void setFullScreen();
 
-    void close();
+    public void close();
 
-    Context getContext();
+    public Context getContext();
 
-    WebSession getHostWebSession();
+    public WebSession getHostWebSession();
 }

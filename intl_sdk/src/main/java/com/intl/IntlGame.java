@@ -13,7 +13,9 @@ import com.appsflyer.AppsFlyerConversionListener;
 import com.appsflyer.AppsFlyerLib;
 import com.intl.channel.FaceBookSDK;
 import com.intl.channel.GoogleSDK;
-import com.intl.usercenter.IntlGameLoginCenter;
+import com.intl.entity.IntlDefine;
+import com.intl.usercenter.IntlGameCenter;
+import com.intl.usercenter.SessionCache;
 import com.intl.utils.IntlGameExceptionUtil;
 import com.intl.utils.IntlGameUtil;
 import com.intl.webview.WebSession;
@@ -27,24 +29,29 @@ import java.util.Map;
  */
 public class IntlGame extends Activity {
     public static int LogMode = 1;
-    public static ILoginListener iLoginListener;
+    public static IBindListener iBindListener;
+    public static ILoginCenterListener iLoginListener;
+    public static IPersonCenterListener iPersonCenterListener;
     public static ILogoutListener iLogoutListener;
     public static String GPclientid;
+    public static String GPsecretid;
     public static String GooggleID = "";
     public static String GoogleClientId;
     public static String FacebookClientId;
     public static Application application;
     public static String UUID = "";
+    public static String _url;
     @SuppressLint("HardwareIds")
-    public static void init(final Activity activity, String devKey, final String googleClientId,final String fbClientId, String url,String clientid, IInitListener iInitListener)
+    public static void init(final Activity activity, String devKey, final String googleClientId, final String fbClientId,  String clientid, String secretid,String url,final IInitListener iInitListener)
     {
+        _url = url;
         GoogleClientId = googleClientId;
         FacebookClientId = fbClientId;
         GPclientid = clientid;
+        GPsecretid = secretid;
         UUID = Settings.Secure.getString(activity.getContentResolver(), "android_id");
         try{
-            Uri uri = Uri.parse(url);
-            IntlGameLoginCenter.init(activity, uri,414,319);
+            IntlGameCenter.init(activity);
         }catch (Exception e){
             IntlGameExceptionUtil.handle(e);
         }
@@ -83,23 +90,33 @@ public class IntlGame extends Activity {
             @Override
             public void onComplete(int code, String ID) {
                 IntlGame.GooggleID = ID;
+                iInitListener.onComplete(IntlDefine.INIT_SUCCESS,ID);
                 Log.d("getLocalGoogleAdID", "GooggleID: "+ID);
 
             }
         });
     }
-    public static void Login(Activity activity, ILoginListener _iLoginListener)
+    public static void LoginCenter(Activity activity, ILoginCenterListener _iLoginListener)
     {
         iLoginListener = _iLoginListener;
-        IntlGameLoginCenter.getInstance().autoLogin(activity);
+        IntlGameCenter.getInstance().LoginCenter(activity,false);
     }
-    public static void LogOut()
+
+    public static void PersonCenter(Activity activity, IPersonCenterListener _iPersonCenterListener)
     {
+        iPersonCenterListener = _iPersonCenterListener;
+        IntlGameCenter.getInstance().PersonCenter(activity);
+    }
+
+
+    public static void LogOut(Activity activity)
+    {
+        SessionCache.cleanAccounts(activity);
         FaceBookSDK.logout();
         GoogleSDK.logout();
     }
     public interface IInitListener {
-        void onComplete(int var1, String var2);
+        void onComplete(int code, String msg);
     }
     public static void Afinit(Application context)
     {
@@ -123,10 +140,16 @@ public class IntlGame extends Activity {
     {
         WebSession.setDialogVisiable(false);
     }
-    public interface ILoginListener{
+    public interface ILoginCenterListener {
+        void onComplete(int code,String openid,String token);
+    }
+    public interface IPersonCenterListener{
         void onComplete(int code,String token);
     }
     public interface ILogoutListener{
         void onComplete();
+    }
+    public interface  IBindListener{
+        void onComplete(int code);
     }
 }

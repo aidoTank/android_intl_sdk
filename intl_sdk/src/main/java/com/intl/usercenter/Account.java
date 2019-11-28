@@ -38,27 +38,47 @@ public class Account {
         }
 
     }
-    String getChannel()
+    public void setOpenid(String openid)
+    {
+        _openid = openid;
+    }
+    public void setAccessToken(String accessToken)
+    {
+        _access_token = accessToken;
+    }
+    public void setAccessTokenExprie(int accessTokenExprie)
+    {
+        _access_token_expire = accessTokenExprie;
+    }
+    public void setRefreshToken(String refreshToken)
+    {
+        _refresh_token = refreshToken;
+    }
+    public void setRefreshTokenExpire(int refreshTokenExpire)
+    {
+        _refresh_token_expire = refreshTokenExpire;
+    }
+    public String getChannel()
     {
         return _channel;
     }
-    String getOpenid()
+    public String getOpenid()
     {
         return _openid;
     }
-    String getAccessToken()
+    public String getAccessToken()
     {
         return _access_token;
     }
-    String getRefreshToken()
+    public   String getRefreshToken()
     {
         return _refresh_token;
     }
-    int getRefreshTokenExpire()
+    public int getRefreshTokenExpire()
     {
         return _refresh_token_expire;
     }
-    int getAccessTokenExpire()
+    public int getAccessTokenExpire()
     {
         return _access_token_expire;
     }

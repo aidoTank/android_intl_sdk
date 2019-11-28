@@ -17,7 +17,6 @@ import java.util.Hashtable;
  */
 public class WebSession {
 
-    private static final String YC_WEB_GENERAL_COMMAND_DOMAIN = "yc.mobilesdk.web";
 
     private static WebSession _currentWebSession;
 
@@ -25,47 +24,47 @@ public class WebSession {
         super();
         _webDailog = null;//new WeakReference<IWebPage>(null);
         _webActivity = null;//new WeakReference<IWebPage>(null);
-        registClose();
-        registCloseAll();
+//        registClose();
+//        registCloseAll();
     }
-    private void registClose()
-    {
-        this.regisetCommandListener(YC_WEB_GENERAL_COMMAND_DOMAIN,
-                "close",
-                new IWebCommandListener() {
-                    @Override
-                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
-                        if (sender.getWebPage() != null) {
-                            sender.getWebPage().close();
-                        }
-                    }
-                });
-    }
-    private void registCloseAll()
-    {
-        this.regisetCommandListener(YC_WEB_GENERAL_COMMAND_DOMAIN,
-                "closeall",
-                new IWebCommandListener() {
-                    @Override
-                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
-                        if (_webActivity != null) {
-                            IWebPage webPage = _webActivity;
-                            if (webPage != null) {
-                                webPage.close();
-                            }
-                        }
-                        if (_webDailog != null) {
-                            IWebPage dialog = _webDailog;
-                            if (dialog != null) {
-                                dialog.close();
-                            }
-                        }
-                        IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_CANCEL,"login cancel");
-                    }
-                });
-
-
-    }
+//    private void registClose()
+//    {
+//        this.regisetCommandListener(YC_WEB_GENERAL_COMMAND_DOMAIN,
+//                "close",
+//                new IWebCommandListener() {
+//                    @Override
+//                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
+//                        if (sender.getWebPage() != null) {
+//                            sender.getWebPage().close();
+//                        }
+//                    }
+//                });
+//    }
+//    private void registCloseAll()
+//    {
+//        this.regisetCommandListener(YC_WEB_GENERAL_COMMAND_DOMAIN,
+//                "closeall",
+//                new IWebCommandListener() {
+//                    @Override
+//                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
+//                        if (_webActivity != null) {
+//                            IWebPage webPage = _webActivity;
+//                            if (webPage != null) {
+//                                webPage.close();
+//                            }
+//                        }
+//                        if (_webDailog != null) {
+//                            IWebPage dialog = _webDailog;
+//                            if (dialog != null) {
+//                                dialog.close();
+//                            }
+//                        }
+//                        IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_CANCEL,"login cancel");
+//                    }
+//                });
+//
+//
+//    }
     public static void setDialogVisiable(boolean visiable) {
         WebSession currentWebSession = getCurrentWebSession();
         if (null == currentWebSession) {

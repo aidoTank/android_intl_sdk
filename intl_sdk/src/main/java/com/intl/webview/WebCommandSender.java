@@ -30,7 +30,7 @@ public class WebCommandSender {
         _commandIdentity = identity;
     }
 
-    IWebPage getWebPage() {
+    public IWebPage getWebPage() {
         return _webPage.get();
     }
 

@@ -2,31 +2,29 @@ package com.intl.usercenter;
 
 import com.intl.IntlGame;
 import com.intl.httphelper.HttpThreadHelper;
-import com.intl.utils.IntlGameExceptionUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
  * @Author: yujingliang
- * @Date: 2019/11/27
+ * @Date: 2019/11/28
  */
-public class GetAccessTokeAPI {
+public class CheckAccessTokenAPI {
 
-    private IgetAccessTokenCallback igetAccessToken;
-    private Session _session;
+    private ICheckAccessTokenCallback iCheckAccessTokenCallback;
+    private Account _account;
     private HttpThreadHelper httpThreadHelper;
-
-    public GetAccessTokeAPI(final Session session)
+    public CheckAccessTokenAPI(final Account account)
     {
-        _session = session;
+        _account = account;
         JSONObject jsonObject = new JSONObject();
-        final String url = "https://agg.ycgame.com/api/auth/authorize/" + _session.getChannel() + "?client_id=" + IntlGame.GPclientid;
+        final String url = "https://agg.ycgame.com/api/auth/check/?client_id=" + IntlGame.GPclientid+"&debug=true";
         try{
-            jsonObject.put("request_type", _session.getRequestType());
-            jsonObject.put("code", _session.getAuthCode());
+            jsonObject.put("openid", _account.getOpenid());
+            jsonObject.put("access_token", _account.getAccessToken());
         } catch (JSONException e) {
-            IntlGameExceptionUtil.handle(e);
+            e.printStackTrace();
         }
         httpThreadHelper = new HttpThreadHelper(
                 jsonObject, url, new HttpThreadHelper.HttpCallback() {
@@ -37,28 +35,27 @@ public class GetAccessTokeAPI {
                     if(result.responseData.optInt("ErrorCode") == 0&& result.responseData.optString("ErrorMessage").equals("Successed"))
                     {
                         JSONObject datajson = result.responseData.optJSONObject("Data");
-                        igetAccessToken.AfterGetAccessToken(_session.getChannel(),datajson);
+                        iCheckAccessTokenCallback.AfterCheck(datajson);
                     }
                     else {
-                        igetAccessToken.AfterGetAccessToken(_session.getChannel(),null);
+                        iCheckAccessTokenCallback.AfterCheck(null);
                     }
-                }else {
-                    igetAccessToken.AfterGetAccessToken(_session.getChannel(),null);
+                }else{
+                    iCheckAccessTokenCallback.AfterCheck(null);
                 }
             }
         }
 
         );
-
     }
     public void Excute() {
         httpThreadHelper.start();
     }
-    public void setListener(IgetAccessTokenCallback _igetAccessToken)
+    public void setListener(ICheckAccessTokenCallback listener)
     {
-        igetAccessToken = _igetAccessToken;
+        iCheckAccessTokenCallback = listener;
     }
-    public interface IgetAccessTokenCallback {
-        void AfterGetAccessToken(String channel,JSONObject accountJson);
+    public interface ICheckAccessTokenCallback {
+        void AfterCheck(JSONObject jsonObject);
     }
 }

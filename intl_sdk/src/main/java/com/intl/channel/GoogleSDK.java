@@ -21,8 +21,11 @@ import com.intl.entity.IntlDefine;
 import com.intl.IntlGame;
 import com.intl.usercenter.Account;
 import com.intl.usercenter.GetAccessTokeAPI;
+import com.intl.usercenter.GuestBindAPI;
+import com.intl.usercenter.IntlGameCenter;
 import com.intl.usercenter.Session;
 import com.intl.usercenter.SessionCache;
+import com.intl.utils.IntlGameUtil;
 
 import org.json.JSONObject;
 
@@ -37,9 +40,11 @@ public class GoogleSDK {
     private static ProgressDialog googlemSpinner;
     private static final int RC_SIGN_IN = 9001;
     private static Activity activity;
+    private static Boolean _isBind = false;
 
-    public static void login(Activity _activity)
+    public static void login(Activity _activity,Boolean isBind)
     {
+        _isBind = isBind;
         googlemSpinner = new ProgressDialog(_activity);
         googlemSpinner.setMessage("Loading...");
         googlemSpinner.show();
@@ -96,71 +101,68 @@ public class GoogleSDK {
     private static void handleSignInResult(Task<GoogleSignInAccount> completedTask)
     {
         try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            final GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             String authCode = account.getServerAuthCode();
             Log.d(TAG, "handleSignInResult: authCode "+authCode+" uid=>"+account.getId()+" ExpirationTimeSecs=>"+account.getExpirationTimeSecs());
             diss();
-            // Signed in successfully, show authenticated UI.
-            IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,authCode);
+            // Signed in successfully.
             Session session = new Session("google",authCode,"code");
-            GetAccessTokeAPI accessTokeAPI = new GetAccessTokeAPI(session);
-            accessTokeAPI.setListener(new GetAccessTokeAPI.IgetAccessToken() {
-                @Override
-                public void AfterGetAccessToken(String channel,JSONObject accountJson) {
-                    SessionCache.saveAccounts(activity,new Account(channel,accountJson));
-                }
-            });
-            accessTokeAPI.Excute();
-//
-//            final JSONObject jsonObject = new JSONObject();
-//            jsonObject.put("request_type","code");
-//            jsonObject.put("code",authCode);
-//            Log.d(TAG, "postparme: "+jsonObject.toString());
-//            final HttpClient httpClient = new DefaultHttpClient();
-//            HttpParams httpParams = httpClient.getParams();
-//            HttpConnectionParams.setConnectionTimeout(httpParams, 15000);
-//            HttpConnectionParams.setSoTimeout(httpParams, 20000);
-//            HttpClientParams.setRedirecting(httpParams, false);
-//            final Thread thread=new Thread(){
-//                public void run() {
-//                    HttpPost post = new HttpPost("http://agg.ycgame.com/api/auth/authorize/google?client_id=7453817292517158");
-//                    post.setHeader("Content-Type", "application/json");
-//                    post.setHeader("Charset", "UTF-8");
-//                    StringEntity entity= null;
-//                    try {
-//                        entity = new StringEntity(jsonObject.toString(), HTTP.UTF_8);
-//                    } catch (UnsupportedEncodingException e) {
-//                        e.printStackTrace();
-//                    }
-//                    entity.setContentType("application/json");
-//                    post.setEntity(entity);
-//                    try {
-//                        HttpResponse httpResponse = httpClient.execute(post);
-//                        int statusCode = httpResponse.getStatusLine().getStatusCode();
-//                        if (statusCode == HttpStatus.SC_OK)
-//                        {
-//                            String sdkresult = EntityUtils.toString(httpResponse.getEntity());
-//                            Log.d(TAG, "sdkresult: "+sdkresult);
-//                        }
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                }
-//            };
-//            thread.start();
 
+            if(_isBind)
+            {
+                GuestBindAPI guestBindAPI = new GuestBindAPI(session);
+                guestBindAPI.setListener(new GuestBindAPI.IGuestBindCallback() {
+                    @Override
+                    public void AfterBind(int resultCode) {
+                        if(resultCode == 0)
+                        {
+                            IntlGameUtil.logd("GuestBindAPI","Bind success!");
+                            IntlGame.iPersonCenterListener.onComplete(IntlDefine.BIND_SUCCESS,SessionCache.loadAccount(IntlGameCenter.getInstance().activity).getAccessToken());
+                        }else {
+                            IntlGameUtil.logd("GuestBindAPI","Bind failed!");
+                            IntlGame.iPersonCenterListener.onComplete(IntlDefine.BIND_FAILED,SessionCache.loadAccount(IntlGameCenter.getInstance().activity).getAccessToken());
+                        }
+
+                    }
+                });
+                guestBindAPI.Excute();
+            }else {
+                final GetAccessTokeAPI accessTokeAPI = new GetAccessTokeAPI(session);
+                accessTokeAPI.setListener(new GetAccessTokeAPI.IgetAccessTokenCallback() {
+                    @Override
+                    public void AfterGetAccessToken(String channel,JSONObject accountJson) {
+                        Log.d(TAG, "accountJson: "+accountJson.toString());
+                        if(accountJson != null)
+                        {
+                            SessionCache.saveAccounts(activity,new Account(channel,accountJson));
+
+                            IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"));
+                        }else {
+                            IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"));
+                        }
+
+                    }
+                });
+                accessTokeAPI.Excute();
+            }
 
         } catch (ApiException e) {
             diss();
-            if(e.getStatusCode() == 12501){
-                IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_CANCEL,e.getMessage());
-            }else{
-                IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,e.getMessage());
+            if(_isBind)
+            {
+                if (e.getStatusCode() == 12501) {
+                    IntlGame.iPersonCenterListener.onComplete(IntlDefine.BIND_CANCEL, e.getMessage());
+                } else {
+                    IntlGame.iPersonCenterListener.onComplete(IntlDefine.BIND_FAILED, e.getMessage());
+                }
+            }else {
+                if (e.getStatusCode() == 12501) {
+                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_CANCEL,null, null);
+                } else {
+                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED, null,null);
+                }
+                Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
             }
-            // The ApiException status code indicates the detailed failure reason.
-            // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
         }
     }
 

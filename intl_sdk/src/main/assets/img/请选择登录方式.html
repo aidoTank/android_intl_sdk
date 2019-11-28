@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- saved from url=(0178)file:///D:/%E9%A1%B9%E7%9B%AE%E9%9C%80%E6%B1%82%E8%AE%BE%E8%AE%A1/QuickSDK/%E6%B8%A0%E9%81%93%E6%8E%A5%E5%85%A5/gp/%E7%99%BB%E5%BD%95%E7%95%8C%E9%9D%A2/html/login.html?t=bindacct -->
+<html lang="en" style="font-size:100px!important"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1,user-scalable=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>404页面</title>
-</head>
+    <title>请选择登录方式</title>
 <style>
     * {
         margin: 0;
@@ -14,11 +12,6 @@
         text-decoration: none;
     }
 
-    .hide {
-        display: none;
-    }
-</style>
-<style>
     html {
         font-size: 100px;
     }
@@ -120,41 +113,68 @@
         float: left;
         background-color: rgba(0, 0, 0, .1);
     }
-</style>
+</style></head>
+
 
 <body>
     <div id="box">
         <div id="logo"></div>
         <div id="close" title="关闭">
-            <a href="ycwebcommand://yc.mobilesdk.logincenter/close"></a>
+            <a href="ycwebcommand://yc.mobilesdk.web/closeall"></a>
         </div>
         <div id="refresh" title="刷新" onclick="location.reload()"></div>
         <div class="main">
-
-            <div id="other" class="acct_type">
-                <p class="title">页面未找到</p>
-                <div class="login_type" name="type_fb">
-                    <a href="ycwebcommand://yc.mobilesdk.logincenter/close">
-                        <span>点击关闭窗口</span>
-                    </a>
-                </div>
+            <p class="title">Welcome 请选择适合的登录方式</p>
+            <div class="login_type" name="type_fb">
+                <a href="ycwebcommand://yc.mobilesdk.logincenter/Facebook">
+                    <i class="login_type_icon icon_fb"></i>
+                    <span>FaceBook</span>
+                </a>
+            </div>
+            <div class="login_type" name="type_google">
+                <a href="ycwebcommand://yc.mobilesdk.logincenter/Google">
+                    <i class="login_type_icon icon_gc"></i>
+                    <span>Google</span>
+                </a>
+            </div>
+            <div class="login_type" name="type_guest">
+                <a href="ycwebcommand://yc.mobilesdk.logincenter/Guest">
+                    <i class="login_type_icon icon_guest"></i>
+                    <span>Guest</span>
+                </a>
             </div>
         </div>
-
     </div>
     <script>
-        setTimeout(function () { resetHtmlSize(); }, 240)
+        resetHtmlSize();
+        reRenderPageContent();
+        // 获取url参数
+        function getQueryString(name) { //decodeURI() 函数可对 encodeURI() 函数编码过的 URI 进行解码。
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return decodeURI(r[2]); return null;
+        }
+
         // 根据系统的字体大小 合并设置html字体大小为接近100px
         function resetHtmlSize() {
             var size = 200 - Math.ceil(parseFloat(window.getComputedStyle(document.documentElement)["font-size"])); //向上取整 这样算不会超过100px
             var html = document.getElementsByTagName('html')[0];
             if (!isNaN(size)) { html.setAttribute('style', 'font-size:' + size + 'px!important'); }
             var viewport = document.querySelector("meta[name=viewport]");
-            if (viewport) {
-                viewport.setAttribute("content", "width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1,user-scalable=no");
+            if (viewport) { 
+                viewport.setAttribute("content", "width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1,user-scalable=no"); 
             }
         }
-    </script>
-</body>
 
-</html>
+        // 根据地址参数决定游客试玩入口是否显示
+        function reRenderPageContent(){
+            var page_type = getQueryString("t");
+            if(page_type == "bindacct"){
+                $("div[name=type_guest]").hide();
+            }
+        }
+       
+    </script>
+
+
+</body></html>

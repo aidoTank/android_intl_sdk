@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,7 +48,8 @@ public class IntlGameUtil {
                     iGgetLocalGoogleAdIdListener.onComplete(0, googleAdID);
                 }catch (Exception e)
                 {
-                    iGgetLocalGoogleAdIdListener.onComplete(-1, "");
+
+                    iGgetLocalGoogleAdIdListener.onComplete(-1, UUID.randomUUID().toString());
                 }
             }
         }).start();

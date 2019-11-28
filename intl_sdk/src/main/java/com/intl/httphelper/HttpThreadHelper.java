@@ -1,5 +1,6 @@
 package com.intl.httphelper;
 
+import com.intl.usercenter.Account;
 import com.intl.utils.IntlGameExceptionUtil;
 
 import org.json.JSONException;
@@ -10,6 +11,8 @@ import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @Author: yujingliang
@@ -17,12 +20,7 @@ import java.net.URL;
  */
 public class HttpThreadHelper{
     private Thread thread;
-    public HttpThreadHelper(final JSONObject jsonObject, final String url, final HttpCallback httpCallbac)
-    {
-        init(jsonObject,url,httpCallbac);
-    }
-
-    private void init (final JSONObject jsonObject, final String url, final HttpCallback httpCallback)
+    public HttpThreadHelper(final JSONObject jsonObject, final String url, final HttpCallback httpCallback)
     {
         thread = new Thread(new Runnable() {
             @Override
@@ -58,7 +56,80 @@ public class HttpThreadHelper{
                 httpCallback.onPostExecute(result);
             }
         });
-
+    }
+    public HttpThreadHelper(final Account account,final JSONObject jsonObject, final String url, final HttpCallback httpCallback)
+    {
+        thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                HttpURLConnection connection = null;
+                HttpResult result = new HttpResult();
+                result.ex = null;
+                result.responseData = null;
+                try {
+                    byte[] postData = jsonObject.toString().getBytes();
+                    URL murl = new URL(url);
+                    connection = (HttpURLConnection) murl.openConnection();
+                    connection.setRequestMethod("POST");
+                    connection.setConnectTimeout(15000);
+                    connection.setReadTimeout(20000);
+                    connection.setInstanceFollowRedirects(false);
+                    connection.setRequestProperty("Content-Type", "application/json");
+                    connection.setRequestProperty("Charset", "UTF-8");
+                    connection.setRequestProperty("AccessToken",account.getAccessToken());
+                    connection.setRequestProperty("OpenId",account.getOpenid());
+                    connection.connect();
+                    DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
+                    dos.write(postData);
+                    dos.flush();
+                    dos.close();
+                    result.httpCode = connection.getResponseCode();
+                    result.responseData = new JSONObject(streamToString(connection.getInputStream()));
+                } catch (Exception e) {
+                    result.ex = e;
+                    IntlGameExceptionUtil.handle(e);
+                }
+                httpCallback.onPostExecute(result);
+            }
+        });
+    }
+    public HttpThreadHelper( final HashMap<String,String> headers ,final JSONObject jsonObject, final String url, final HttpCallback httpCallback)
+    {
+        thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                HttpURLConnection connection = null;
+                HttpResult result = new HttpResult();
+                result.ex = null;
+                result.responseData = null;
+                try {
+                    byte[] postData = jsonObject.toString().getBytes();
+                    URL murl = new URL(url);
+                    connection = (HttpURLConnection) murl.openConnection();
+                    connection.setRequestMethod("POST");
+                    connection.setConnectTimeout(15000);
+                    connection.setReadTimeout(20000);
+                    connection.setInstanceFollowRedirects(false);
+                    connection.setRequestProperty("Content-Type", "application/json");
+                    connection.setRequestProperty("Charset", "UTF-8");
+                    for (String key :headers.keySet())
+                    {
+                        connection.setRequestProperty(key,headers.get(key));
+                    }
+                    connection.connect();
+                    DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
+                    dos.write(postData);
+                    dos.flush();
+                    dos.close();
+                    result.httpCode = connection.getResponseCode();
+                    result.responseData = new JSONObject(streamToString(connection.getInputStream()));
+                } catch (Exception e) {
+                    result.ex = e;
+                    IntlGameExceptionUtil.handle(e);
+                }
+                httpCallback.onPostExecute(result);
+            }
+        });
     }
     public void start()
     {

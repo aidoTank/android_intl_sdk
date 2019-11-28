@@ -63,4 +63,13 @@ public class SessionCache {
             IntlGameExceptionUtil.handle(e);
         }
     }
+
+    public static void cleanAccounts(Context context)
+    {
+        SharedPreferences preference = context.getSharedPreferences(GP_SEESION_CACHE_NAME, Context.MODE_PRIVATE);
+        if(preference != null)
+        {
+            preference.edit().remove("account").apply();
+        }
+    }
 }

@@ -56,7 +56,7 @@ public class FaceBookSDK {
             public void onCancel() {
 
                 //取消登录
-                IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_CANCEL,"");
+//                IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_CANCEL,"");
 
             }
 
@@ -64,7 +64,7 @@ public class FaceBookSDK {
             public void onError(FacebookException error) {
 
                 //登录错误
-                IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,error.getMessage());
+//                IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,error.getMessage());
             }
         });
 
@@ -115,9 +115,9 @@ public class FaceBookSDK {
             @Override
             public void onCompleted(JSONObject object, GraphResponse response) {
                 if (object != null) {
-                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,accessToken.getToken());
+//                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,accessToken.getToken());
                 }else{
-                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,response.getRawResponse());
+//                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,response.getRawResponse());
                 }
             }
         });
