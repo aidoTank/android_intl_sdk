@@ -144,7 +144,7 @@ public class IntlGame extends Activity {
         void onComplete(int code,String openid,String token);
     }
     public interface IPersonCenterListener{
-        void onComplete(int code,String token);
+        void onComplete(int code);
     }
     public interface ILogoutListener{
         void onComplete();

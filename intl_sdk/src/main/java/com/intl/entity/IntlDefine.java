@@ -19,6 +19,8 @@ public class IntlDefine {
     public static final int BIND_CANCEL = 0x110;
     public static final int BIND_FAILED = 0x120;
 
+    public static final int SWITCH = 0x130;
+
 
 
 }

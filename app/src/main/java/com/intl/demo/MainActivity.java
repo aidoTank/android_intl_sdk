@@ -16,11 +16,14 @@ import com.intl.usercenter.IntlGameCenter;
 import com.ycgame.test.R;
 
 
+import org.json.JSONException;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends Activity {
     private TextView textView;
+    private TextView debugview;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +37,7 @@ public class MainActivity extends Activity {
         final int level = 0;
         setContentView(R.layout.activity_main);
         textView = findViewById(R.id.result_View);
+        debugview = findViewById(R.id.debug_View);
         Button loginbtn = findViewById(R.id.btn_login);
         Button logoutbtn = findViewById(R.id.btn_logout);
         Button bind = findViewById(R.id.btn_bind);
@@ -140,8 +144,15 @@ public class MainActivity extends Activity {
                 textView.setText(msg);
             }
         });
-
-
+    }
+    @SuppressLint("SetTextI18n")
+    private void UpdateDebugUI(final String msg){
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                debugview.setText(msg);
+            }
+        });
     }
     HashMap<String ,String> map = new HashMap<>();
     private void login()
@@ -153,8 +164,6 @@ public class MainActivity extends Activity {
                 if(code == IntlDefine.LOGIN_SUCCESS)
                 {
                     UpdateUI(token);
-                    map.put("access_token",token);
-                    map.put("openid",openid);
                 }else if(code == IntlDefine.LOGIN_CANCEL)
                 {
                     UpdateUI("LoginCenter cancel");
@@ -168,14 +177,22 @@ public class MainActivity extends Activity {
 
     public void GameLogin(Activity activity)
     {
-        GameLoginAPI gameLoginAPI = new GameLoginAPI(map);
-        gameLoginAPI.setListener(new GameLoginAPI.ILoginCallback() {
-            @Override
-            public void AfterLogin(String result) {
-                UpdateUI(result);
+        Account account= IntlGameCenter.getInstance().loadAccounts(activity);
+        if(account != null) {
+            try {
+                UpdateDebugUI(account.getJSONObj().toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        });
-        gameLoginAPI.Excute();
+            GameLoginAPI gameLoginAPI = new GameLoginAPI(account);
+            gameLoginAPI.setListener(new GameLoginAPI.ILoginCallback() {
+                @Override
+                public void AfterLogin(String result) {
+                    UpdateUI(result);
+                }
+            });
+            gameLoginAPI.Excute();
+        }
     }
 
     private void logout(Activity activity)
@@ -188,7 +205,7 @@ public class MainActivity extends Activity {
     {
         IntlGame.PersonCenter(activity, new IntlGame.IPersonCenterListener() {
             @Override
-            public void onComplete(int code, String token) {
+            public void onComplete(int code) {
                 if(code == IntlDefine.BIND_SUCCESS)
                 {
                     UpdateUI("绑定成功！");

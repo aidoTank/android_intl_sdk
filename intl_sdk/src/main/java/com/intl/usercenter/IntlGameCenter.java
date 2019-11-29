@@ -38,7 +38,7 @@ public class IntlGameCenter {
     private  int _dialogHeight;
     private WebSession _webSession;
     public Activity activity;
-    ProgressDialog _progressDialog;
+        ProgressDialog _progressDialog;
 
     public static void init(Activity activity){
 
@@ -154,7 +154,7 @@ public class IntlGameCenter {
     }
 
 
-    private Account loadAccounts(Context context) {
+    public Account loadAccounts(Context context) {
         return SessionCache.loadAccount(context);
     }
     private void setAccount(Context context, Account account) {
@@ -177,7 +177,7 @@ public class IntlGameCenter {
                     @Override
                     public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
                         WebSession.currentWebSession().forceCloseSession();
-                        IntlGame.iLoginListener.onComplete(IntlDefine.BIND_CANCEL,"login cancel",null);
+                        IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_CANCEL,"login cancel",null);
 
                     }
                 });
@@ -249,7 +249,7 @@ public class IntlGameCenter {
                     public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
                         Log.d("IntlGameLoginCenter", "handleCommand: "+command);
                         WebSession.currentWebSession().forceCloseSession();
-                        //TODO:切换账号
+                        IntlGame.iPersonCenterListener.onComplete(IntlDefine.SWITCH);
                     }
                 }
 

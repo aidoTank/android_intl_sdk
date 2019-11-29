@@ -47,9 +47,9 @@ public class WebDialog extends Dialog implements IWebPage {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(context.getApplicationContext().getResources().getIdentifier("activity_ycweb_dialog", "layout", context.getPackageName()));
         _isEnableBackKey = enableBackKey;
-        _webView = (android.webkit.WebView) this.findViewById(context.getApplicationContext().getResources().getIdentifier("web_view", "id", context.getPackageName()));//R.id.web_view);
-        _symbolView = (RelativeLayout)this.findViewById(context.getApplicationContext().getResources().getIdentifier("symbol_view", "id", context.getPackageName()));//R.id.symbol_view);
-        _containerLayout = (LinearLayout)this.findViewById(context.getApplicationContext().getResources().getIdentifier("container_layout", "id", context.getPackageName()));//R.id.symbol_view);
+        _webView =  this.findViewById(context.getApplicationContext().getResources().getIdentifier("web_view", "id", context.getPackageName()));//R.id.web_view);
+        _symbolView = this.findViewById(context.getApplicationContext().getResources().getIdentifier("symbol_view", "id", context.getPackageName()));//R.id.symbol_view);
+        _containerLayout = this.findViewById(context.getApplicationContext().getResources().getIdentifier("container_layout", "id", context.getPackageName()));//R.id.symbol_view);
 
         setSize(with, hight);
 

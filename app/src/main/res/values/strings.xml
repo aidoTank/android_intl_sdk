@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">android_intl_sdk</string>
+    <string name="app_name">demo</string>
     <string name="login_btn">login</string>
     <string name="logout_btn">logout</string>
-    <string name="bind_btn">Bind</string>
+    <string name="bind_btn">用户中心</string>
     <string name="gamelogin_btn">游戏登录</string>
 </resources>

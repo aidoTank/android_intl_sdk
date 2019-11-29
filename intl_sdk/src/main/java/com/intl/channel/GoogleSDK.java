@@ -45,14 +45,14 @@ public class GoogleSDK {
     public static void login(Activity _activity,Boolean isBind)
     {
         _isBind = isBind;
-        googlemSpinner = new ProgressDialog(_activity);
-        googlemSpinner.setMessage("Loading...");
-        googlemSpinner.show();
+//        googlemSpinner = new ProgressDialog(_activity);
+//        googlemSpinner.setMessage("Loading...");
+//        googlemSpinner.show();
         activity = _activity;
         if(IntlGame.GoogleClientId == null)
         {
             Toast.makeText(_activity, "googleClientId erre", Toast.LENGTH_SHORT).show();
-            diss();
+//            diss();
             return;
         }
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -104,7 +104,7 @@ public class GoogleSDK {
             final GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             String authCode = account.getServerAuthCode();
             Log.d(TAG, "handleSignInResult: authCode "+authCode+" uid=>"+account.getId()+" ExpirationTimeSecs=>"+account.getExpirationTimeSecs());
-            diss();
+//            diss();
             // Signed in successfully.
             Session session = new Session("google",authCode,"code");
 
@@ -117,10 +117,10 @@ public class GoogleSDK {
                         if(resultCode == 0)
                         {
                             IntlGameUtil.logd("GuestBindAPI","Bind success!");
-                            IntlGame.iPersonCenterListener.onComplete(IntlDefine.BIND_SUCCESS,SessionCache.loadAccount(IntlGameCenter.getInstance().activity).getAccessToken());
+                            IntlGame.iPersonCenterListener.onComplete(IntlDefine.BIND_SUCCESS);
                         }else {
                             IntlGameUtil.logd("GuestBindAPI","Bind failed!");
-                            IntlGame.iPersonCenterListener.onComplete(IntlDefine.BIND_FAILED,SessionCache.loadAccount(IntlGameCenter.getInstance().activity).getAccessToken());
+                            IntlGame.iPersonCenterListener.onComplete(IntlDefine.BIND_FAILED);
                         }
 
                     }
@@ -131,14 +131,13 @@ public class GoogleSDK {
                 accessTokeAPI.setListener(new GetAccessTokeAPI.IgetAccessTokenCallback() {
                     @Override
                     public void AfterGetAccessToken(String channel,JSONObject accountJson) {
-                        Log.d(TAG, "accountJson: "+accountJson.toString());
                         if(accountJson != null)
                         {
                             SessionCache.saveAccounts(activity,new Account(channel,accountJson));
 
                             IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"));
                         }else {
-                            IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"));
+                            IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,null,null);
                         }
 
                     }
@@ -147,13 +146,13 @@ public class GoogleSDK {
             }
 
         } catch (ApiException e) {
-            diss();
+//            diss();
             if(_isBind)
             {
                 if (e.getStatusCode() == 12501) {
-                    IntlGame.iPersonCenterListener.onComplete(IntlDefine.BIND_CANCEL, e.getMessage());
+                    IntlGame.iPersonCenterListener.onComplete(IntlDefine.BIND_CANCEL);
                 } else {
-                    IntlGame.iPersonCenterListener.onComplete(IntlDefine.BIND_FAILED, e.getMessage());
+                    IntlGame.iPersonCenterListener.onComplete(IntlDefine.BIND_FAILED);
                 }
             }else {
                 if (e.getStatusCode() == 12501) {
@@ -166,9 +165,9 @@ public class GoogleSDK {
         }
     }
 
-    private static void diss()
-    {
-        googlemSpinner.dismiss();
-    }
+//    private static void diss()
+//    {
+//        googlemSpinner.dismiss();
+//    }
 
 }

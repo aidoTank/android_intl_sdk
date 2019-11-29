@@ -84,7 +84,7 @@ public class Account {
     }
 
 
-    JSONObject getJSONObj() throws JSONException {
+    public JSONObject getJSONObj() throws JSONException {
         JSONObject obj = new JSONObject();
         obj.put("channel",_channel);
         obj.put("refresh_token",_refresh_token);

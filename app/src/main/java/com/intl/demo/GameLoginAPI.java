@@ -22,13 +22,13 @@ public class GameLoginAPI {
     private ILoginCallback iLoginCallback;
     private HttpThreadHelper httpThreadHelper;
 
-    public GameLoginAPI(final HashMap<String,String> account)
+    public GameLoginAPI(final Account account)
     {
         JSONObject jsonObject = new JSONObject();
         final String url = "http://pss-i.ycgame.com/member.ashx?q=3auth_n&ch=agl&did=99000736614286";
         try{
-            jsonObject.put("openid", account.get("openid"));
-            jsonObject.put("access_token", account.get("access_token"));
+            jsonObject.put("openid", account.getOpenid());
+            jsonObject.put("access_token", account.getAccessToken());
         } catch (JSONException e) {
             IntlGameExceptionUtil.handle(e);
         }
