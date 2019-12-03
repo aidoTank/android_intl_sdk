@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class IntlGameSignUtil {
 
-    public static String Sign(JSONObject jsonObject,Long tm)
+    public static String Sign(JSONObject jsonObject,String tm)
     {
         HashMap<String,Object> data = new HashMap<>();
         data.put("tm",tm);

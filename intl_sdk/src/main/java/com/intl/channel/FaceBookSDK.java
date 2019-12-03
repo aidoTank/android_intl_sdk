@@ -1,7 +1,6 @@
 package com.intl.channel;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +16,12 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.intl.entity.IntlDefine;
 import com.intl.IntlGame;
+import com.intl.usercenter.Account;
+import com.intl.usercenter.GetAccessTokeOneAPI;
+import com.intl.usercenter.GuestBindAPI;
+import com.intl.usercenter.Session;
+import com.intl.usercenter.SessionCache;
+import com.intl.utils.IntlGameUtil;
 
 import org.json.JSONObject;
 
@@ -33,15 +38,10 @@ public class FaceBookSDK {
     private static CallbackManager callbackManager;
     private static List<String> permissions;
     private static LoginManager loginManager;
-    private static ProgressDialog fbprogressDialog;
-
     /**
      * 登录
      */
-    public static void login(Activity activity) {
-        fbprogressDialog = new ProgressDialog(activity);
-        fbprogressDialog.setMessage("Loading...");
-        fbprogressDialog.show();
+    public static void login(Activity activity, final boolean isBind) {
         act = activity;
         callbackManager = CallbackManager.Factory.create();
         getLoginManager().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
@@ -49,14 +49,19 @@ public class FaceBookSDK {
             public void onSuccess(LoginResult loginResult) {
                 // login success
                 AccessToken accessToken = loginResult.getAccessToken();
-                getLoginInfo(accessToken);
+                getLoginInfo(accessToken,isBind);
             }
 
             @Override
             public void onCancel() {
 
                 //取消登录
-//                IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_CANCEL,"");
+                if(isBind)
+                {
+                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_CANCEL,null);
+                }else {
+                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_CANCEL,null, null,null);
+                }
 
             }
 
@@ -64,7 +69,12 @@ public class FaceBookSDK {
             public void onError(FacebookException error) {
 
                 //登录错误
-//                IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,error.getMessage());
+                if(isBind)
+                {
+                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,error.toString());
+                }else {
+                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED, null,null,error.toString());
+                }
             }
         });
 
@@ -72,51 +82,66 @@ public class FaceBookSDK {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         Profile profile = Profile.getCurrentProfile();
         if (accessToken == null || accessToken.isExpired() || profile == null) {
-            LoginManager.getInstance().logInWithReadPermissions(activity, Arrays.asList("public_profile, email, user_birthday, user_friends"));
+            LoginManager.getInstance().logInWithReadPermissions(activity, Arrays.asList("public_profile"));
         } else {
-            getLoginInfo(accessToken);
+            getLoginInfo(accessToken,isBind);
         }
-
-        diss();
-
     }
 
     public static void logout() {
-        if (IsLoggedIn(act))
-        {
             Log.d("FacebookSDK", "logout");
             getLoginManager().logOut();
-        }
     }
 
-    /**
-     * 是否登录成功
-     * @param activity
-     * @return
-     */
-    public static boolean IsLoggedIn(Activity activity)
-    {
-        if (activity == null)
-        {
-            return false;
-        }
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        return accessToken != null && !accessToken.isExpired();
-    }
 
     /**
      * 获取登录信息
      *
      * @param accessToken
      */
-    private static void getLoginInfo(final AccessToken accessToken) {
+    private static void getLoginInfo(final AccessToken accessToken, final boolean _isBind) {
 
         GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
             @Override
             public void onCompleted(JSONObject object, GraphResponse response) {
                 if (object != null) {
-//                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,accessToken.getToken());
-                }else{
+                    Session session = new Session("facebook",accessToken.getToken(),"code");
+                    if(_isBind)
+                    {
+                        GuestBindAPI guestBindAPI = new GuestBindAPI(session);
+                        guestBindAPI.setListener(new GuestBindAPI.IGuestBindCallback() {
+                            @Override
+                            public void AfterBind(int resultCode,String errorMsg) {
+                                if(resultCode == 0)
+                                {
+                                    IntlGameUtil.logd("GuestBindAPI","Bind success!");
+                                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_SUCCESS,errorMsg);
+                                }else {
+                                    IntlGameUtil.logd("GuestBindAPI","Bind failed!");
+                                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,errorMsg);
+                                }
+
+                            }
+                        });
+                        guestBindAPI.Excute();
+                    }else {
+                        final GetAccessTokeOneAPI accessTokeAPI = new GetAccessTokeOneAPI(session);
+                        accessTokeAPI.setListener(new GetAccessTokeOneAPI.IgetAccessTokenCallback() {
+                            @Override
+                            public void AfterGetAccessToken(String channel,JSONObject accountJson,String errorMsg) {
+                                if(accountJson != null)
+                                {
+                                    SessionCache.saveAccounts(act,new Account(channel,accountJson));
+
+                                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"),null);
+                                }else {
+                                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,null,null,errorMsg);
+                                }
+
+                            }
+                        });
+                        accessTokeAPI.Excute();
+                    }                }else{
 //                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,response.getRawResponse());
                 }
             }
@@ -150,9 +175,4 @@ public class FaceBookSDK {
             callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-
-    private static void diss()
-    {
-        fbprogressDialog.dismiss();
-    }
 }

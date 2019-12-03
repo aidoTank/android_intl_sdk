@@ -137,11 +137,11 @@ public class WebSession {
         }
     }
     public IWebCommandListener getCommand(String commandDomain, String command) {
-        Hashtable<String, WebSession.IWebCommandListener> commandTable =
+        Hashtable<String, IWebCommandListener> commandTable =
                 _regedCommandDomain.get(commandDomain);
 
         if (null != commandTable && commandTable.containsKey(command)) {
-            WebSession.IWebCommandListener listener = commandTable.get(command);
+            IWebCommandListener listener = commandTable.get(command);
             return listener;
         }
         return  null;

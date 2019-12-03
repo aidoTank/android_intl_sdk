@@ -20,9 +20,8 @@ import com.google.android.gms.tasks.Task;
 import com.intl.entity.IntlDefine;
 import com.intl.IntlGame;
 import com.intl.usercenter.Account;
-import com.intl.usercenter.GetAccessTokeAPI;
+import com.intl.usercenter.GetAccessTokeOneAPI;
 import com.intl.usercenter.GuestBindAPI;
-import com.intl.usercenter.IntlGameCenter;
 import com.intl.usercenter.Session;
 import com.intl.usercenter.SessionCache;
 import com.intl.utils.IntlGameUtil;
@@ -45,14 +44,10 @@ public class GoogleSDK {
     public static void login(Activity _activity,Boolean isBind)
     {
         _isBind = isBind;
-//        googlemSpinner = new ProgressDialog(_activity);
-//        googlemSpinner.setMessage("Loading...");
-//        googlemSpinner.show();
         activity = _activity;
         if(IntlGame.GoogleClientId == null)
         {
             Toast.makeText(_activity, "googleClientId erre", Toast.LENGTH_SHORT).show();
-//            diss();
             return;
         }
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -104,7 +99,6 @@ public class GoogleSDK {
             final GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             String authCode = account.getServerAuthCode();
             Log.d(TAG, "handleSignInResult: authCode "+authCode+" uid=>"+account.getId()+" ExpirationTimeSecs=>"+account.getExpirationTimeSecs());
-//            diss();
             // Signed in successfully.
             Session session = new Session("google",authCode,"code");
 
@@ -113,31 +107,31 @@ public class GoogleSDK {
                 GuestBindAPI guestBindAPI = new GuestBindAPI(session);
                 guestBindAPI.setListener(new GuestBindAPI.IGuestBindCallback() {
                     @Override
-                    public void AfterBind(int resultCode) {
+                    public void AfterBind(int resultCode,String errorMsg) {
                         if(resultCode == 0)
                         {
                             IntlGameUtil.logd("GuestBindAPI","Bind success!");
-                            IntlGame.iPersonCenterListener.onComplete(IntlDefine.BIND_SUCCESS);
+                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_SUCCESS,errorMsg);
                         }else {
                             IntlGameUtil.logd("GuestBindAPI","Bind failed!");
-                            IntlGame.iPersonCenterListener.onComplete(IntlDefine.BIND_FAILED);
+                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,errorMsg);
                         }
 
                     }
                 });
                 guestBindAPI.Excute();
             }else {
-                final GetAccessTokeAPI accessTokeAPI = new GetAccessTokeAPI(session);
-                accessTokeAPI.setListener(new GetAccessTokeAPI.IgetAccessTokenCallback() {
+                final GetAccessTokeOneAPI accessTokeAPI = new GetAccessTokeOneAPI(session);
+                accessTokeAPI.setListener(new GetAccessTokeOneAPI.IgetAccessTokenCallback() {
                     @Override
-                    public void AfterGetAccessToken(String channel,JSONObject accountJson) {
+                    public void AfterGetAccessToken(String channel,JSONObject accountJson,String errorMsg) {
                         if(accountJson != null)
                         {
                             SessionCache.saveAccounts(activity,new Account(channel,accountJson));
 
-                            IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"));
+                            IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"),null);
                         }else {
-                            IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,null,null);
+                            IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,null,null,errorMsg);
                         }
 
                     }
@@ -146,28 +140,22 @@ public class GoogleSDK {
             }
 
         } catch (ApiException e) {
-//            diss();
             if(_isBind)
             {
                 if (e.getStatusCode() == 12501) {
-                    IntlGame.iPersonCenterListener.onComplete(IntlDefine.BIND_CANCEL);
+                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_CANCEL,null);
                 } else {
-                    IntlGame.iPersonCenterListener.onComplete(IntlDefine.BIND_FAILED);
+                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,e.getMessage());
                 }
             }else {
                 if (e.getStatusCode() == 12501) {
-                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_CANCEL,null, null);
+                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_CANCEL,null, null,null);
                 } else {
-                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED, null,null);
+                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED, null,null,e.getMessage());
                 }
                 Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
             }
         }
     }
-
-//    private static void diss()
-//    {
-//        googlemSpinner.dismiss();
-//    }
 
 }

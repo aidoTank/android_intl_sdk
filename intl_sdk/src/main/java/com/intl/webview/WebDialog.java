@@ -64,6 +64,7 @@ public class WebDialog extends Dialog implements IWebPage {
         });
 
         _webView.getSettings().setJavaScriptEnabled(true);
+        _webView.getSettings().setDomStorageEnabled(true);
         _webView.getSettings().setSupportZoom(false);
         _webView.getSettings().setBuiltInZoomControls(false);
         _webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
@@ -84,7 +85,7 @@ public class WebDialog extends Dialog implements IWebPage {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(context.getApplicationContext().getResources().getIdentifier("activity_ycweb_dialog", "layout", context.getPackageName()));
         _isEnableBackKey = enableBackKey;
-        _webView = (android.webkit.WebView) this.findViewById(context.getApplicationContext().getResources().getIdentifier("web_view", "id", context.getPackageName()));//R.id.web_view);
+        _webView = (WebView) this.findViewById(context.getApplicationContext().getResources().getIdentifier("web_view", "id", context.getPackageName()));//R.id.web_view);
         _symbolView = (RelativeLayout)this.findViewById(context.getApplicationContext().getResources().getIdentifier("symbol_view", "id", context.getPackageName()));//R.id.symbol_view);
         _containerLayout = (LinearLayout)this.findViewById(context.getApplicationContext().getResources().getIdentifier("container_layout", "id", context.getPackageName()));//R.id.symbol_view);
 

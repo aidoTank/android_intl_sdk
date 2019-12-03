@@ -25,10 +25,12 @@ public class Guest {
         GuestLoginAPI guestLoginAPI = new GuestLoginAPI(session);
         guestLoginAPI.setListener(new GuestLoginAPI.IGuestLoginCallback() {
             @Override
-            public void AfterGuestLogin(String channel, JSONObject jsonObject) {
+            public void AfterGuestLogin(String channel, JSONObject jsonObject,String errorMsg) {
                 if(jsonObject != null){
                     SessionCache.saveAccounts(activity,new Account(channel,jsonObject));
-                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"));
+                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
+                }else {
+                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,null,null,errorMsg);
                 }
             }
         });

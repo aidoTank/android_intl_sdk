@@ -38,13 +38,16 @@ public class IntlGame extends Activity {
     public static String GooggleID = "";
     public static String GoogleClientId;
     public static String FacebookClientId;
+    public static String fbsecret = "10050c859a7f6e918f8ce0412d00370b";
     public static Application application;
     public static String UUID = "";
-    public static String _url;
+    public static String _urlHost;
+    public static String AppId_fb;
+    public static String callbackurl_fb;
     @SuppressLint("HardwareIds")
     public static void init(final Activity activity, String devKey, final String googleClientId, final String fbClientId,  String clientid, String secretid,String url,final IInitListener iInitListener)
     {
-        _url = url;
+        _urlHost = url;
         GoogleClientId = googleClientId;
         FacebookClientId = fbClientId;
         GPclientid = clientid;
@@ -107,12 +110,15 @@ public class IntlGame extends Activity {
         iPersonCenterListener = _iPersonCenterListener;
         IntlGameCenter.getInstance().PersonCenter(activity);
     }
-
+    public static boolean isLogin(Activity activity)
+    {
+        return SessionCache.loadAccount(activity) != null;
+    }
 
     public static void LogOut(Activity activity)
     {
         SessionCache.cleanAccounts(activity);
-        FaceBookSDK.logout();
+        //FaceBookSDK.logout();
         GoogleSDK.logout();
     }
     public interface IInitListener {
@@ -141,10 +147,10 @@ public class IntlGame extends Activity {
         WebSession.setDialogVisiable(false);
     }
     public interface ILoginCenterListener {
-        void onComplete(int code,String openid,String token);
+        void onComplete(int code, String openid, String token, String errorMsg);
     }
     public interface IPersonCenterListener{
-        void onComplete(int code);
+        void onComplete(String type, int code, String errorMsg);
     }
     public interface ILogoutListener{
         void onComplete();

@@ -30,20 +30,30 @@ public class HttpThreadHelper{
                 result.ex = null;
                 result.responseData = null;
                 try {
-                    byte[] postData = jsonObject.toString().getBytes();
+                    byte[] postData = null;
+                    String method = "GET";
+                    if(jsonObject != null)
+                    {
+                        method = "POST";
+                        postData  = jsonObject.toString().getBytes();
+                    }
                     URL murl = new URL(url);
                     connection = (HttpURLConnection) murl.openConnection();
-                    connection.setRequestMethod("POST");
+                    connection.setRequestMethod(method);
                     connection.setConnectTimeout(15000);
                     connection.setReadTimeout(20000);
                     connection.setInstanceFollowRedirects(false);
                     connection.setRequestProperty("Content-Type", "application/json");
                     connection.setRequestProperty("Charset", "UTF-8");
                     connection.connect();
-                    DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
-                    dos.write(postData);
-                    dos.flush();
-                    dos.close();
+                    if(postData != null)
+                    {
+                        DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
+                        dos.write(postData);
+                        dos.flush();
+                        dos.close();
+                    }
+
                     int responseCode = connection.getResponseCode();
                     result.httpCode = responseCode;
                     if (HttpURLConnection.HTTP_OK == responseCode) {

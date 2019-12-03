@@ -23,14 +23,16 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import java.text.ParseException;
 /**
  * @Author: yujingliang
  * @Date: 2019/11/18
@@ -38,7 +40,7 @@ import java.util.regex.Pattern;
 public class IntlGameUtil {
     private static final String TAG = "IntlGameUtil";
     public static boolean ENABLE_LOG = true;
-
+    private static DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm") ;
     public static void getLocalGoogleAdID(final Context context, final IGgetLocalGoogleAdIdListener iGgetLocalGoogleAdIdListener){
         (new Thread(){
             public void run(){
@@ -59,7 +61,25 @@ public class IntlGameUtil {
         return androidID;
     }
     public interface IGgetLocalGoogleAdIdListener{
-        void onComplete(int code,String ID);
+        void onComplete(int code, String ID);
+    }
+
+    /**
+     * 得到UTC时间，类型为字符串，格式为"yyyy-MM-dd HH:mm"<br />
+     * 如果获取失败，返回null
+     * @return
+     */
+    public static String getUTCTimeStr() {
+        //StringBuffer UTCTimeBuffer = new StringBuffer();
+        // 1、取得本地时间：
+        Calendar cal = Calendar.getInstance() ;
+        // 2、取得时间偏移量：
+        int zoneOffset = cal.get(java.util.Calendar.ZONE_OFFSET);
+        // 3、取得夏令时差：
+        int dstOffset = cal.get(java.util.Calendar.DST_OFFSET);
+        // 4、从本地时间里扣除这些差量，即可以取得UTC时间：
+        cal.add(java.util.Calendar.MILLISECOND, -(zoneOffset + dstOffset));
+        return String.valueOf(cal.getTime().getTime()/1000);
     }
 
     public static String md5(String source) {

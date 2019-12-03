@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.intl.IntlGame;
 import com.intl.entity.IntlDefine;
@@ -28,7 +27,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        IntlGame.init(MainActivity.this,"YGAaFkq3vf753xo3JeZLvX","883426973649-ik34obtorst3iug0p43jpae4q80l9usk.apps.googleusercontent.com","","7453817292517158","EVWHPXxGEOXzbjfWxhUp4yOYgTMSJDNA","http://agg.ycgame.com/index.html", new IntlGame.IInitListener() {
+        IntlGame.init(MainActivity.this,"YGAaFkq3vf753xo3JeZLvX","883426973649-ik34obtorst3iug0p43jpae4q80l9usk.apps.googleusercontent.com","754170961660851","7453817292517158","EVWHPXxGEOXzbjfWxhUp4yOYgTMSJDNA","https://gather-auth.ycgame.com", new IntlGame.IInitListener() {
             @Override
             public void onComplete(int var1, String var2) {
 
@@ -71,7 +70,7 @@ public class MainActivity extends Activity {
         bind.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bind(MainActivity.this);
+                PersonCenter(MainActivity.this);
             }
         });
         gameLogin.setOnClickListener(new View.OnClickListener() {
@@ -160,7 +159,7 @@ public class MainActivity extends Activity {
         IntlGame.LoginCenter(MainActivity.this,new IntlGame.ILoginCenterListener(){
 
             @Override
-            public void onComplete(int code,String openid,String token) {
+            public void onComplete(int code,String openid,String token,String msg) {
                 if(code == IntlDefine.LOGIN_SUCCESS)
                 {
                     UpdateUI(token);
@@ -168,7 +167,7 @@ public class MainActivity extends Activity {
                 {
                     UpdateUI("LoginCenter cancel");
                 }else {
-                    UpdateUI("LoginCenter failed: errorMsg==>"+token);
+                    UpdateUI("LoginCenter failed: errorMsg==>"+msg);
                 }
 
             }
@@ -197,23 +196,33 @@ public class MainActivity extends Activity {
 
     private void logout(Activity activity)
     {
+        UpdateDebugUI("");
         IntlGame.LogOut(activity );
         initResultView();
     }
 
-    private void bind(final Activity activity)
+    private void PersonCenter(final Activity activity)
     {
         IntlGame.PersonCenter(activity, new IntlGame.IPersonCenterListener() {
             @Override
-            public void onComplete(int code) {
-                if(code == IntlDefine.BIND_SUCCESS)
+            public void onComplete(String type, int code, String errorMsg) {
+                String msg = null;
+                switch (code)
                 {
-                    UpdateUI("绑定成功！");
-                }else if(code ==IntlDefine.BIND_FAILED ) {
-                    UpdateUI("绑定失败！");
-                }else {
-                    UpdateUI("绑定取消！");
+                    case IntlDefine.BIND_SUCCESS:
+                        msg = "绑定成功！";
+                        break;
+                    case IntlDefine.BIND_FAILED:
+                        msg = "绑定失败！";
+                        break;
+                    case IntlDefine.BIND_CANCEL:
+                        msg = "绑定取消！";
+                        break;
+                    case IntlDefine.SWITCH:
+                        msg = "点击了切换账号！";
+                        break;
                 }
+                UpdateUI(msg);
             }
         });
     }

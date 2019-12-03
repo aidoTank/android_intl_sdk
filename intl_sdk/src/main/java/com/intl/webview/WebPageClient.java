@@ -1,11 +1,10 @@
 package com.intl.webview;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
-import android.view.KeyEvent;
+
+import com.intl.utils.IntlGameLoading;
 
 import java.lang.ref.WeakReference;
 import java.util.Hashtable;
@@ -24,9 +23,9 @@ class WebPageClient extends android.webkit.WebViewClient {
 
     WebPageClient(IWebPage ycWebPage) {
         _webBase = new WeakReference<>(ycWebPage);
-        _progressDialog = new ProgressDialog(_webBase.get().getContext());
-        _progressDialog.setCanceledOnTouchOutside(false);
-        _progressDialog.setMessage("Loading...");
+//        _progressDialog = new ProgressDialog(_webBase.get().getContext());
+//        _progressDialog.setCanceledOnTouchOutside(false);
+//        _progressDialog.setMessage("Loading...");
     }
 
     @Deprecated
@@ -64,27 +63,30 @@ class WebPageClient extends android.webkit.WebViewClient {
 
     @Override
     public void onPageStarted(final android.webkit.WebView view, String url, Bitmap favicon) {
-        _progressDialog.show();
-        _progressDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
-            @Override
-            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                return keyCode != KeyEvent.KEYCODE_BACK;
-            }
-        });
-        _progressDialog.setCanceledOnTouchOutside(false);
+//        _progressDialog.show();
+//        _progressDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+//            @Override
+//            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+//                return keyCode != KeyEvent.KEYCODE_BACK;
+//            }
+//        });
+//        _progressDialog.setCanceledOnTouchOutside(false);
+        IntlGameLoading.getInstance().show(_webBase.get().getContext());
     }
 
 
     @Override
     public void onPageFinished(android.webkit.WebView view, String url) {
-        _progressDialog.dismiss();
+//        _progressDialog.dismiss();
+        IntlGameLoading.getInstance().hide();
     }
 
     @Override
     public void onReceivedError(android.webkit.WebView view, int errorCode,
                                 String description, String failingUrl) {
         // 出错
-        _progressDialog.dismiss();
+//        _progressDialog.dismiss();
+        IntlGameLoading.getInstance().hide();
 
         WebCommandSender sender = new WebCommandSender(_webBase.get(), view, null);
 
