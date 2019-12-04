@@ -8,7 +8,6 @@ import android.util.Log;
 
 import com.intl.IntlGame;
 import com.intl.channel.FaceBookSDK;
-import com.intl.channel.FaceBookWeb;
 import com.intl.channel.GoogleSDK;
 import com.intl.channel.Guest;
 import com.intl.entity.IntlDefine;
@@ -43,10 +42,6 @@ public class IntlGameCenter {
 
         return _instance;
     }
-    private IntlGameCenter()
-    {
-
-    }
     private IntlGameCenter(Activity activity)
     {
         this.activity = activity;
@@ -57,7 +52,7 @@ public class IntlGameCenter {
         _webSession.showDialog(activity,
                 414,
                 319,
-                Uri.parse(IntlGame._urlHost+"/index.html"), false);
+                Uri.parse(IntlGame.urlHost +"/index.html"), false);
 
     }
 
@@ -65,9 +60,9 @@ public class IntlGameCenter {
     {
         Account act = loadAccounts(activity);
         if(act !=null)
-        _webSession.showDialog(activity,414,319,Uri.parse(IntlGame._urlHost+"/usercenter.html?openid="+act.getOpenid()+"&access_token="+act.getAccessToken()),false);
+        _webSession.showDialog(activity,414,319,Uri.parse(IntlGame.urlHost +"/usercenter.html?openid="+act.getOpenid()+"&access_token="+act.getAccessToken()),false);
     }
-    public void LoginCenter(final Activity activity, final Boolean isBindApi)
+    public void LoginCenter(final Activity activity)
     {
         if (_progressDialog != null && _progressDialog.isShowing()) {
             return;
@@ -79,11 +74,11 @@ public class IntlGameCenter {
         }
         final Account account = loadAccounts(activity.getApplicationContext());
         if (account == null) {
-            showLoginWebView(activity,IntlGame._urlHost+"/index.html");
+            showLoginWebView(activity,IntlGame.urlHost +"/index.html");
             return;
         }
-//        if(account.getAccessTokenExpire()>(System.currentTimeMillis()/1000))
-        if(false)
+        if(account.getAccessTokenExpire()>IntlGameUtil.getUTCTimeStr())
+//        if(false)
         {
             IntlGameUtil.logd("IntlGame","AccessTokenExpire =>"+account.getAccessTokenExpire()+" currentTime=>"+System.currentTimeMillis()/1000);
             CheckAccessTokenAPI checkAPI = new CheckAccessTokenAPI(account);
@@ -118,14 +113,20 @@ public class IntlGameCenter {
                         account.setRefreshToken(jsonObject.optString("refresh_token"));
                         account.setRefreshTokenExpire(jsonObject.optInt("refresh_token_expire"));
                         setAccount(activity,account);
-                        IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
+                        if(IntlGame.iLoginListener != null)
+                        {
+                            IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
+                        }
                         try {
                             IntlGameUtil.logd("IntlGameLoginCenter","Refresh Account=>"+account.getJSONObj().toString());
                         } catch (JSONException e) {
                             IntlGameExceptionUtil.handle(e);
                         }
                     }else {
-                        IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,null,null,errorMsg);
+                        if(IntlGame.iLoginListener != null)
+                        {
+                            IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,null,null,errorMsg);
+                        }
                     }
 
                 }
@@ -150,7 +151,10 @@ public class IntlGameCenter {
                     @Override
                     public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
                         WebSession.currentWebSession().forceCloseSession();
-
+                        if(IntlGame.iPersonCenterListener != null)
+                        {
+                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_CANCEL,null);
+                        }
                     }
                 });
         _webSession.regisetCommandListener(LOGIN_CENTER_WEB_COMMAND_DOMAIN,
@@ -159,7 +163,10 @@ public class IntlGameCenter {
                     @Override
                     public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
                         WebSession.currentWebSession().forceCloseSession();
-                        IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_CANCEL,"login cancel",null,null);
+                        if(IntlGame.iLoginListener != null)
+                        {
+                            IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_CANCEL,"login cancel",null,null);
+                        }
 
                     }
                 });
@@ -233,7 +240,9 @@ public class IntlGameCenter {
                     public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
                         Log.d("IntlGameLoginCenter", "handleCommand: "+command);
                         WebSession.currentWebSession().forceCloseSession();
-                        IntlGame.iPersonCenterListener.onComplete("switchroles",IntlDefine.SWITCH,null);
+                        if(IntlGame.iPersonCenterListener !=null){
+                            IntlGame.iPersonCenterListener.onComplete("switchroles",IntlDefine.SWITCH,null);
+                        }
                     }
                 }
 
@@ -248,6 +257,7 @@ public class IntlGameCenter {
 
             @Override
             public void onWebSessionClosed() {
+                IntlGameUtil.logd("IntlGameCenter","onWebSessionClosed");
             }
         });
 

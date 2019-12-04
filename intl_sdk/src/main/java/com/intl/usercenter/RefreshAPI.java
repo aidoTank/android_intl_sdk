@@ -25,11 +25,11 @@ public class RefreshAPI {
         _account = account;
         JSONObject jsonObject = new JSONObject();
         HashMap<String,String> headers = new HashMap<>();
-        final String url = IntlGame._urlHost+"/api/auth/refresh/?client_id=" + IntlGame.GPclientid;
+        final String url = IntlGame.urlHost +"/api/auth/refresh/?client_id=" + IntlGame.GPclientid;
         try{
             jsonObject.put("openid", account.getOpenid());
             jsonObject.put("refresh_token", account.getRefreshToken());
-            String Timestamp = IntlGameUtil.getUTCTimeStr();
+            long Timestamp = IntlGameUtil.getUTCTimeStr();
             String signstr = IntlGameSignUtil.Sign(jsonObject,Timestamp);
             headers.put("Authorization",signstr);
             headers.put("Timestamp", String.valueOf(Timestamp));

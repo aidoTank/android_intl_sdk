@@ -9,19 +9,23 @@ import org.json.JSONObject;
 
 /**
  * @Author: yujingliang
- * @Date: 2019/11/28
+ * @Date: 2019/12/4
  */
-public class GuestBindAPI {
+public class GuestBindTwoAPI {
     private IGuestBindCallback iGuestBindCallback;
     private Session _session;
     private HttpThreadHelper httpThreadHelper;
-    public GuestBindAPI(Session session){
+    public GuestBindTwoAPI(Session session){
         _session = session;
         JSONObject jsonObject = new JSONObject();
-        final String url = IntlGame._urlHost+"/api/sources/guestbind/" + _session.getChannel() + "?client_id=" + IntlGame.GPclientid;
+        final String url = IntlGame.urlHost +"/api/sources/guestbind/" + _session.getChannel() + "?client_id=" + IntlGame.GPclientid;
         try{
             jsonObject.put("request_type", _session.getRequestType());
-            jsonObject.put("code", _session.getAuthCode());
+            jsonObject.put("account_id", _session.get_account_id());
+            jsonObject.put("access_token", _session.get_access_token());
+            jsonObject.put("access_token_expire", _session.get_access_token_expire());
+            jsonObject.put("refresh_token", _session.get_refresh_token());
+            jsonObject.put("refresh_token_expire", _session.get_refresh_token_expire());
         } catch (JSONException e) {
             e.printStackTrace();
         }

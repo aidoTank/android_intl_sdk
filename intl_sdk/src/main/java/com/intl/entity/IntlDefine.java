@@ -14,6 +14,10 @@ public class IntlDefine {
     public static final int LOGIN_CANCEL = 0x80;
     public static final int LOGIN_FAILED = 0x90;
 
+    public static final int LOGOUT_SUCCESS = 0x130;
+    public static final int LOGOUT_FAILED = 0x140;
+
+
 
     public static final int BIND_SUCCESS = 0x100;
     public static final int BIND_CANCEL = 0x110;

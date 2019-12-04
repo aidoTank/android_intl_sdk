@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -17,6 +16,7 @@ import com.intl.entity.IntlDefine;
 import com.intl.usercenter.IntlGameCenter;
 import com.intl.usercenter.SessionCache;
 import com.intl.utils.IntlGameExceptionUtil;
+import com.intl.utils.IntlGameLoading;
 import com.intl.utils.IntlGameUtil;
 import com.intl.webview.WebSession;
 
@@ -29,7 +29,6 @@ import java.util.Map;
  */
 public class IntlGame extends Activity {
     public static int LogMode = 1;
-    public static IBindListener iBindListener;
     public static ILoginCenterListener iLoginListener;
     public static IPersonCenterListener iPersonCenterListener;
     public static ILogoutListener iLogoutListener;
@@ -38,20 +37,16 @@ public class IntlGame extends Activity {
     public static String GooggleID = "";
     public static String GoogleClientId;
     public static String FacebookClientId;
-    public static String fbsecret = "10050c859a7f6e918f8ce0412d00370b";
     public static Application application;
     public static String UUID = "";
-    public static String _urlHost;
-    public static String AppId_fb;
-    public static String callbackurl_fb;
+    public static String urlHost = "https://gather-auth.ycgame.com";
     @SuppressLint("HardwareIds")
-    public static void init(final Activity activity, String devKey, final String googleClientId, final String fbClientId,  String clientid, String secretid,String url,final IInitListener iInitListener)
+    public static void init(final Activity activity, String devKey, final String google_clientid, final String facebook_clientid,  String gp_clientid, String gp_secret,final IInitListener iInitListener)
     {
-        _urlHost = url;
-        GoogleClientId = googleClientId;
-        FacebookClientId = fbClientId;
-        GPclientid = clientid;
-        GPsecretid = secretid;
+        GoogleClientId = google_clientid;
+        FacebookClientId = facebook_clientid;
+        GPclientid = gp_clientid;
+        GPsecretid = gp_secret;
         UUID = Settings.Secure.getString(activity.getContentResolver(), "android_id");
         try{
             IntlGameCenter.init(activity);
@@ -102,7 +97,7 @@ public class IntlGame extends Activity {
     public static void LoginCenter(Activity activity, ILoginCenterListener _iLoginListener)
     {
         iLoginListener = _iLoginListener;
-        IntlGameCenter.getInstance().LoginCenter(activity,false);
+        IntlGameCenter.getInstance().LoginCenter(activity);
     }
 
     public static void PersonCenter(Activity activity, IPersonCenterListener _iPersonCenterListener)
@@ -115,15 +110,14 @@ public class IntlGame extends Activity {
         return SessionCache.loadAccount(activity) != null;
     }
 
-    public static void LogOut(Activity activity)
+    public static void LogOut(Activity activity,ILogoutListener _iLogoutListener)
     {
+        iLogoutListener = _iLogoutListener;
         SessionCache.cleanAccounts(activity);
-        //FaceBookSDK.logout();
+        FaceBookSDK.logout();
         GoogleSDK.logout();
     }
-    public interface IInitListener {
-        void onComplete(int code, String msg);
-    }
+
     public static void Afinit(Application context)
     {
         application = context;
@@ -146,6 +140,14 @@ public class IntlGame extends Activity {
     {
         WebSession.setDialogVisiable(false);
     }
+    public static void IntlonDestory()
+    {
+        IntlGameLoading.getInstance().destory();
+    }
+
+    public interface IInitListener {
+        void onComplete(int code, String msg);
+    }
     public interface ILoginCenterListener {
         void onComplete(int code, String openid, String token, String errorMsg);
     }
@@ -153,9 +155,6 @@ public class IntlGame extends Activity {
         void onComplete(String type, int code, String errorMsg);
     }
     public interface ILogoutListener{
-        void onComplete();
-    }
-    public interface  IBindListener{
         void onComplete(int code);
     }
 }

@@ -69,28 +69,20 @@ public class WebSession {
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                _webDailog = null;
-                if (null == _webDailog && null == _webActivity) {
-                    setCurrentWebSession(null);
-                    if (null != _webSessionListener) {
-                        _webSessionListener.onWebSessionClosed();
-                    }
-                }
             }
         });
         dialog.show();
     }
 
     public void forceCloseSession() {
-        if (_webActivity != null) {
-            IWebPage webPage = _webActivity;
-            if (webPage != null) {
-                webPage.close();
-            }
-        }
         if (_webDailog != null) {
             IWebPage dialog = _webDailog;
             if (dialog != null) {
+                _webDailog = null;
+                setCurrentWebSession(null);
+                if (null != _webSessionListener) {
+                    _webSessionListener.onWebSessionClosed();
+                }
                 dialog.close();
             }
         }

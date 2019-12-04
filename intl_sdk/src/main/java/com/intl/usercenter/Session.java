@@ -14,15 +14,21 @@ public class Session {
     private String _request_type;
     private String _account_id;
     private String _access_token;
-    private int _access_token_expire;
+    private long _access_token_expire;
     private String _refresh_token;
-    private int _refresh_token_expire;
+    private long _refresh_token_expire;
 
     public Session(String channel,String authcode,String request_type)
     {
         _channel = channel;
         _authcode = authcode;
         _request_type = request_type;
+    }
+    public Session(String channel,String access_token)
+    {
+        _channel = channel;
+        _access_token = access_token;
+        _request_type = "token";
     }
     public Session()
     {}
@@ -46,7 +52,7 @@ public class Session {
     {
         return _access_token;
     }
-    public int get_access_token_expire()
+    public long get_access_token_expire()
     {
         return _access_token_expire;
     }
@@ -54,7 +60,7 @@ public class Session {
     {
         return _refresh_token;
     }
-    public int get_refresh_token_expire()
+    public long get_refresh_token_expire()
     {
         return _refresh_token_expire;
     }
@@ -75,7 +81,7 @@ public class Session {
     {
          _access_token = access_token;
     }
-    public void set_access_token_expire(int access_token_expire)
+    public void set_access_token_expire(long access_token_expire)
     {
          _access_token_expire = access_token_expire;
     }

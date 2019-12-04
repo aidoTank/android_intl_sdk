@@ -21,9 +21,10 @@ import com.intl.entity.IntlDefine;
 import com.intl.IntlGame;
 import com.intl.usercenter.Account;
 import com.intl.usercenter.GetAccessTokeOneAPI;
-import com.intl.usercenter.GuestBindAPI;
+import com.intl.usercenter.GuestBindOneAPI;
 import com.intl.usercenter.Session;
 import com.intl.usercenter.SessionCache;
+import com.intl.utils.IntlGameLoading;
 import com.intl.utils.IntlGameUtil;
 
 import org.json.JSONObject;
@@ -59,6 +60,7 @@ public class GoogleSDK {
         mGoogleSignInClient = GoogleSignIn.getClient(_activity, gso);
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         _activity.startActivityForResult(signInIntent, RC_SIGN_IN);
+        IntlGameLoading.getInstance().show(_activity);
     }
     public static void logout()
     {
@@ -76,8 +78,11 @@ public class GoogleSDK {
                             if(task.isSuccessful())
                             {
                                 Log.d(TAG, "Google logout: success");
+                                IntlGame.iLogoutListener.onComplete(IntlDefine.LOGOUT_SUCCESS);
                             }else{
                                 Log.d(TAG, "Google logout: failed");
+                                IntlGame.iLogoutListener.onComplete(IntlDefine.LOGOUT_FAILED);
+
                             }
                         }
                     });
@@ -86,6 +91,7 @@ public class GoogleSDK {
     public static void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         if (requestCode == RC_SIGN_IN&&mGoogleSignInClient !=null) {
+            IntlGameLoading.getInstance().hide();
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
         }
@@ -104,8 +110,8 @@ public class GoogleSDK {
 
             if(_isBind)
             {
-                GuestBindAPI guestBindAPI = new GuestBindAPI(session);
-                guestBindAPI.setListener(new GuestBindAPI.IGuestBindCallback() {
+                GuestBindOneAPI guestBindAPI = new GuestBindOneAPI(session);
+                guestBindAPI.setListener(new GuestBindOneAPI.IGuestBindCallback() {
                     @Override
                     public void AfterBind(int resultCode,String errorMsg) {
                         if(resultCode == 0)

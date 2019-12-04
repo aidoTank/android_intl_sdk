@@ -19,7 +19,7 @@ public class GuestLoginAPI {
     {
         _session = session;
         JSONObject jsonObject = new JSONObject();
-        final String url = IntlGame._urlHost+"/api/auth/authorize/?client_id=" + IntlGame.GPclientid;
+        final String url = IntlGame.urlHost +"/api/auth/authorize/?client_id=" + IntlGame.GPclientid;
         try{
             jsonObject.put("request_type", _session.getRequestType());
             jsonObject.put("unique_id", _session.getAuthCode());

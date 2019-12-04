@@ -17,10 +17,12 @@ import com.facebook.login.LoginResult;
 import com.intl.entity.IntlDefine;
 import com.intl.IntlGame;
 import com.intl.usercenter.Account;
-import com.intl.usercenter.GetAccessTokeOneAPI;
-import com.intl.usercenter.GuestBindAPI;
+import com.intl.usercenter.GetAccessTokeTwoAPI;
+import com.intl.usercenter.GuestBindOneAPI;
+import com.intl.usercenter.GuestBindTwoAPI;
 import com.intl.usercenter.Session;
 import com.intl.usercenter.SessionCache;
+import com.intl.utils.IntlGameLoading;
 import com.intl.utils.IntlGameUtil;
 
 import org.json.JSONObject;
@@ -36,13 +38,13 @@ public class FaceBookSDK {
 
     private static Activity act;
     private static CallbackManager callbackManager;
-    private static List<String> permissions;
     private static LoginManager loginManager;
     /**
      * 登录
      */
     public static void login(Activity activity, final boolean isBind) {
         act = activity;
+        IntlGameLoading.getInstance().show(activity);
         callbackManager = CallbackManager.Factory.create();
         getLoginManager().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
@@ -77,7 +79,7 @@ public class FaceBookSDK {
                 }
             }
         });
-
+        IntlGameLoading.getInstance().hide();
         //判断当前token，如果不为空，则已经获取过权限，否则读取权限走registerCallback回调
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         Profile profile = Profile.getCurrentProfile();
@@ -89,8 +91,11 @@ public class FaceBookSDK {
     }
 
     public static void logout() {
+        if (IsLoggedIn(act))
+        {
             Log.d("FacebookSDK", "logout");
             getLoginManager().logOut();
+        }
     }
 
 
@@ -105,11 +110,13 @@ public class FaceBookSDK {
             @Override
             public void onCompleted(JSONObject object, GraphResponse response) {
                 if (object != null) {
-                    Session session = new Session("facebook",accessToken.getToken(),"code");
+                    Session session = new Session("facebook",accessToken.getToken());
+                    session.set_account_id(accessToken.getUserId());
+                    session.set_access_token_expire(accessToken.getDataAccessExpirationTime().getTime()/1000);
                     if(_isBind)
                     {
-                        GuestBindAPI guestBindAPI = new GuestBindAPI(session);
-                        guestBindAPI.setListener(new GuestBindAPI.IGuestBindCallback() {
+                        GuestBindTwoAPI guestBindAPI = new GuestBindTwoAPI(session);
+                        guestBindAPI.setListener(new GuestBindTwoAPI.IGuestBindCallback() {
                             @Override
                             public void AfterBind(int resultCode,String errorMsg) {
                                 if(resultCode == 0)
@@ -125,8 +132,8 @@ public class FaceBookSDK {
                         });
                         guestBindAPI.Excute();
                     }else {
-                        final GetAccessTokeOneAPI accessTokeAPI = new GetAccessTokeOneAPI(session);
-                        accessTokeAPI.setListener(new GetAccessTokeOneAPI.IgetAccessTokenCallback() {
+                        final GetAccessTokeTwoAPI accessTokeAPI = new GetAccessTokeTwoAPI(session);
+                        accessTokeAPI.setListener(new GetAccessTokeTwoAPI.IgetAccessTokenCallback() {
                             @Override
                             public void AfterGetAccessToken(String channel,JSONObject accountJson,String errorMsg) {
                                 if(accountJson != null)
@@ -141,8 +148,14 @@ public class FaceBookSDK {
                             }
                         });
                         accessTokeAPI.Excute();
-                    }                }else{
-//                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,response.getRawResponse());
+                    }
+                }else{
+                    if(_isBind)
+                    {
+                        IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,response.getRawResponse());
+                    }else {
+                        IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,null,null,response.getRawResponse());
+                    }
                 }
             }
         });
@@ -154,7 +167,28 @@ public class FaceBookSDK {
 
     }
 
-
+    /**
+     * 是否登录成功
+     * @param activity
+     * @return
+     */
+    public static boolean IsLoggedIn(Activity activity)
+    {
+        if (activity == null)
+        {
+            return false;
+        }
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+        if (isLoggedIn)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
 
     /**

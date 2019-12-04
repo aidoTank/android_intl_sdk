@@ -50,7 +50,6 @@ public class IntlGameUtil {
                     iGgetLocalGoogleAdIdListener.onComplete(0, googleAdID);
                 }catch (Exception e)
                 {
-
                     iGgetLocalGoogleAdIdListener.onComplete(-1, UUID.randomUUID().toString());
                 }
             }
@@ -69,7 +68,7 @@ public class IntlGameUtil {
      * 如果获取失败，返回null
      * @return
      */
-    public static String getUTCTimeStr() {
+    public static long getUTCTimeStr() {
         //StringBuffer UTCTimeBuffer = new StringBuffer();
         // 1、取得本地时间：
         Calendar cal = Calendar.getInstance() ;
@@ -79,7 +78,7 @@ public class IntlGameUtil {
         int dstOffset = cal.get(java.util.Calendar.DST_OFFSET);
         // 4、从本地时间里扣除这些差量，即可以取得UTC时间：
         cal.add(java.util.Calendar.MILLISECOND, -(zoneOffset + dstOffset));
-        return String.valueOf(cal.getTime().getTime()/1000);
+        return (cal.getTime().getTime()/1000);
     }
 
     public static String md5(String source) {

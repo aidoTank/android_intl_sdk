@@ -20,7 +20,7 @@ public class CheckAccessTokenAPI {
     {
         _account = account;
         JSONObject jsonObject = new JSONObject();
-        final String url = IntlGame._urlHost+"/api/auth/check/?client_id=" + IntlGame.GPclientid+"&debug=true";
+        final String url = IntlGame.urlHost +"/api/auth/check/?client_id=" + IntlGame.GPclientid+"&debug=true";
         try{
             jsonObject.put("openid", _account.getOpenid());
             jsonObject.put("access_token", _account.getAccessToken());
