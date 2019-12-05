@@ -136,7 +136,16 @@ public class MainActivity extends Activity {
     private void logout(Activity activity)
     {
         UpdateDebugUI("");
-        IntlGame.LogOut(activity );
+        IntlGame.LogOut(activity, new IntlGame.ILogoutListener() {
+            @Override
+            public void onComplete(int code) {
+                if(code == 0){
+
+                }else {
+
+                }
+            }
+        });
         initResultView();
     }
 
