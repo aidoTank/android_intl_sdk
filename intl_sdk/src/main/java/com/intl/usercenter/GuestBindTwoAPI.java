@@ -13,19 +13,17 @@ import org.json.JSONObject;
  */
 public class GuestBindTwoAPI {
     private IGuestBindCallback iGuestBindCallback;
-    private Session _session;
     private HttpThreadHelper httpThreadHelper;
     public GuestBindTwoAPI(Session session){
-        _session = session;
         JSONObject jsonObject = new JSONObject();
-        final String url = IntlGame.urlHost +"/api/sources/guestbind/" + _session.getChannel() + "?client_id=" + IntlGame.GPclientid;
+        final String url = IntlGame.urlHost +"/api/sources/guestbind/" + session.getChannel() + "?client_id=" + IntlGame.GPclientid;
         try{
-            jsonObject.put("request_type", _session.getRequestType());
-            jsonObject.put("account_id", _session.get_account_id());
-            jsonObject.put("access_token", _session.get_access_token());
-            jsonObject.put("access_token_expire", _session.get_access_token_expire());
-            jsonObject.put("refresh_token", _session.get_refresh_token());
-            jsonObject.put("refresh_token_expire", _session.get_refresh_token_expire());
+            jsonObject.put("request_type", session.getRequestType());
+            jsonObject.put("account_id", session.get_account_id());
+            jsonObject.put("access_token", session.get_access_token());
+            jsonObject.put("access_token_expire", session.get_access_token_expire());
+            jsonObject.put("refresh_token", session.get_refresh_token());
+            jsonObject.put("refresh_token_expire", session.get_refresh_token_expire());
         } catch (JSONException e) {
             e.printStackTrace();
         }

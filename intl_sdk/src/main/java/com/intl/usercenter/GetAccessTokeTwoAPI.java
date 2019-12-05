@@ -14,21 +14,19 @@ import org.json.JSONObject;
  */
 public class GetAccessTokeTwoAPI {
     private IgetAccessTokenCallback igetAccessToken;
-    private Session _session;
     private HttpThreadHelper httpThreadHelper;
 
     public GetAccessTokeTwoAPI(final Session session)
     {
-        _session = session;
         JSONObject jsonObject = new JSONObject();
-        final String url = IntlGame.urlHost +"/api/auth/authorize/" + _session.getChannel() + "?client_id=" + IntlGame.GPclientid;
+        final String url = IntlGame.urlHost +"/api/auth/authorize/" + session.getChannel() + "?client_id=" + IntlGame.GPclientid;
         try{
-            jsonObject.put("request_type", _session.getRequestType());
-            jsonObject.put("account_id", _session.get_account_id());
-            jsonObject.put("access_token", _session.get_access_token());
-            jsonObject.put("access_token_expire", _session.get_access_token_expire());
-            jsonObject.put("refresh_token", _session.get_refresh_token());
-            jsonObject.put("refresh_token_expire", _session.get_refresh_token_expire());
+            jsonObject.put("request_type", session.getRequestType());
+            jsonObject.put("account_id", session.get_account_id());
+            jsonObject.put("access_token", session.get_access_token());
+            jsonObject.put("access_token_expire", session.get_access_token_expire());
+            jsonObject.put("refresh_token", session.get_refresh_token());
+            jsonObject.put("refresh_token_expire", session.get_refresh_token_expire());
         } catch (JSONException e) {
             IntlGameExceptionUtil.handle(e);
         }
@@ -44,14 +42,14 @@ public class GetAccessTokeTwoAPI {
                     if(result.responseData.optInt("ErrorCode") == 0&& result.responseData.optString("ErrorMessage").equals("Successed"))
                     {
                         datajson = result.responseData.optJSONObject("Data");
-                        igetAccessToken.AfterGetAccessToken(_session.getChannel(),datajson,null);
+                        igetAccessToken.AfterGetAccessToken(session.getChannel(),datajson,null);
                     }
                     else {
-                        igetAccessToken.AfterGetAccessToken(_session.getChannel(),null,result.responseData.optString("ErrorMessage"));
+                        igetAccessToken.AfterGetAccessToken(session.getChannel(),null,result.responseData.optString("ErrorMessage"));
                     }
                 }else {
 
-                    igetAccessToken.AfterGetAccessToken(_session.getChannel(),null,result.ex.getMessage());
+                    igetAccessToken.AfterGetAccessToken(session.getChannel(),null,result.ex.getMessage());
                 }
             }
         }

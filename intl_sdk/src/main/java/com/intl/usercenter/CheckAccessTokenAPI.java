@@ -14,16 +14,14 @@ import org.json.JSONObject;
 public class CheckAccessTokenAPI {
 
     private ICheckAccessTokenCallback iCheckAccessTokenCallback;
-    private Account _account;
     private HttpThreadHelper httpThreadHelper;
     public CheckAccessTokenAPI(final Account account)
     {
-        _account = account;
         JSONObject jsonObject = new JSONObject();
         final String url = IntlGame.urlHost +"/api/auth/check/?client_id=" + IntlGame.GPclientid+"&debug=true";
         try{
-            jsonObject.put("openid", _account.getOpenid());
-            jsonObject.put("access_token", _account.getAccessToken());
+            jsonObject.put("openid", account.getOpenid());
+            jsonObject.put("access_token", account.getAccessToken());
         } catch (JSONException e) {
             e.printStackTrace();
         }

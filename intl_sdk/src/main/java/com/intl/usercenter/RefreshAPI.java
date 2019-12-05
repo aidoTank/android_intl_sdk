@@ -19,10 +19,8 @@ import java.util.HashMap;
 public class RefreshAPI {
     private IRefreshCallback iRefreshCallback;
     private HttpThreadHelper httpThreadHelper;
-    private Account _account;
     public RefreshAPI(Account account)
     {
-        _account = account;
         JSONObject jsonObject = new JSONObject();
         HashMap<String,String> headers = new HashMap<>();
         final String url = IntlGame.urlHost +"/api/auth/refresh/?client_id=" + IntlGame.GPclientid;

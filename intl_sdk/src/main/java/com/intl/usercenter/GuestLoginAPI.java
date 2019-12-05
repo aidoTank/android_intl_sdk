@@ -12,17 +12,15 @@ import org.json.JSONObject;
  * @Date: 2019/11/28
  */
 public class GuestLoginAPI {
-    private Session _session;
     private IGuestLoginCallback iGuestLoginCallback;
     private HttpThreadHelper httpThreadHelper;
-    public GuestLoginAPI(Session session)
+    public GuestLoginAPI(final Session session)
     {
-        _session = session;
         JSONObject jsonObject = new JSONObject();
         final String url = IntlGame.urlHost +"/api/auth/authorize/?client_id=" + IntlGame.GPclientid;
         try{
-            jsonObject.put("request_type", _session.getRequestType());
-            jsonObject.put("unique_id", _session.getAuthCode());
+            jsonObject.put("request_type", session.getRequestType());
+            jsonObject.put("unique_id", session.getAuthCode());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -35,10 +33,10 @@ public class GuestLoginAPI {
                 if (result.ex == null && result.httpCode == 200) {
                     if (result.responseData.optInt("ErrorCode") == 0 && result.responseData.optString("ErrorMessage").equals("Successed")) {
                         JSONObject datajson = result.responseData.optJSONObject("Data");
-                        iGuestLoginCallback.AfterGuestLogin(_session.getChannel(), datajson,result.responseData.optString("ErrorMessage"));
+                        iGuestLoginCallback.AfterGuestLogin(session.getChannel(), datajson,result.responseData.optString("ErrorMessage"));
                     }
                 } else {
-                    iGuestLoginCallback.AfterGuestLogin(_session.getChannel(), null,result.ex.getMessage());
+                    iGuestLoginCallback.AfterGuestLogin(session.getChannel(), null,result.ex.getMessage());
                 }
             }
         }

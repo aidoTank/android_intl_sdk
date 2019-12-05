@@ -13,15 +13,13 @@ import org.json.JSONObject;
  */
 public class GuestBindOneAPI {
     private IGuestBindCallback iGuestBindCallback;
-    private Session _session;
     private HttpThreadHelper httpThreadHelper;
     public GuestBindOneAPI(Session session){
-        _session = session;
         JSONObject jsonObject = new JSONObject();
-        final String url = IntlGame.urlHost +"/api/sources/guestbind/" + _session.getChannel() + "?client_id=" + IntlGame.GPclientid;
+        final String url = IntlGame.urlHost +"/api/sources/guestbind/" + session.getChannel() + "?client_id=" + IntlGame.GPclientid;
         try{
-            jsonObject.put("request_type", _session.getRequestType());
-            jsonObject.put("code", _session.getAuthCode());
+            jsonObject.put("request_type", session.getRequestType());
+            jsonObject.put("code", session.getAuthCode());
         } catch (JSONException e) {
             e.printStackTrace();
         }
