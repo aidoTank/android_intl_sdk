@@ -12,9 +12,10 @@ import com.appsflyer.AppsFlyerConversionListener;
 import com.appsflyer.AppsFlyerLib;
 import com.intl.channel.FaceBookSDK;
 import com.intl.channel.GoogleSDK;
+import com.intl.channel.Guest;
 import com.intl.entity.IntlDefine;
 import com.intl.usercenter.IntlGameCenter;
-import com.intl.usercenter.SessionCache;
+import com.intl.usercenter.AccountCache;
 import com.intl.utils.IntlGameExceptionUtil;
 import com.intl.utils.IntlGameLoading;
 import com.intl.utils.IntlGameUtil;
@@ -88,7 +89,7 @@ public class IntlGame extends Activity {
             @Override
             public void onComplete(int code, String ID) {
                 IntlGame.GooggleID = ID;
-                iInitListener.onComplete(IntlDefine.INIT_SUCCESS,ID);
+                iInitListener.onComplete(IntlDefine.SUCCESS,ID);
                 Log.d("getLocalGoogleAdID", "GooggleID: "+ID);
 
             }
@@ -107,15 +108,16 @@ public class IntlGame extends Activity {
     }
     public static boolean isLogin(Activity activity)
     {
-        return SessionCache.loadAccount(activity) != null;
+        return AccountCache.loadAccount(activity) != null;
     }
 
     public static void LogOut(Activity activity,ILogoutListener _iLogoutListener)
     {
         iLogoutListener = _iLogoutListener;
-        SessionCache.cleanAccounts(activity);
+        AccountCache.cleanAccounts(activity);
         FaceBookSDK.logout();
         GoogleSDK.logout();
+        Guest.logout();
     }
 
     public static void Afinit(Application context)
@@ -140,9 +142,9 @@ public class IntlGame extends Activity {
     {
         WebSession.setDialogVisiable(false);
     }
-    public static void IntlonDestory()
+    public static void IntlonDestroy()
     {
-        IntlGameLoading.getInstance().destory();
+        IntlGameLoading.getInstance().destroy();
     }
 
     public interface IInitListener {
@@ -155,6 +157,6 @@ public class IntlGame extends Activity {
         void onComplete(String type, int code, String errorMsg);
     }
     public interface ILogoutListener{
-        void onComplete(int code);
+        void onComplete(int code,String errorMsg);
     }
 }

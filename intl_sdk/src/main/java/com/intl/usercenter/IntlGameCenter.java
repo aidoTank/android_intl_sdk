@@ -1,9 +1,10 @@
 package com.intl.usercenter;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import com.intl.IntlGame;
@@ -19,7 +20,9 @@ import com.intl.webview.WebSession;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
 import java.util.Dictionary;
+import java.util.HashMap;
 
 /**
  * @Author: yujingliang
@@ -30,13 +33,72 @@ public class IntlGameCenter {
     private static final String PERSON_CENTER_WEB_COMMAND_DOMAIN = "yc.mobilesdk.personcenter";
     private static IntlGameCenter _instance;
     private WebSession _webSession;
-    public Activity activity;
-        ProgressDialog _progressDialog;
+    public WeakReference<Activity> activity;
+    private IntlGameHandler handler;
+    static class IntlGameHandler extends Handler{
+        WeakReference<Activity> activity;
+        IntlGameHandler(WeakReference<Activity> activity){
+            this.activity = activity;
+        }
+        @Override
+        public void handleMessage(Message msg){
+            HashMap Msgmap = (HashMap)msg.obj;
+            WebSession.currentWebSession().forceCloseSession();
+            if(String.valueOf(Msgmap.get("commandDomain")) .equals(LOGIN_CENTER_WEB_COMMAND_DOMAIN))
+            {
+                switch (String.valueOf( Msgmap.get("command"))){
+                    case "close":
+                        if(IntlGame.iLoginListener != null)
+                        {
+                            IntlGame.iLoginListener.onComplete(IntlDefine.CANCEL,"login cancel",null,null);
+                        }
+                        break;
+                    case "Google":
+                        GoogleSDK.login(this.activity,false);
+                        break;
+                    case "Facebook":
+                        FaceBookSDK.login(activity,false);
+                        break;
+                    case "Guest":
+                        Guest.login(activity);
+                        break;
+                }
+                return;
+            }
+
+            if(String.valueOf(Msgmap.get("commandDomain")) .equals(PERSON_CENTER_WEB_COMMAND_DOMAIN)){
+                switch (String.valueOf( Msgmap.get("command"))){
+                    case "close":
+                        if(IntlGame.iPersonCenterListener != null)
+                        {
+                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.CANCEL,null);
+                        }
+                        break;
+                    case "Google":
+                        GoogleSDK.login(activity,true);
+
+                        break;
+                    case "Facebook":
+                        FaceBookSDK.login(activity,false);
+
+                        break;
+                    case "Switch":
+                        if(IntlGame.iPersonCenterListener !=null){
+                            IntlGame.iPersonCenterListener.onComplete("switchroles",IntlDefine.SUCCESS,null);
+                        }
+                        break;
+                }
+            }
+        }
+    }
 
     public static void init(Activity activity){
 
         if (_instance == null)
+        {
             _instance = new IntlGameCenter(activity);
+
+        }
     }
     public static IntlGameCenter getInstance() {
 
@@ -44,7 +106,8 @@ public class IntlGameCenter {
     }
     private IntlGameCenter(Activity activity)
     {
-        this.activity = activity;
+        this.activity = new WeakReference<>(activity);
+        handler = new IntlGameHandler(this.activity);
         _webSession = new WebSession();
         registCommand();
     }
@@ -52,7 +115,7 @@ public class IntlGameCenter {
         _webSession.showDialog(activity,
                 414,
                 319,
-                Uri.parse(IntlGame.urlHost +"/index.html"), false);
+                Uri.parse(_uri), false);
 
     }
 
@@ -64,11 +127,6 @@ public class IntlGameCenter {
     }
     public void LoginCenter(final Activity activity)
     {
-        if (_progressDialog != null && _progressDialog.isShowing()) {
-            return;
-        } else {
-            Log.d("WEB", "AutoLoginBusy");
-        }
         if (WebSession.getIsShwoingWebPage()) {
             return;
         }
@@ -92,9 +150,9 @@ public class IntlGameCenter {
                         account.setAccessToken(jsonObject.optString("access_token"));
                         account.setAccessTokenExprie(jsonObject.optInt("access_token_expire"));
                         setAccount(activity,account);
-                        IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
+                        IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
                     }else{
-                        IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,null,null,errorMsg);
+                        IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);
                     }
                 }
             });
@@ -115,7 +173,7 @@ public class IntlGameCenter {
                         setAccount(activity,account);
                         if(IntlGame.iLoginListener != null)
                         {
-                            IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
+                            IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
                         }
                         try {
                             IntlGameUtil.logd("IntlGameLoginCenter","Refresh Account=>"+account.getJSONObj().toString());
@@ -125,7 +183,7 @@ public class IntlGameCenter {
                     }else {
                         if(IntlGame.iLoginListener != null)
                         {
-                            IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,null,null,errorMsg);
+                            IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);
                         }
                     }
 
@@ -138,115 +196,128 @@ public class IntlGameCenter {
 
 
     public Account loadAccounts(Context context) {
-        return SessionCache.loadAccount(context);
+        return AccountCache.loadAccount(context);
     }
     private void setAccount(Context context, Account account) {
-        SessionCache.saveAccounts(context, account);
+        AccountCache.saveAccounts(context, account);
     }
     private void registCommand()
     {
-        _webSession.regisetCommandListener(PERSON_CENTER_WEB_COMMAND_DOMAIN,
-                "close",
-                new WebSession.IWebCommandListener() {
-                    @Override
-                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
-                        WebSession.currentWebSession().forceCloseSession();
-                        if(IntlGame.iPersonCenterListener != null)
-                        {
-                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_CANCEL,null);
-                        }
-                    }
-                });
-        _webSession.regisetCommandListener(LOGIN_CENTER_WEB_COMMAND_DOMAIN,
-                "close",
-                new WebSession.IWebCommandListener() {
-                    @Override
-                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
-                        WebSession.currentWebSession().forceCloseSession();
-                        if(IntlGame.iLoginListener != null)
-                        {
-                            IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_CANCEL,"login cancel",null,null);
-                        }
-
-                    }
-                });
-        _webSession.regisetCommandListener(LOGIN_CENTER_WEB_COMMAND_DOMAIN,"Google",
-                new WebSession.IWebCommandListener() {
-
-                    @Override
-                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
-                        Log.d("IntlGameLoginCenter", "handleCommand: "+command);
-                        WebSession.currentWebSession().forceCloseSession();
-                        GoogleSDK.login(activity,false);
-                    }
-                }
-
-        );
-        _webSession.regisetCommandListener(PERSON_CENTER_WEB_COMMAND_DOMAIN,"Google",
-                new WebSession.IWebCommandListener() {
-
-                    @Override
-                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
-                        Log.d("IntlGameLoginCenter", "handleCommand: "+command);
-                        WebSession.currentWebSession().forceCloseSession();
-                        GoogleSDK.login(activity,true);
-                    }
-                }
-
-        );
-        _webSession.regisetCommandListener(LOGIN_CENTER_WEB_COMMAND_DOMAIN,"Facebook",
-                new WebSession.IWebCommandListener() {
-
-                    @Override
-                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
-                        Log.d("IntlGameLoginCenter", "handleCommand: "+command);
-                        WebSession.currentWebSession().forceCloseSession();
-                        FaceBookSDK.login(activity,false);
-//                        new FaceBookWeb(activity,false).show();
-                    }
-                }
-
-        );
-        _webSession.regisetCommandListener(PERSON_CENTER_WEB_COMMAND_DOMAIN,"Facebook",
-                new WebSession.IWebCommandListener() {
-
-                    @Override
-                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
-                        Log.d("IntlGameLoginCenter", "handleCommand: "+command);
-                        WebSession.currentWebSession().forceCloseSession();
-                        FaceBookSDK.login(activity,true);
-//                        new FaceBookWeb(activity,true).show();
-                    }
-                }
-
-        );
-        _webSession.regisetCommandListener(LOGIN_CENTER_WEB_COMMAND_DOMAIN,"Guest",
-                new WebSession.IWebCommandListener() {
-
-                    @Override
-                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
-                        Log.d("IntlGameLoginCenter", "handleCommand: "+command);
-                        WebSession.currentWebSession().forceCloseSession();
-                        Guest.login(activity);
-                    }
-                }
-
-        );
-
-        _webSession.regisetCommandListener(PERSON_CENTER_WEB_COMMAND_DOMAIN,"Switch",
-                new WebSession.IWebCommandListener() {
-
-                    @Override
-                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
-                        Log.d("IntlGameLoginCenter", "handleCommand: "+command);
-                        WebSession.currentWebSession().forceCloseSession();
-                        if(IntlGame.iPersonCenterListener !=null){
-                            IntlGame.iPersonCenterListener.onComplete("switchroles",IntlDefine.SWITCH,null);
-                        }
-                    }
-                }
-
-        );
+        _webSession.regisetCommandListener(new WebSession.IWebCommandListener() {
+            @Override
+            public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
+                HashMap<String,Object> map = new HashMap<>();
+                map.put("commandDomain",commandDomain);
+                map.put("command",command);
+                map.put("args",args);
+                Message msg = new Message();
+                msg.obj = map;
+                handler.sendMessage(msg);
+            }
+        });
+//        _webSession.regisetCommandListener(PERSON_CENTER_WEB_COMMAND_DOMAIN,
+//                "close",
+//                new WebSession.IWebCommandListener() {
+//                    @Override
+//                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
+//                        WebSession.currentWebSession().forceCloseSession();
+//                        Message msg = new Message();
+//                        msg.what = IntlDefine.BIND_MSG;
+//                        msg.obj = "bind";
+//                        handler.sendMessage(msg);
+//
+//
+//                    }
+//                });
+//        _webSession.regisetCommandListener(LOGIN_CENTER_WEB_COMMAND_DOMAIN,
+//                "close",
+//                new WebSession.IWebCommandListener() {
+//                    @Override
+//                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
+//                        WebSession.currentWebSession().forceCloseSession();
+//                        if(IntlGame.iLoginListener != null)
+//                        {
+//                            IntlGame.iLoginListener.onComplete(IntlDefine.CANCEL,"login cancel",null,null);
+//                        }
+//
+//                    }
+//                });
+//        _webSession.regisetCommandListener(LOGIN_CENTER_WEB_COMMAND_DOMAIN,"Google",
+//                new WebSession.IWebCommandListener() {
+//
+//                    @Override
+//                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
+//                        Log.d("IntlGameLoginCenter", "handleCommand: "+command);
+//                        WebSession.currentWebSession().forceCloseSession();
+//                        GoogleSDK.login(activity,false);
+//                    }
+//                }
+//
+//        );
+//        _webSession.regisetCommandListener(PERSON_CENTER_WEB_COMMAND_DOMAIN,"Google",
+//                new WebSession.IWebCommandListener() {
+//                    @Override
+//                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
+//                        Log.d("IntlGameLoginCenter", "handleCommand: "+command);
+//                        WebSession.currentWebSession().forceCloseSession();
+//                        GoogleSDK.login(activity,true);
+//                    }
+//                }
+//
+//        );
+//        _webSession.regisetCommandListener(LOGIN_CENTER_WEB_COMMAND_DOMAIN,"Facebook",
+//                new WebSession.IWebCommandListener() {
+//
+//                    @Override
+//                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
+//                        Log.d("IntlGameLoginCenter", "handleCommand: "+command);
+//                        WebSession.currentWebSession().forceCloseSession();
+//                        FaceBookSDK.login(activity,false);
+////                        new FaceBookWeb(activity,false).show();
+//                    }
+//                }
+//
+//        );
+//        _webSession.regisetCommandListener(PERSON_CENTER_WEB_COMMAND_DOMAIN,"Facebook",
+//                new WebSession.IWebCommandListener() {
+//
+//                    @Override
+//                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
+//                        Log.d("IntlGameLoginCenter", "handleCommand: "+command);
+//                        WebSession.currentWebSession().forceCloseSession();
+//                        FaceBookSDK.login(activity,true);
+////                        new FaceBookWeb(activity,true).show();
+//                    }
+//                }
+//
+//        );
+//        _webSession.regisetCommandListener(LOGIN_CENTER_WEB_COMMAND_DOMAIN,"Guest",
+//                new WebSession.IWebCommandListener() {
+//
+//                    @Override
+//                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
+//                        Log.d("IntlGameLoginCenter", "handleCommand: "+command);
+//                        WebSession.currentWebSession().forceCloseSession();
+//                        Guest.login(activity);
+//                    }
+//                }
+//
+//        );
+//
+//        _webSession.regisetCommandListener(PERSON_CENTER_WEB_COMMAND_DOMAIN,"Switch",
+//                new WebSession.IWebCommandListener() {
+//
+//                    @Override
+//                    public void handleCommand(WebCommandSender sender, String commandDomain, String command, Dictionary<String, String> args) {
+//                        Log.d("IntlGameLoginCenter", "handleCommand: "+command);
+//                        WebSession.currentWebSession().forceCloseSession();
+//                        if(IntlGame.iPersonCenterListener !=null){
+//                            IntlGame.iPersonCenterListener.onComplete("switchroles",IntlDefine.SUCCESS,null);
+//                        }
+//                    }
+//                }
+//
+//        );
 
         _webSession.setWebSessionListener(new WebSession.IWebSessionListener() {
             @Override

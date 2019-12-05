@@ -48,8 +48,8 @@ class WebPageClient extends android.webkit.WebViewClient {
                 return true;
 
             if (_webBase.get() != null && _webBase.get().getHostWebSession() != null ) {
-                WebSession.IWebCommandListener listener = _webBase.get().getHostWebSession().getCommand(commandDomain, command);
-
+//                WebSession.IWebCommandListener listener = _webBase.get().getHostWebSession().getCommand(commandDomain, command);
+                WebSession.IWebCommandListener listener = _webBase.get().getHostWebSession().getCommand();
                 if (listener != null) {
                     WebCommandSender sender = new WebCommandSender(_webBase.get(), view, queryTable.get("identity"));//queryTable 不包含identity 返回Null
                     listener.handleCommand(sender,commandDomain,command, queryTable);

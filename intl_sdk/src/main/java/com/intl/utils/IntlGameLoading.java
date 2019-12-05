@@ -40,7 +40,7 @@ public class IntlGameLoading {
         IntlGameLoading loading = this;
         setDialog();
     }
-    public final void destory() {
+    public final void destroy() {
         try {
             if(this.dialog != null && this.dialog.isShowing()) {
                 this.dialog.dismiss();

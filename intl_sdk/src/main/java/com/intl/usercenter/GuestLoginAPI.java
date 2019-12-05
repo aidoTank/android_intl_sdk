@@ -26,7 +26,7 @@ public class GuestLoginAPI {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        IntlGameLoading.getInstance().show(IntlGameCenter.getInstance().activity);
+        IntlGameLoading.getInstance().show(IntlGameCenter.getInstance().activity.get());
         httpThreadHelper = new HttpThreadHelper(
                 jsonObject, url, new HttpThreadHelper.HttpCallback() {
             @Override

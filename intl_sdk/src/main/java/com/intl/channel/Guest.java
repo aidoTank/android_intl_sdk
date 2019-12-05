@@ -7,11 +7,11 @@ import com.intl.entity.IntlDefine;
 import com.intl.usercenter.Account;
 import com.intl.usercenter.GuestLoginAPI;
 import com.intl.usercenter.Session;
-import com.intl.usercenter.SessionCache;
-import com.intl.utils.IntlGameUtil;
+import com.intl.usercenter.AccountCache;
 
-import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.lang.ref.WeakReference;
 
 /**
  * @Author: yujingliang
@@ -19,7 +19,7 @@ import org.json.JSONObject;
  */
 public class Guest {
 
-    public static void login(final Activity activity)
+    public static void login(final WeakReference<Activity> activity)
     {
         Session session = new Session("ycgame",IntlGame.GooggleID,"guest");
         GuestLoginAPI guestLoginAPI = new GuestLoginAPI(session);
@@ -27,13 +27,18 @@ public class Guest {
             @Override
             public void AfterGuestLogin(String channel, JSONObject jsonObject,String errorMsg) {
                 if(jsonObject != null){
-                    SessionCache.saveAccounts(activity,new Account(channel,jsonObject));
-                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
+                    AccountCache.saveAccounts(activity.get(),new Account(channel,jsonObject));
+                    IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
                 }else {
-                    IntlGame.iLoginListener.onComplete(IntlDefine.LOGIN_FAILED,null,null,errorMsg);
+                    IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);
                 }
             }
         });
         guestLoginAPI.Excute();
+    }
+    public static void logout()
+    {
+        if(IntlGame.iLogoutListener!= null)
+            IntlGame.iLogoutListener.onComplete(IntlDefine.SUCCESS,null);
     }
 }

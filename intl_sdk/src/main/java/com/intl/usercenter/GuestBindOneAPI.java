@@ -25,9 +25,9 @@ public class GuestBindOneAPI {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        IntlGameLoading.getInstance().show(IntlGameCenter.getInstance().activity);
+        IntlGameLoading.getInstance().show(IntlGameCenter.getInstance().activity.get());
         httpThreadHelper = new HttpThreadHelper(
-                SessionCache.loadAccount(IntlGameCenter.getInstance().activity),
+                AccountCache.loadAccount(IntlGameCenter.getInstance().activity.get()),
                 jsonObject, url, new HttpThreadHelper.HttpCallback() {
             @Override
             public void onPostExecute(HttpThreadHelper.HttpResult result) {

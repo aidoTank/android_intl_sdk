@@ -103,6 +103,11 @@ public class WebSession {
     }
     private Hashtable<String, Hashtable<String, IWebCommandListener>> _regedCommandDomain =
             new Hashtable<String, Hashtable<String, IWebCommandListener>>();
+    private IWebCommandListener iWebCommandListener;
+    public void regisetCommandListener(IWebCommandListener listener)
+    {
+        iWebCommandListener = listener;
+    }
     public void regisetCommandListener(String commandDomain, String command, IWebCommandListener listener) {
 
         if (listener == null)
@@ -127,6 +132,12 @@ public class WebSession {
             }
             commandTable.put(command,listener);
         }
+    }
+    public IWebCommandListener getCommand()
+    {
+        if(iWebCommandListener != null)
+            return iWebCommandListener;
+        return null;
     }
     public IWebCommandListener getCommand(String commandDomain, String command) {
         Hashtable<String, IWebCommandListener> commandTable =

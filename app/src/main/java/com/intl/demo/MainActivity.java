@@ -99,10 +99,10 @@ public class MainActivity extends Activity {
 
             @Override
             public void onComplete(int code,String openid,String token,String msg) {
-                if(code == IntlDefine.LOGIN_SUCCESS)
+                if(code == IntlDefine.SUCCESS)
                 {
                     UpdateUI("已登录:"+token);
-                }else if(code == IntlDefine.LOGIN_CANCEL)
+                }else if(code == IntlDefine.CANCEL)
                 {
                     UpdateUI("LoginCenter cancel");
                 }else {
@@ -138,15 +138,17 @@ public class MainActivity extends Activity {
         UpdateDebugUI("");
         IntlGame.LogOut(activity, new IntlGame.ILogoutListener() {
             @Override
-            public void onComplete(int code) {
-                if(code == 0){
-
-                }else {
+            public void onComplete(int code, String errorMsg) {
+                if(code == 0)
+                {
+                    UpdateUI("注销成功！");
+                }else{
+                    UpdateUI("注销失败！");
 
                 }
             }
+
         });
-        initResultView();
     }
 
     private void PersonCenter(final Activity activity)
@@ -155,21 +157,10 @@ public class MainActivity extends Activity {
             @Override
             public void onComplete(String type, int code, String errorMsg) {
                 String msg = null;
-                switch (code)
-                {
-                    case IntlDefine.BIND_SUCCESS:
-                        msg = "绑定成功！";
-                        break;
-                    case IntlDefine.BIND_FAILED:
-                        msg = "绑定失败！";
-                        break;
-                    case IntlDefine.BIND_CANCEL:
-                        msg = "绑定取消！";
-                        break;
-                    case IntlDefine.SWITCH:
-                        msg = "点击了切换账号！之后游戏需调用Logout和重新Login！";
-                        break;
-                }
+                if(type.equals("bind"))
+                    msg = (code ==0?"绑定成功！":(code ==1?"绑定失败！":"绑定取消！"));
+                if(type.equals("switchroles"))
+                    msg = "点击了切换账号！之后游戏需调用Logout和重新Login！";
                 UpdateUI(msg);
             }
         });
