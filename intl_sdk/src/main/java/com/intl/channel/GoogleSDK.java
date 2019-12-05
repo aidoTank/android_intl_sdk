@@ -38,12 +38,11 @@ import java.lang.ref.WeakReference;
  */
 public class GoogleSDK {
     private static final String TAG = "GoogleSDK" ;
-    private static GoogleSignInClient mGoogleSignInClient;
-    private static ProgressDialog googlemSpinner;
+    private static WeakReference<GoogleSignInClient> mGoogleSignInClient;
     private static final int RC_SIGN_IN = 9001;
     private static WeakReference<Activity> activity;
     private static Boolean _isBind = false;
-
+    private static GoogleSignInOptions gso;
     public static void login(WeakReference<Activity>  _activity,Boolean isBind)
     {
         _isBind = isBind;
@@ -53,28 +52,31 @@ public class GoogleSDK {
             Toast.makeText(_activity.get(), "googleClientId erre", Toast.LENGTH_SHORT).show();
             return;
         }
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestScopes(new Scope(Scopes.DRIVE_APPFOLDER))
                 .requestEmail()
                 .requestProfile()
                 .requestServerAuthCode(IntlGame.GoogleClientId)
                 .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(_activity.get(), gso);
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        mGoogleSignInClient = new WeakReference<>(GoogleSignIn.getClient(_activity.get(), gso)) ;
+        Intent signInIntent = mGoogleSignInClient.get().getSignInIntent();
         _activity.get().startActivityForResult(signInIntent, RC_SIGN_IN);
         IntlGameLoading.getInstance().show(_activity.get());
     }
-    public static void logout()
+    public static void logout(Activity activity)
     {
-        if (activity == null)
-        {
-            return;
-        }
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(activity.get());
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(activity);
         if (acct != null) {
             Log.d("GoogleSDK", "logout");
-            mGoogleSignInClient.signOut()
-                    .addOnCompleteListener( activity.get(), new OnCompleteListener<Void>() {
+            gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestScopes(new Scope(Scopes.DRIVE_APPFOLDER))
+                    .requestEmail()
+                    .requestProfile()
+                    .requestServerAuthCode(IntlGame.GoogleClientId)
+                    .build();
+            mGoogleSignInClient = new WeakReference<>(GoogleSignIn.getClient(activity, gso)) ;
+            mGoogleSignInClient.get().signOut()
+                    .addOnCompleteListener( activity, new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful())

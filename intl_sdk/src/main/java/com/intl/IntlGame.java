@@ -116,7 +116,7 @@ public class IntlGame extends Activity {
         iLogoutListener = _iLogoutListener;
         AccountCache.cleanAccounts(activity);
         FaceBookSDK.logout();
-        GoogleSDK.logout();
+        GoogleSDK.logout(activity);
         Guest.logout();
     }
 
