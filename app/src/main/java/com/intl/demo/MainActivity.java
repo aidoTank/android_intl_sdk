@@ -9,7 +9,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import com.intl.IntlGame;
 import com.intl.entity.IntlDefine;
-import com.intl.usercenter.Account;
+import com.intl.entity.Account;
 import com.intl.usercenter.IntlGameCenter;
 import com.ycgame.test.R;
 import org.json.JSONException;
@@ -21,7 +21,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        ChatView chatView = new ChatView(this);
+        chatView.show();
         IntlGame.init(MainActivity.this,"YGAaFkq3vf753xo3JeZLvX","1061953441680-6l4ts44pco3vj1ao002qe1psf8rrqjam.apps.googleusercontent.com","754170961660851","7453817292517158","EVWHPXxGEOXzbjfWxhUp4yOYgTMSJDNA", new IntlGame.IInitListener() {
             @Override
             public void onComplete(int var1, String var2) {

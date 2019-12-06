@@ -3,6 +3,7 @@ package com.intl.usercenter;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.intl.entity.Account;
 import com.intl.utils.IntlGameExceptionUtil;
 
 import org.json.JSONException;

@@ -5,14 +5,17 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 import com.intl.IntlGame;
-import com.intl.channel.FaceBookSDK;
-import com.intl.channel.GoogleSDK;
-import com.intl.channel.Guest;
+import com.intl.api.AuthorizeCheckAPI;
+import com.intl.api.RefreshAPI;
+import com.intl.entity.Account;
+import com.intl.loginchannel.FaceBookSDK;
+import com.intl.loginchannel.GoogleSDK;
+import com.intl.loginchannel.Guest;
 import com.intl.entity.IntlDefine;
 import com.intl.utils.IntlGameExceptionUtil;
+import com.intl.utils.IntlGameLoading;
 import com.intl.utils.IntlGameUtil;
 import com.intl.webview.WebCommandSender;
 import com.intl.webview.WebSession;
@@ -72,7 +75,7 @@ public class IntlGameCenter {
                     GoogleSDK.login(this.activity,!isLoginScene);
                     break;
                 case "Facebook":
-                    FaceBookSDK.login(activity,isLoginScene);
+                    FaceBookSDK.login(activity,!isLoginScene);
                     break;
                 case "Guest":
                     Guest.login(activity);
@@ -112,6 +115,28 @@ public class IntlGameCenter {
                 Uri.parse(_uri), false);
 
     }
+    public boolean isLogin(Activity activity)
+    {
+        return AccountCache.loadAccount(activity) != null;
+    }
+    public void LogOut(Activity activity)
+    {
+        AccountCache.cleanAccounts(activity);
+        GoogleSDK.logout(activity);
+        Guest.logout();
+        FaceBookSDK.logout();
+
+    }
+    public void onPause(){
+        WebSession.setDialogVisiable(false);
+    }
+    public void onResume(){
+        WebSession.setDialogVisiable(true);
+    }
+    public void onDestroy()
+    {
+        IntlGameLoading.getInstance().destroy();
+    }
 
     public void PersonCenter(Activity activity)
     {
@@ -133,8 +158,8 @@ public class IntlGameCenter {
 //        if(false)
         {
             IntlGameUtil.logd("IntlGame","AccessTokenExpire =>"+account.getAccessTokenExpire()+" currentTime=>"+System.currentTimeMillis()/1000);
-            CheckAccessTokenAPI checkAPI = new CheckAccessTokenAPI(account);
-            checkAPI.setListener(new CheckAccessTokenAPI.ICheckAccessTokenCallback() {
+            AuthorizeCheckAPI checkAPI = new AuthorizeCheckAPI(account);
+            checkAPI.setListener(new AuthorizeCheckAPI.ICheckAccessTokenCallback() {
                 @Override
                 public void AfterCheck(JSONObject jsonObject,String errorMsg) {
                     if(jsonObject != null)

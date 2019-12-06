@@ -1,8 +1,12 @@
-package com.intl.usercenter;
+package com.intl.api;
 
 import com.intl.IntlGame;
+import com.intl.entity.Session;
 import com.intl.httphelper.HttpThreadHelper;
+import com.intl.usercenter.AccountCache;
+import com.intl.usercenter.IntlGameCenter;
 import com.intl.utils.IntlGameLoading;
+import com.intl.utils.IntlGameUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,10 +15,10 @@ import org.json.JSONObject;
  * @Author: yujingliang
  * @Date: 2019/12/4
  */
-public class GuestBindTwoAPI {
+public class GuestBindFAPI {
     private IGuestBindCallback iGuestBindCallback;
     private HttpThreadHelper httpThreadHelper;
-    public GuestBindTwoAPI(Session session){
+    public GuestBindFAPI(Session session){
         JSONObject jsonObject = new JSONObject();
         final String url = IntlGame.urlHost +"/api/sources/guestbind/" + session.getChannel() + "?client_id=" + IntlGame.GPclientid;
         try{
@@ -42,9 +46,11 @@ public class GuestBindTwoAPI {
                         iGuestBindCallback.AfterBind(0,null);
                     }
                     else {
+                        IntlGameUtil.logd("IntlEX","GuestBindFBAPI error:"+result.responseData.toString());
                         iGuestBindCallback.AfterBind(-1,result.responseData.optString("ErrorMessage"));
                     }
                 }else {
+                    IntlGameUtil.logd("IntlEX","GuestBindFBAPI time out:"+ (result.ex != null ? result.ex.getMessage() : null));
                     iGuestBindCallback.AfterBind(-1, result.ex != null ? result.ex.getMessage() : null);
                 }
             }

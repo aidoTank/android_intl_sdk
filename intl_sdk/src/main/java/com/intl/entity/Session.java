@@ -1,4 +1,4 @@
-package com.intl.usercenter;
+package com.intl.entity;
 
 import org.json.JSONException;
 import org.json.JSONObject;

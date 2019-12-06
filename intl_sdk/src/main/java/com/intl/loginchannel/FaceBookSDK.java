@@ -1,4 +1,4 @@
-package com.intl.channel;
+package com.intl.loginchannel;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -16,10 +16,10 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.intl.entity.IntlDefine;
 import com.intl.IntlGame;
-import com.intl.usercenter.Account;
-import com.intl.usercenter.GetAccessTokeTwoAPI;
-import com.intl.usercenter.GuestBindTwoAPI;
-import com.intl.usercenter.Session;
+import com.intl.entity.Account;
+import com.intl.api.AuthorizeFAPI;
+import com.intl.api.GuestBindFAPI;
+import com.intl.entity.Session;
 import com.intl.usercenter.AccountCache;
 import com.intl.utils.IntlGameLoading;
 import com.intl.utils.IntlGameUtil;
@@ -112,8 +112,8 @@ public class FaceBookSDK {
                     session.set_access_token_expire(accessToken.getDataAccessExpirationTime().getTime()/1000);
                     if(_isBind)
                     {
-                        GuestBindTwoAPI guestBindAPI = new GuestBindTwoAPI(session);
-                        guestBindAPI.setListener(new GuestBindTwoAPI.IGuestBindCallback() {
+                        GuestBindFAPI guestBindAPI = new GuestBindFAPI(session);
+                        guestBindAPI.setListener(new GuestBindFAPI.IGuestBindCallback() {
                             @Override
                             public void AfterBind(int resultCode,String errorMsg) {
                                 if(resultCode == 0)
@@ -129,8 +129,8 @@ public class FaceBookSDK {
                         });
                         guestBindAPI.Excute();
                     }else {
-                        final GetAccessTokeTwoAPI accessTokeAPI = new GetAccessTokeTwoAPI(session);
-                        accessTokeAPI.setListener(new GetAccessTokeTwoAPI.IgetAccessTokenCallback() {
+                        final AuthorizeFAPI accessTokeAPI = new AuthorizeFAPI(session);
+                        accessTokeAPI.setListener(new AuthorizeFAPI.IgetAccessTokenCallback() {
                             @Override
                             public void AfterGetAccessToken(String channel,JSONObject accountJson,String errorMsg) {
                                 if(accountJson != null)

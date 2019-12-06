@@ -1,9 +1,12 @@
-package com.intl.usercenter;
+package com.intl.api;
 
 import com.intl.IntlGame;
+import com.intl.entity.Session;
 import com.intl.httphelper.HttpThreadHelper;
+import com.intl.usercenter.IntlGameCenter;
 import com.intl.utils.IntlGameExceptionUtil;
 import com.intl.utils.IntlGameLoading;
+import com.intl.utils.IntlGameUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,11 +15,11 @@ import org.json.JSONObject;
  * @Author: yujingliang
  * @Date: 2019/12/3
  */
-public class GetAccessTokeTwoAPI {
+public class AuthorizeFAPI {
     private IgetAccessTokenCallback igetAccessToken;
     private HttpThreadHelper httpThreadHelper;
 
-    public GetAccessTokeTwoAPI(final Session session)
+    public AuthorizeFAPI(final Session session)
     {
         JSONObject jsonObject = new JSONObject();
         final String url = IntlGame.urlHost +"/api/auth/authorize/" + session.getChannel() + "?client_id=" + IntlGame.GPclientid;
@@ -45,10 +48,11 @@ public class GetAccessTokeTwoAPI {
                         igetAccessToken.AfterGetAccessToken(session.getChannel(),datajson,null);
                     }
                     else {
+                        IntlGameUtil.logd("IntlEX","GetAccessTokeFBAPI error:"+result.responseData.toString());
                         igetAccessToken.AfterGetAccessToken(session.getChannel(),null,result.responseData.optString("ErrorMessage"));
                     }
                 }else {
-
+                    IntlGameUtil.logd("IntlEX","GetAccessTokeFBAPI time out:"+ (result.ex != null ? result.ex.getMessage() : null));
                     igetAccessToken.AfterGetAccessToken(session.getChannel(),null,result.ex.getMessage());
                 }
             }

@@ -1,7 +1,9 @@
-package com.intl.usercenter;
+package com.intl.api;
 
 import com.intl.IntlGame;
+import com.intl.entity.Account;
 import com.intl.httphelper.HttpThreadHelper;
+import com.intl.usercenter.IntlGameCenter;
 import com.intl.utils.IntlGameExceptionUtil;
 import com.intl.utils.IntlGameLoading;
 import com.intl.utils.IntlGameSignUtil;
@@ -42,16 +44,18 @@ public class RefreshAPI {
                 jsonObject, url, new HttpThreadHelper.HttpCallback() {
             @Override
             public void onPostExecute(HttpThreadHelper.HttpResult result) {
-                if (result.ex == null || result.httpCode == 200) {
+                if (result.ex == null && result.httpCode == 200) {
                     IntlGameLoading.getInstance().hide();
                     if (result.responseData.optInt("ErrorCode") == 0 && result.responseData.optString("ErrorMessage").equals("Successed")) {
                         JSONObject datajson = result.responseData.optJSONObject("Data");
                         IntlGameUtil.logd("RefreshAPI","refreshAccessToken Success!");
                         iRefreshCallback.AfterRefresh(datajson,null);
                     }else {
+                        IntlGameUtil.logd("IntlEX","RefreshAPI error:"+result.responseData.toString());
                         iRefreshCallback.AfterRefresh(null,result.responseData.optString("ErrorMessage"));
                     }
                 }else {
+                    IntlGameUtil.logd("IntlEX","RefreshAPI time out:"+ (result.ex != null ? result.ex.getMessage() : null));
                     iRefreshCallback.AfterRefresh(null,result.ex.getMessage());
                 }
             }

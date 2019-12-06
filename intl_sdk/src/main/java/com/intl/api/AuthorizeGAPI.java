@@ -1,9 +1,12 @@
-package com.intl.usercenter;
+package com.intl.api;
 
 import com.intl.IntlGame;
+import com.intl.entity.Session;
 import com.intl.httphelper.HttpThreadHelper;
+import com.intl.usercenter.IntlGameCenter;
 import com.intl.utils.IntlGameExceptionUtil;
 import com.intl.utils.IntlGameLoading;
+import com.intl.utils.IntlGameUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,12 +15,12 @@ import org.json.JSONObject;
  * @Author: yujingliang
  * @Date: 2019/11/27
  */
-public class GetAccessTokeOneAPI {
+public class AuthorizeGAPI {
 
     private IgetAccessTokenCallback igetAccessToken;
     private HttpThreadHelper httpThreadHelper;
 
-    public GetAccessTokeOneAPI(final Session session)
+    public AuthorizeGAPI(final Session session)
     {
         JSONObject jsonObject = new JSONObject();
         final String url = IntlGame.urlHost +"/api/auth/authorize/" + session.getChannel() + "?client_id=" + IntlGame.GPclientid;
@@ -42,11 +45,12 @@ public class GetAccessTokeOneAPI {
                         igetAccessToken.AfterGetAccessToken(session.getChannel(),datajson,null);
                     }
                     else {
+                        IntlGameUtil.logd("IntlEX","GetAccessTokeGoogleAPI error:"+result.responseData.toString());
                         igetAccessToken.AfterGetAccessToken(session.getChannel(),null,result.responseData.optString("ErrorMessage"));
                     }
                 }else {
-
-                    igetAccessToken.AfterGetAccessToken(session.getChannel(),null,result.ex.getMessage());
+                    IntlGameUtil.logd("IntlEX","GetAccessTokeGoogleAPI time out:"+ (result.ex != null ? result.ex.getMessage() : null));
+                    igetAccessToken.AfterGetAccessToken(session.getChannel(),null,(result.ex != null ? result.ex.getMessage() : null));
                 }
             }
         }

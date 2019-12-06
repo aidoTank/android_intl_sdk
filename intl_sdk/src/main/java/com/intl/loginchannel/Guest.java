@@ -1,12 +1,12 @@
-package com.intl.channel;
+package com.intl.loginchannel;
 
 import android.app.Activity;
 
 import com.intl.IntlGame;
 import com.intl.entity.IntlDefine;
-import com.intl.usercenter.Account;
-import com.intl.usercenter.GuestLoginAPI;
-import com.intl.usercenter.Session;
+import com.intl.entity.Account;
+import com.intl.api.AuthorizeGUAPI;
+import com.intl.entity.Session;
 import com.intl.usercenter.AccountCache;
 
 import org.json.JSONObject;
@@ -22,8 +22,8 @@ public class Guest {
     public static void login(final WeakReference<Activity> activity)
     {
         Session session = new Session("ycgame",IntlGame.GooggleID,"guest");
-        GuestLoginAPI guestLoginAPI = new GuestLoginAPI(session);
-        guestLoginAPI.setListener(new GuestLoginAPI.IGuestLoginCallback() {
+        AuthorizeGUAPI guestLoginAPI = new AuthorizeGUAPI(session);
+        guestLoginAPI.setListener(new AuthorizeGUAPI.IGuestLoginCallback() {
             @Override
             public void AfterGuestLogin(String channel, JSONObject jsonObject,String errorMsg) {
                 if(jsonObject != null){

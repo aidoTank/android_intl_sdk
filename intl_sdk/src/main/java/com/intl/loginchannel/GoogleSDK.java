@@ -1,7 +1,6 @@
-package com.intl.channel;
+package com.intl.loginchannel;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -19,10 +18,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.intl.entity.IntlDefine;
 import com.intl.IntlGame;
-import com.intl.usercenter.Account;
-import com.intl.usercenter.GetAccessTokeOneAPI;
-import com.intl.usercenter.GuestBindOneAPI;
-import com.intl.usercenter.Session;
+import com.intl.entity.Account;
+import com.intl.api.AuthorizeGAPI;
+import com.intl.api.GuestBindGAPI;
+import com.intl.entity.Session;
 import com.intl.usercenter.AccountCache;
 import com.intl.utils.IntlGameLoading;
 import com.intl.utils.IntlGameUtil;
@@ -46,6 +45,7 @@ public class GoogleSDK {
     public static void login(WeakReference<Activity>  _activity,Boolean isBind)
     {
         _isBind = isBind;
+
         activity = _activity;
         if(IntlGame.GoogleClientId == null)
         {
@@ -91,6 +91,9 @@ public class GoogleSDK {
                         }
                     });
         }
+        else {
+            IntlGameUtil.logd("IntlEX","GoogleSDK getLastSignedInAccount == null!");
+        }
     }
     public static void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -114,8 +117,8 @@ public class GoogleSDK {
 
             if(_isBind)
             {
-                GuestBindOneAPI guestBindAPI = new GuestBindOneAPI(session);
-                guestBindAPI.setListener(new GuestBindOneAPI.IGuestBindCallback() {
+                GuestBindGAPI guestBindAPI = new GuestBindGAPI(session);
+                guestBindAPI.setListener(new GuestBindGAPI.IGuestBindCallback() {
                     @Override
                     public void AfterBind(int resultCode,String errorMsg) {
                         if(resultCode == 0)
@@ -131,8 +134,8 @@ public class GoogleSDK {
                 });
                 guestBindAPI.Excute();
             }else {
-                final GetAccessTokeOneAPI accessTokeAPI = new GetAccessTokeOneAPI(session);
-                accessTokeAPI.setListener(new GetAccessTokeOneAPI.IgetAccessTokenCallback() {
+                final AuthorizeGAPI accessTokeAPI = new AuthorizeGAPI(session);
+                accessTokeAPI.setListener(new AuthorizeGAPI.IgetAccessTokenCallback() {
                     @Override
                     public void AfterGetAccessToken(String channel,JSONObject accountJson,String errorMsg) {
                         if(accountJson != null)

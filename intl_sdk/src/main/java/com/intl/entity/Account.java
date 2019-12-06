@@ -1,4 +1,4 @@
-package com.intl.usercenter;
+package com.intl.entity;
 
 import com.intl.utils.IntlGameExceptionUtil;
 
@@ -17,7 +17,7 @@ public class Account {
     private String _openid;
     private String _access_token;
     private int _access_token_expire;
-    Account(String channel,String refresh_token,int refresh_token_expire,String openid,String access_token,int access_token_expire){
+    public Account(String channel,String refresh_token,int refresh_token_expire,String openid,String access_token,int access_token_expire){
         _channel = channel;
         _access_token = access_token;
         _access_token_expire = access_token_expire;
@@ -38,6 +38,7 @@ public class Account {
         }
 
     }
+
     public void setOpenid(String openid)
     {
         _openid = openid;
@@ -58,6 +59,7 @@ public class Account {
     {
         _refresh_token_expire = refreshTokenExpire;
     }
+
     public String getChannel()
     {
         return _channel;

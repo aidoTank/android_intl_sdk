@@ -10,16 +10,13 @@ import android.util.Log;
 
 import com.appsflyer.AppsFlyerConversionListener;
 import com.appsflyer.AppsFlyerLib;
-import com.intl.channel.FaceBookSDK;
-import com.intl.channel.GoogleSDK;
-import com.intl.channel.Guest;
+import com.intl.af.AFManager;
+import com.intl.loginchannel.FaceBookSDK;
+import com.intl.loginchannel.GoogleSDK;
 import com.intl.entity.IntlDefine;
 import com.intl.usercenter.IntlGameCenter;
-import com.intl.usercenter.AccountCache;
 import com.intl.utils.IntlGameExceptionUtil;
-import com.intl.utils.IntlGameLoading;
 import com.intl.utils.IntlGameUtil;
-import com.intl.webview.WebSession;
 
 import java.util.Map;
 
@@ -39,16 +36,13 @@ public class IntlGame extends Activity {
     public static String GoogleClientId;
     public static String FacebookClientId;
     public static Application application;
-    public static String UUID = "";
     public static String urlHost = "https://gather-auth.ycgame.com";
-    @SuppressLint("HardwareIds")
     public static void init(final Activity activity, String devKey, final String google_clientid, final String facebook_clientid,  String gp_clientid, String gp_secret,final IInitListener iInitListener)
     {
         GoogleClientId = google_clientid;
         FacebookClientId = facebook_clientid;
         GPclientid = gp_clientid;
         GPsecretid = gp_secret;
-        UUID = Settings.Secure.getString(activity.getContentResolver(), "android_id");
         try{
             IntlGameCenter.init(activity);
         }catch (Exception e){
@@ -56,34 +50,8 @@ public class IntlGame extends Activity {
         }
         if(devKey != null)
         {
-            AppsFlyerConversionListener conversionDataListener = new AppsFlyerConversionListener(){
-
-                @Override
-                public void onInstallConversionDataLoaded(Map<String, String> map) {
-                    Log.d("AppsFlyer", "onInstallConversionDataLoaded: "+map);
-                }
-
-                @Override
-                public void onInstallConversionFailure(String s) {
-                    Log.d("AppsFlyer", "onInstallConversionFailure: "+s);
-                }
-
-                @Override
-                public void onAppOpenAttribution(Map<String, String> map) {
-                    Log.d("AppsFlyer", "onAppOpenAttribution: "+map);
-                }
-
-                @Override
-                public void onAttributionFailure(String s) {
-
-                }
-            };
-            AppsFlyerLib.getInstance().init(devKey, conversionDataListener, activity);
-            AppsFlyerLib.getInstance().setAndroidIdData(IntlGameUtil.getLocalAndroidId(activity));
-            AppsFlyerLib.getInstance().setDebugLog(true);
-
+            AFManager.getInstance().AFinit(activity,devKey,IntlGame.application);
         }
-
 
         IntlGameUtil.getLocalGoogleAdID(activity, new IntlGameUtil.IGgetLocalGoogleAdIdListener() {
             @Override
@@ -108,16 +76,13 @@ public class IntlGame extends Activity {
     }
     public static boolean isLogin(Activity activity)
     {
-        return AccountCache.loadAccount(activity) != null;
+        return IntlGameCenter.getInstance().isLogin(activity);
     }
 
     public static void LogOut(Activity activity,ILogoutListener _iLogoutListener)
     {
         iLogoutListener = _iLogoutListener;
-        AccountCache.cleanAccounts(activity);
-        FaceBookSDK.logout();
-        GoogleSDK.logout(activity);
-        Guest.logout();
+        IntlGameCenter.getInstance().LogOut(activity);
     }
 
     public static void Afinit(Application context)
@@ -136,15 +101,15 @@ public class IntlGame extends Activity {
 
     public static void IntlonResume()
     {
-        WebSession.setDialogVisiable(true);
+        IntlGameCenter.getInstance().onResume();
     }
     public static void IntlonPause()
     {
-        WebSession.setDialogVisiable(false);
+        IntlGameCenter.getInstance().onPause();
     }
     public static void IntlonDestroy()
     {
-        IntlGameLoading.getInstance().destroy();
+        IntlGameCenter.getInstance().onDestroy();
     }
 
     public interface IInitListener {

@@ -1,17 +1,11 @@
 package com.intl.demo;
 
-import android.app.Activity;
-
-import com.intl.IntlGame;
 import com.intl.httphelper.HttpThreadHelper;
-import com.intl.usercenter.Account;
-import com.intl.usercenter.Session;
+import com.intl.entity.Account;
 import com.intl.utils.IntlGameExceptionUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.HashMap;
 
 /**
  * @Author: yujingliang

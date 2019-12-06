@@ -1,8 +1,11 @@
-package com.intl.usercenter;
+package com.intl.api;
 
 import com.intl.IntlGame;
+import com.intl.entity.Account;
 import com.intl.httphelper.HttpThreadHelper;
+import com.intl.usercenter.IntlGameCenter;
 import com.intl.utils.IntlGameLoading;
+import com.intl.utils.IntlGameUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,11 +14,11 @@ import org.json.JSONObject;
  * @Author: yujingliang
  * @Date: 2019/11/28
  */
-public class CheckAccessTokenAPI {
+public class AuthorizeCheckAPI {
 
     private ICheckAccessTokenCallback iCheckAccessTokenCallback;
     private HttpThreadHelper httpThreadHelper;
-    public CheckAccessTokenAPI(final Account account)
+    public AuthorizeCheckAPI(final Account account)
     {
         JSONObject jsonObject = new JSONObject();
         final String url = IntlGame.urlHost +"/api/auth/check/?client_id=" + IntlGame.GPclientid+"&debug=true";
@@ -39,9 +42,11 @@ public class CheckAccessTokenAPI {
                         iCheckAccessTokenCallback.AfterCheck(datajson,null);
                     }
                     else {
+                        IntlGameUtil.logd("IntlEX","GetAccessTokeFBAPI error:"+result.responseData.toString());
                         iCheckAccessTokenCallback.AfterCheck(null,result.responseData.optString("ErrorMessage"));
                     }
                 }else{
+                    IntlGameUtil.logd("IntlEX","CheckAccessTokenAPI time out:"+ (result.ex != null ? result.ex.getMessage() : null));
                     iCheckAccessTokenCallback.AfterCheck(null, result.ex != null ? result.ex.getMessage() : null);
                 }
             }
