@@ -11,9 +11,11 @@ import android.util.Log;
 import com.appsflyer.AppsFlyerConversionListener;
 import com.appsflyer.AppsFlyerLib;
 import com.intl.af.AFManager;
+import com.intl.entity.Account;
 import com.intl.loginchannel.FaceBookSDK;
 import com.intl.loginchannel.GoogleSDK;
 import com.intl.entity.IntlDefine;
+import com.intl.usercenter.AccountCache;
 import com.intl.usercenter.IntlGameCenter;
 import com.intl.utils.IntlGameExceptionUtil;
 import com.intl.utils.IntlGameUtil;
@@ -78,8 +80,7 @@ public class IntlGame extends Activity {
     {
         return IntlGameCenter.getInstance().isLogin(activity);
     }
-
-    public static void LogOut(Activity activity,ILogoutListener _iLogoutListener)
+    public static void LoginCenterLogout(Activity activity,ILogoutListener _iLogoutListener)
     {
         iLogoutListener = _iLogoutListener;
         IntlGameCenter.getInstance().LogOut(activity);
@@ -90,7 +91,7 @@ public class IntlGame extends Activity {
         application = context;
     }
     public static void AfEvent(Context context, String eventname, Map<String, Object> map) {
-        AppsFlyerLib.getInstance().trackEvent(context, eventname, map);
+        AFManager.getInstance().AfEvent(context,eventname,map );
     }
 
     public static void IntlonActivityResults(int requestCode, int resultCode, Intent intent)
@@ -122,6 +123,6 @@ public class IntlGame extends Activity {
         void onComplete(String type, int code, String errorMsg);
     }
     public interface ILogoutListener{
-        void onComplete(int code,String errorMsg);
+        void onComplete(int code, String errorMsg);
     }
 }

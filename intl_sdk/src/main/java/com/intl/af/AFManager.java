@@ -2,6 +2,7 @@ package com.intl.af;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.util.Log;
 
 import com.appsflyer.AppsFlyerConversionListener;
@@ -51,5 +52,9 @@ public class AFManager {
         AppsFlyerLib.getInstance().startTracking(context);
         AppsFlyerLib.getInstance().setAndroidIdData(IntlGameUtil.getLocalAndroidId(activity));
         AppsFlyerLib.getInstance().setDebugLog(true);
+    }
+
+    public void AfEvent(Context context, String eventname, Map<String, Object> map) {
+        AppsFlyerLib.getInstance().trackEvent(context, eventname, map);
     }
 }

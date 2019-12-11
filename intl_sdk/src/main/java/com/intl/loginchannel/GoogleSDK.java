@@ -125,6 +125,9 @@ public class GoogleSDK {
                         {
                             IntlGameUtil.logd("GuestBindAPI","Bind success!");
                             IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.SUCCESS,errorMsg);
+                        }else if(resultCode == 10010){
+                            IntlGameUtil.logd("GuestBindAPI","Bind failed!");
+                            IntlGame.iPersonCenterListener.onComplete("bind",10010,errorMsg);
                         }else {
                             IntlGameUtil.logd("GuestBindAPI","Bind failed!");
                             IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.FAILED,errorMsg);

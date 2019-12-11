@@ -43,7 +43,7 @@ public class GuestBindGAPI {
                     }
                     else {
                         IntlGameUtil.logd("IntlEX","GuestBindGoogleAPI error:"+result.responseData.toString());
-                        iGuestBindCallback.AfterBind(-1,result.responseData.optString("ErrorMessage"));
+                        iGuestBindCallback.AfterBind(result.responseData.optInt("ErrorCode"),result.responseData.optString("ErrorMessage"));
                     }
                 }else {
                     IntlGameUtil.logd("IntlEX","GuestBindGoogleAPI time out:"+ (result.ex != null ? result.ex.getMessage() : null));

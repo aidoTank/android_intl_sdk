@@ -32,4 +32,6 @@ public class IntlDefine {
     public static final int CANCEL = -1;
     public static final int FAILED = 1;
 
+    public static final int HAVE_BIND=0x10;
+
 }

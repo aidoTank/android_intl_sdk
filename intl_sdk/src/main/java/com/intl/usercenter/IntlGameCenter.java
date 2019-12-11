@@ -26,6 +26,7 @@ import org.json.JSONObject;
 import java.lang.ref.WeakReference;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Author: yujingliang
@@ -168,6 +169,13 @@ public class IntlGameCenter {
                         account.setOpenid(jsonObject.optString("openid"));
                         account.setAccessToken(jsonObject.optString("access_token"));
                         account.setAccessTokenExprie(jsonObject.optInt("access_token_expire"));
+                        boolean first_authorize = jsonObject.optBoolean("first_authorize");
+                        if(first_authorize){
+                            account.setIsFirstAuthorize(true);
+                            Map<String, Object> map = new HashMap<>();
+                            map.put("user_id", jsonObject.optString("openid"));
+                            IntlGame.AfEvent(activity, "af_complete_registration", map);
+                        }
                         setAccount(activity,account);
                         IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
                     }else{

@@ -39,7 +39,8 @@ public class AccountCache {
                 String openid = jsonObj.optString("openid");
                 String access_token = jsonObj.optString("access_token");
                 int access_token_expire = jsonObj.optInt("access_token_expire");
-                return new Account(channel,refresh_token,refresh_token_expire,openid,access_token,access_token_expire);
+                boolean first_authorize = jsonObj.optBoolean("first_authorize");
+                return new Account(channel,refresh_token,refresh_token_expire,openid,access_token,access_token_expire,first_authorize);
             }
             return null;
 

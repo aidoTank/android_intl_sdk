@@ -105,7 +105,7 @@ public class FaceBookSDK {
 
         GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
             @Override
-            public void onCompleted(JSONObject object, GraphResponse response) {
+            public void onCompleted(JSONObject object, final GraphResponse response) {
                 if (object != null) {
                     Session session = new Session("facebook",accessToken.getToken());
                     session.set_account_id(accessToken.getUserId());
@@ -120,6 +120,9 @@ public class FaceBookSDK {
                                 {
                                     IntlGameUtil.logd("GuestBindAPI","Bind success!");
                                     IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.SUCCESS,errorMsg);
+                                } else if(resultCode == 10010){
+                                    IntlGameUtil.logd("GuestBindAPI","Bind failed!");
+                                    IntlGame.iPersonCenterListener.onComplete("bind",10010,errorMsg);
                                 }else {
                                     IntlGameUtil.logd("GuestBindAPI","Bind failed!");
                                     IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.FAILED,errorMsg);

@@ -73,11 +73,11 @@ public class IntlGameUtil {
         // 1、取得本地时间：
         Calendar cal = Calendar.getInstance() ;
         // 2、取得时间偏移量：
-        int zoneOffset = cal.get(java.util.Calendar.ZONE_OFFSET);
+        int zoneOffset = cal.get(Calendar.ZONE_OFFSET);
         // 3、取得夏令时差：
-        int dstOffset = cal.get(java.util.Calendar.DST_OFFSET);
+        int dstOffset = cal.get(Calendar.DST_OFFSET);
         // 4、从本地时间里扣除这些差量，即可以取得UTC时间：
-        cal.add(java.util.Calendar.MILLISECOND, -(zoneOffset + dstOffset));
+        cal.add(Calendar.MILLISECOND, -(zoneOffset + dstOffset));
         return (cal.getTime().getTime()/1000);
     }
 

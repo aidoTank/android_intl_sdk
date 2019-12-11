@@ -11,7 +11,6 @@
         android:id="@+id/symbol_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="3dp"
         android:background="@android:color/holo_blue_bright">
     <WebView
         android:id="@+id/web_view"

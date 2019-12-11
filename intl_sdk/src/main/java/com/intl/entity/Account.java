@@ -17,13 +17,15 @@ public class Account {
     private String _openid;
     private String _access_token;
     private int _access_token_expire;
-    public Account(String channel,String refresh_token,int refresh_token_expire,String openid,String access_token,int access_token_expire){
+    private Boolean _first_authorize;
+    public Account(String channel,String refresh_token,int refresh_token_expire,String openid,String access_token,int access_token_expire,boolean first_authorize){
         _channel = channel;
         _access_token = access_token;
         _access_token_expire = access_token_expire;
         _refresh_token_expire = refresh_token_expire;
         _openid = openid;
         _refresh_token = refresh_token;
+        _first_authorize = first_authorize;
     }
     public Account(String channel, JSONObject jsonObject) {
         _channel = channel;
@@ -33,6 +35,7 @@ public class Account {
             _refresh_token_expire = jsonObject.getInt("refresh_token_expire");
             _openid = jsonObject.getString("openid");
             _access_token = jsonObject.getString("access_token");
+            _first_authorize = jsonObject.getBoolean("first_authorize");
         } catch (JSONException e) {
             IntlGameExceptionUtil.handle(e);
         }
@@ -59,7 +62,10 @@ public class Account {
     {
         _refresh_token_expire = refreshTokenExpire;
     }
-
+    public void setIsFirstAuthorize(boolean first_authorize)
+    {
+        _first_authorize = first_authorize;
+    }
     public String getChannel()
     {
         return _channel;
@@ -84,6 +90,10 @@ public class Account {
     {
         return _access_token_expire;
     }
+    public boolean getIsFirstAuthorize()
+    {
+        return _first_authorize;
+    }
 
 
     public JSONObject getJSONObj() throws JSONException {
@@ -94,6 +104,7 @@ public class Account {
         obj.put("openid", _openid);
         obj.put("access_token", _access_token);
         obj.put("access_token_expire",_access_token_expire);
+        obj.put("first_authorize",_first_authorize);
         return obj;
     }
 }

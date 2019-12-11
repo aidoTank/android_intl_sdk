@@ -44,10 +44,9 @@ public class GuestBindFAPI {
                     {
                         JSONObject datajson = result.responseData.optJSONObject("Data");
                         iGuestBindCallback.AfterBind(0,null);
-                    }
-                    else {
+                    } else {
                         IntlGameUtil.logd("IntlEX","GuestBindFBAPI error:"+result.responseData.toString());
-                        iGuestBindCallback.AfterBind(-1,result.responseData.optString("ErrorMessage"));
+                        iGuestBindCallback.AfterBind(result.responseData.optInt("ErrorCode"),result.responseData.optString("ErrorMessage"));
                     }
                 }else {
                     IntlGameUtil.logd("IntlEX","GuestBindFBAPI time out:"+ (result.ex != null ? result.ex.getMessage() : null));
