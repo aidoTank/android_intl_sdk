@@ -43,14 +43,14 @@ public class GuestBindFAPI {
                     if(result.responseData.optInt("ErrorCode") == 0&& result.responseData.optString("ErrorMessage").equals("Successed"))
                     {
                         JSONObject datajson = result.responseData.optJSONObject("Data");
-                        iGuestBindCallback.AfterBind(0,null);
+                        iGuestBindCallback.AfterBind(0,datajson,null);
                     } else {
                         IntlGameUtil.logd("IntlEX","GuestBindFBAPI error:"+result.responseData.toString());
-                        iGuestBindCallback.AfterBind(result.responseData.optInt("ErrorCode"),result.responseData.optString("ErrorMessage"));
+                        iGuestBindCallback.AfterBind(result.responseData.optInt("ErrorCode"),null,result.responseData.optString("ErrorMessage"));
                     }
                 }else {
                     IntlGameUtil.logd("IntlEX","GuestBindFBAPI time out:"+ (result.ex != null ? result.ex.getMessage() : null));
-                    iGuestBindCallback.AfterBind(-1, result.ex != null ? result.ex.getMessage() : null);
+                    iGuestBindCallback.AfterBind(-1,null, result.ex != null ? result.ex.getMessage() : null);
                 }
             }
         }
@@ -67,7 +67,7 @@ public class GuestBindFAPI {
         iGuestBindCallback = listener;
     }
     public interface IGuestBindCallback{
-        void AfterBind(int resultCode, String errorMsg);
+        void AfterBind(int resultCode, JSONObject jsonObject, String errorMsg);
     }
 
 }

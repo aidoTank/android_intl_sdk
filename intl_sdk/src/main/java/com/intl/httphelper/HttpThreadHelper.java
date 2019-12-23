@@ -16,7 +16,7 @@ import java.util.HashMap;
  * @Author: yujingliang
  * @Date: 2019/11/27
  */
-public class HttpThreadHelper{
+public class HttpThreadHelper {
     private Thread thread;
     public HttpThreadHelper(final JSONObject jsonObject, final String url, final HttpCallback httpCallback)
     {
@@ -65,7 +65,7 @@ public class HttpThreadHelper{
             }
         });
     }
-    public HttpThreadHelper(final Account account,final JSONObject jsonObject, final String url, final HttpCallback httpCallback)
+    public HttpThreadHelper(final Account account, final JSONObject jsonObject, final String url, final HttpCallback httpCallback)
     {
         thread = new Thread(new Runnable() {
             @Override
@@ -101,7 +101,7 @@ public class HttpThreadHelper{
             }
         });
     }
-    public HttpThreadHelper( final HashMap<String,String> headers ,final JSONObject jsonObject, final String url, final HttpCallback httpCallback)
+    public HttpThreadHelper(final HashMap<String,String> headers , final JSONObject jsonObject, final String url, final HttpCallback httpCallback)
     {
         thread = new Thread(new Runnable() {
             @Override
@@ -126,6 +126,9 @@ public class HttpThreadHelper{
                     }
                     connection.connect();
                     DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
+                    dos.write(postData);
+                    dos.flush();
+                    dos.close();
                     result.httpCode = connection.getResponseCode();
                     result.responseData = new JSONObject(streamToString(connection.getInputStream()));
                 } catch (Exception e) {
@@ -136,7 +139,57 @@ public class HttpThreadHelper{
             }
         });
     }
-    public HttpThreadHelper(final String url,final HttpCallback httpCallback)
+
+    public HttpThreadHelper(final HashMap<String,Object> postmap, final String url, final HttpCallback httpCallback )
+    {
+        final StringBuilder str = new StringBuilder();
+        for(String key :postmap.keySet())
+        {
+            str.append(key).append("=").append(postmap.get(key)).append("&");
+        }
+        str.deleteCharAt(str.length()-1);
+        thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                HttpURLConnection connection = null;
+                HttpResult result = new HttpResult();
+                result.ex = null;
+                result.responseData = null;
+                try {
+                    byte[] postData = str.toString().getBytes();
+                    String method = "POST";
+                    URL murl = new URL(url);
+                    connection = (HttpURLConnection) murl.openConnection();
+                    connection.setRequestMethod(method);
+                    connection.setConnectTimeout(15000);
+                    connection.setReadTimeout(20000);
+                    connection.setInstanceFollowRedirects(false);
+                    connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                    connection.setRequestProperty("Charset", "UTF-8");
+                    connection.connect();
+                    if(postData != null)
+                    {
+                        DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
+                        dos.write(postData);
+                        dos.flush();
+                        dos.close();
+                    }
+
+                    int responseCode = connection.getResponseCode();
+                    result.httpCode = responseCode;
+                    if (HttpURLConnection.HTTP_OK == responseCode) {
+                        result.responseData = new JSONObject(streamToString(connection.getInputStream()));
+                    }
+                } catch (Exception e) {
+                    result.ex = e;
+                    IntlGameExceptionUtil.handle(e);
+                }
+                httpCallback.onPostExecute(result);
+            }
+        });
+    }
+
+    public HttpThreadHelper(final String url, final HttpCallback httpCallback)
     {
         thread = new Thread(new Runnable() {
             @Override

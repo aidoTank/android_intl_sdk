@@ -11,7 +11,7 @@ import com.intl.IntlGame;
 import com.intl.entity.IntlDefine;
 import com.intl.entity.Account;
 import com.intl.usercenter.IntlGameCenter;
-import com.ycgame.test.R;
+import com.ycgame.t11.gp.R;
 import org.json.JSONException;
 import java.util.HashMap;
 
@@ -21,9 +21,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ChatView chatView = new ChatView(this);
-        chatView.show();
-        IntlGame.init(MainActivity.this,"YGAaFkq3vf753xo3JeZLvX","1061953441680-6l4ts44pco3vj1ao002qe1psf8rrqjam.apps.googleusercontent.com","754170961660851","7453817292517158","EVWHPXxGEOXzbjfWxhUp4yOYgTMSJDNA", new IntlGame.IInitListener() {
+        IntlGame.init(MainActivity.this,"t11","YGAaFkq3vf753xo3JeZLvX","1061953441680-6l4ts44pco3vj1ao002qe1psf8rrqjam.apps.googleusercontent.com","754170961660851","7453817292517158","EVWHPXxGEOXzbjfWxhUp4yOYgTMSJDNA", new IntlGame.IInitListener() {
             @Override
             public void onComplete(int var1, String var2) {
 
@@ -105,9 +103,9 @@ public class MainActivity extends Activity {
                     UpdateUI("已登录:"+token);
                 }else if(code == IntlDefine.CANCEL)
                 {
-                    UpdateUI("LoginCenter cancel");
+                    UpdateUI("LoginCenterFirst cancel");
                 }else {
-                    UpdateUI("LoginCenter failed: errorMsg==>"+msg);
+                    UpdateUI("LoginCenterFirst failed: errorMsg==>"+msg);
                 }
 
             }
@@ -137,7 +135,7 @@ public class MainActivity extends Activity {
     private void logout(Activity activity)
     {
         UpdateDebugUI("");
-        IntlGame.LogOut(activity, new IntlGame.ILogoutListener() {
+        IntlGame.LoginCenterLogout(activity, new IntlGame.ILogoutListener() {
             @Override
             public void onComplete(int code, String errorMsg) {
                 if(code == 0)

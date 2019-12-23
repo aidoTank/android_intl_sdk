@@ -34,4 +34,8 @@ public class IntlDefine {
 
     public static final int HAVE_BIND=0x10;
 
+    public static final int BIND_SUCCESS = 0x100;
+    public static final int BIND_CANCEL = 0x110;
+    public static final int BIND_FAILED = 0x120;
+
 }

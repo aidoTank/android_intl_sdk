@@ -83,6 +83,7 @@ public class IntlGameCenter {
                     break;
                 case "Switch":
                     if(IntlGame.iPersonCenterListener !=null){
+                        IntlGame.LoginCenterLogout(this.activity.get(),null);
                         IntlGame.iPersonCenterListener.onComplete("switchroles",IntlDefine.SUCCESS,null);
                     }
                     break;
@@ -111,8 +112,8 @@ public class IntlGameCenter {
     }
     public void showLoginWebView(Activity activity,String _uri) {
         _webSession.showDialog(activity,
-                414,
-                319,
+                520,
+                315,
                 Uri.parse(_uri), false);
 
     }
@@ -120,13 +121,27 @@ public class IntlGameCenter {
     {
         return AccountCache.loadAccount(activity) != null;
     }
+
+    public boolean isGuest(Activity activity)
+    {
+        if(!isLogin(activity))
+        {
+            return false;
+        }
+        Account account = AccountCache.loadAccount(activity);
+        return account.getChannel().equals("ycgame");
+    }
     public void LogOut(Activity activity)
     {
         AccountCache.cleanAccounts(activity);
         GoogleSDK.logout(activity);
         Guest.logout();
         FaceBookSDK.logout();
-
+    }
+    private void channelLogout(Activity activity)
+    {
+        GoogleSDK.logout(activity);
+        Guest.logout();
     }
     public void onPause(){
         WebSession.setDialogVisiable(false);
@@ -143,15 +158,19 @@ public class IntlGameCenter {
     {
         Account act = loadAccounts(activity);
         if(act !=null)
-        _webSession.showDialog(activity,414,319,Uri.parse(IntlGame.urlHost +"/usercenter.html?openid="+act.getOpenid()+"&access_token="+act.getAccessToken()),false);
+        _webSession.showDialog(activity,520,315,Uri.parse(IntlGame.urlHost +"/usercenter.html?openid="+act.getOpenid()+"&access_token="+act.getAccessToken()),false);
     }
-    public void LoginCenter(final Activity activity)
+    public void LoginCenterFirst(final Activity activity)
     {
         if (WebSession.getIsShwoingWebPage()) {
             return;
         }
         final Account account = loadAccounts(activity.getApplicationContext());
-        if (account == null) {
+        if (account == null||IntlGame.isLogin(activity)) {
+            if(IntlGame.isLogin(activity))
+            {
+                channelLogout(activity);
+            }
             showLoginWebView(activity,IntlGame.urlHost +"/index.html");
             return;
         }
@@ -162,21 +181,11 @@ public class IntlGameCenter {
             AuthorizeCheckAPI checkAPI = new AuthorizeCheckAPI(account);
             checkAPI.setListener(new AuthorizeCheckAPI.ICheckAccessTokenCallback() {
                 @Override
-                public void AfterCheck(JSONObject jsonObject,String errorMsg) {
+                public void AfterCheck(final JSONObject jsonObject, String errorMsg) {
                     if(jsonObject != null)
                     {
                         IntlGameUtil.logd("IntlGame","AccessToken is Effective");
-                        account.setOpenid(jsonObject.optString("openid"));
-                        account.setAccessToken(jsonObject.optString("access_token"));
-                        account.setAccessTokenExprie(jsonObject.optInt("access_token_expire"));
-                        boolean first_authorize = jsonObject.optBoolean("first_authorize");
-                        if(first_authorize){
-                            account.setIsFirstAuthorize(true);
-                            Map<String, Object> map = new HashMap<>();
-                            map.put("user_id", jsonObject.optString("openid"));
-                            IntlGame.AfEvent(activity, "af_complete_registration", map);
-                        }
-                        setAccount(activity,account);
+                        IntlGame.isFirstUseLogin = false;
                         IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
                     }else{
                         IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);
@@ -200,6 +209,7 @@ public class IntlGameCenter {
                         setAccount(activity,account);
                         if(IntlGame.iLoginListener != null)
                         {
+                            IntlGame.isFirstUseLogin = false;
                             IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
                         }
                         try {
@@ -221,6 +231,18 @@ public class IntlGameCenter {
 
     }
 
+    public void LoginCenterSecond(final Activity activity)
+    {
+        if (WebSession.getIsShwoingWebPage()) {
+            return;
+        }
+        if(IntlGame.isLogin(activity))
+        {
+            channelLogout(activity);
+        }
+        showLoginWebView(activity,IntlGame.urlHost +"/index.html");
+
+    }
 
     public Account loadAccounts(Context context) {
         return AccountCache.loadAccount(context);

@@ -2,10 +2,11 @@ package com.intl.loginchannel;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
+
+import androidx.annotation.NonNull;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -29,6 +30,8 @@ import com.intl.utils.IntlGameUtil;
 import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -82,11 +85,16 @@ public class GoogleSDK {
                             if(task.isSuccessful())
                             {
                                 Log.d(TAG, "Google logout: success");
-                                IntlGame.iLogoutListener.onComplete(IntlDefine.SUCCESS,null);
+                                if(IntlGame.iLogoutListener != null)
+                                {
+                                    IntlGame.iLogoutListener.onComplete(IntlDefine.SUCCESS,null);
+                                }
                             }else{
                                 Log.d(TAG, "Google logout: failed");
-                                IntlGame.iLogoutListener.onComplete(IntlDefine.FAILED,task.getException()!=null?task.getException().getMessage():null);
-
+                                if(IntlGame.iLogoutListener != null)
+                                {
+                                    IntlGame.iLogoutListener.onComplete(IntlDefine.FAILED,task.getException()!=null?task.getException().getMessage():null);
+                                }
                             }
                         }
                     });
@@ -111,7 +119,7 @@ public class GoogleSDK {
         try {
             final GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             String authCode = account.getServerAuthCode();
-            Log.d(TAG, "handleSignInResult: authCode "+authCode+" uid=>"+account.getId()+" ExpirationTimeSecs=>"+account.getExpirationTimeSecs());
+            Log.d(TAG, "handleSignInResult: authCode "+authCode+" uid=>"+account.getId());
             // Signed in successfully.
             Session session = new Session("google",authCode,"code");
 
@@ -120,10 +128,11 @@ public class GoogleSDK {
                 GuestBindGAPI guestBindAPI = new GuestBindGAPI(session);
                 guestBindAPI.setListener(new GuestBindGAPI.IGuestBindCallback() {
                     @Override
-                    public void AfterBind(int resultCode,String errorMsg) {
+                    public void AfterBind(int resultCode,JSONObject accountJson,String errorMsg) {
                         if(resultCode == 0)
                         {
                             IntlGameUtil.logd("GuestBindAPI","Bind success!");
+                            AccountCache.saveAccounts(activity.get(),new Account("google",accountJson));
                             IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.SUCCESS,errorMsg);
                         }else if(resultCode == 10010){
                             IntlGameUtil.logd("GuestBindAPI","Bind failed!");
@@ -143,8 +152,15 @@ public class GoogleSDK {
                     public void AfterGetAccessToken(String channel,JSONObject accountJson,String errorMsg) {
                         if(accountJson != null)
                         {
-                            AccountCache.saveAccounts(activity.get(),new Account(channel,accountJson));
-
+                            Account userac = new Account(channel,accountJson);
+                            boolean first_authorize = userac.getIsFirstAuthorize();
+                            if(first_authorize){
+                                Map<String, Object> map = new HashMap<>();
+                                map.put("user_id", accountJson.optString("openid"));
+                                IntlGame.AfEvent(activity.get(), "af_complete_registration", map);
+                            }
+                            AccountCache.saveAccounts(activity.get(),userac);
+                            IntlGame.isFirstUseLogin = false;
                             IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"),null);
                         }else {
                             IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);

@@ -39,15 +39,15 @@ public class GuestBindGAPI {
                     if(result.responseData.optInt("ErrorCode") == 0&& result.responseData.optString("ErrorMessage").equals("Successed"))
                     {
                         JSONObject datajson = result.responseData.optJSONObject("Data");
-                        iGuestBindCallback.AfterBind(0,null);
+                        iGuestBindCallback.AfterBind(0,datajson,null);
                     }
                     else {
                         IntlGameUtil.logd("IntlEX","GuestBindGoogleAPI error:"+result.responseData.toString());
-                        iGuestBindCallback.AfterBind(result.responseData.optInt("ErrorCode"),result.responseData.optString("ErrorMessage"));
+                        iGuestBindCallback.AfterBind(result.responseData.optInt("ErrorCode"),null,result.responseData.optString("ErrorMessage"));
                     }
                 }else {
                     IntlGameUtil.logd("IntlEX","GuestBindGoogleAPI time out:"+ (result.ex != null ? result.ex.getMessage() : null));
-                    iGuestBindCallback.AfterBind(-1, result.ex != null ? result.ex.getMessage() : null);
+                    iGuestBindCallback.AfterBind(-1, null,result.ex != null ? result.ex.getMessage() : null);
                 }
             }
         }
@@ -64,7 +64,7 @@ public class GuestBindGAPI {
         iGuestBindCallback = listener;
     }
     public interface IGuestBindCallback{
-        void AfterBind(int resultCode, String errorMsg);
+        void AfterBind(int resultCode, JSONObject jsonObject, String errorMsg);
     }
 
 }

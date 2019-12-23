@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1061953441680",
+    "firebase_url": "https://t11global-gplogin.firebaseio.com",
+    "project_id": "t11global-gplogin",
+    "storage_bucket": "t11global-gplogin.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1061953441680:android:ab64cb7fa88948aab26d15",
+        "android_client_info": {
+          "package_name": "com.ycgame.t11.gp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1061953441680-4ls18fqiv1osk4l9ebjv19nup576pn84.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARl2SqNN8aWuuKTcEzEE9vtUfF-532Kzc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1061953441680-4ls18fqiv1osk4l9ebjv19nup576pn84.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

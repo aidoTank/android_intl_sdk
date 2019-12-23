@@ -1,21 +1,15 @@
 package com.intl;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.provider.Settings;
 import android.util.Log;
 
-import com.appsflyer.AppsFlyerConversionListener;
-import com.appsflyer.AppsFlyerLib;
 import com.intl.af.AFManager;
-import com.intl.entity.Account;
 import com.intl.loginchannel.FaceBookSDK;
 import com.intl.loginchannel.GoogleSDK;
 import com.intl.entity.IntlDefine;
-import com.intl.usercenter.AccountCache;
 import com.intl.usercenter.IntlGameCenter;
 import com.intl.utils.IntlGameExceptionUtil;
 import com.intl.utils.IntlGameUtil;
@@ -38,9 +32,12 @@ public class IntlGame extends Activity {
     public static String GoogleClientId;
     public static String FacebookClientId;
     public static Application application;
+    public static String Game;
     public static String urlHost = "https://gather-auth.ycgame.com";
-    public static void init(final Activity activity, String devKey, final String google_clientid, final String facebook_clientid,  String gp_clientid, String gp_secret,final IInitListener iInitListener)
+    public static boolean isFirstUseLogin = true;
+    public static void init(final Activity activity, String game,String devKey, final String google_clientid, final String facebook_clientid,  String gp_clientid, String gp_secret,final IInitListener iInitListener)
     {
+        Game = game;
         GoogleClientId = google_clientid;
         FacebookClientId = facebook_clientid;
         GPclientid = gp_clientid;
@@ -68,7 +65,14 @@ public class IntlGame extends Activity {
     public static void LoginCenter(Activity activity, ILoginCenterListener _iLoginListener)
     {
         iLoginListener = _iLoginListener;
-        IntlGameCenter.getInstance().LoginCenter(activity);
+        if(isFirstUseLogin)
+        {
+            IntlGameCenter.getInstance().LoginCenterFirst(activity);
+        }
+        else {
+            IntlGameCenter.getInstance().LoginCenterSecond(activity);
+
+        }
     }
 
     public static void PersonCenter(Activity activity, IPersonCenterListener _iPersonCenterListener)
@@ -79,6 +83,11 @@ public class IntlGame extends Activity {
     public static boolean isLogin(Activity activity)
     {
         return IntlGameCenter.getInstance().isLogin(activity);
+    }
+
+    public static boolean isGuest(Activity activity)
+    {
+        return IntlGameCenter.getInstance().isGuest(activity);
     }
     public static void LoginCenterLogout(Activity activity,ILogoutListener _iLogoutListener)
     {

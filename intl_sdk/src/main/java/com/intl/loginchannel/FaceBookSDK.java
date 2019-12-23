@@ -28,6 +28,8 @@ import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Author: yujingliang
@@ -115,10 +117,13 @@ public class FaceBookSDK {
                         GuestBindFAPI guestBindAPI = new GuestBindFAPI(session);
                         guestBindAPI.setListener(new GuestBindFAPI.IGuestBindCallback() {
                             @Override
-                            public void AfterBind(int resultCode,String errorMsg) {
+                            public void AfterBind(int resultCode,JSONObject accountJson,String errorMsg) {
+                                if(IntlGame.iPersonCenterListener ==null)
+                                    return;
                                 if(resultCode == 0)
                                 {
                                     IntlGameUtil.logd("GuestBindAPI","Bind success!");
+                                    AccountCache.saveAccounts(activity.get(),new Account("facebook",accountJson));
                                     IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.SUCCESS,errorMsg);
                                 } else if(resultCode == 10010){
                                     IntlGameUtil.logd("GuestBindAPI","Bind failed!");
@@ -136,10 +141,19 @@ public class FaceBookSDK {
                         accessTokeAPI.setListener(new AuthorizeFAPI.IgetAccessTokenCallback() {
                             @Override
                             public void AfterGetAccessToken(String channel,JSONObject accountJson,String errorMsg) {
+                                if(IntlGame.iLoginListener == null)
+                                    return;
                                 if(accountJson != null)
                                 {
-                                    AccountCache.saveAccounts(activity.get(),new Account(channel,accountJson));
-
+                                    Account userac = new Account(channel,accountJson);
+                                    boolean first_authorize = userac.getIsFirstAuthorize();
+                                    if(first_authorize){
+                                        Map<String, Object> map = new HashMap<>();
+                                        map.put("user_id", accountJson.optString("openid"));
+                                        IntlGame.AfEvent(activity.get(), "af_complete_registration", map);
+                                    }
+                                    AccountCache.saveAccounts(activity.get(),userac);
+                                    IntlGame.isFirstUseLogin = false;
                                     IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"),null);
                                 }else {
                                     IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);
@@ -152,8 +166,10 @@ public class FaceBookSDK {
                 }else{
                     if(_isBind)
                     {
+                        if(IntlGame.iPersonCenterListener != null)
                         IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.FAILED,response.getRawResponse());
                     }else {
+                        if(IntlGame.iLoginListener != null)
                         IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,response.getRawResponse());
                     }
                 }
