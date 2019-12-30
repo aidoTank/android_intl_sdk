@@ -1,4 +1,4 @@
-package com.intl.googlepay;
+package com.intl.ipa;
 
 import android.content.Context;
 import android.content.SharedPreferences;

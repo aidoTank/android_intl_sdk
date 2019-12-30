@@ -10,6 +10,7 @@ import com.appsflyer.AppsFlyerLib;
 import com.intl.IntlGame;
 import com.intl.utils.IntlGameUtil;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -17,6 +18,7 @@ import java.util.Map;
  * @Date: 2019/12/6
  */
 public class AFManager {
+    private static final String TAG = "AFManager";
     private static AFManager instance;
     public static AFManager getInstance()
     {
@@ -56,5 +58,25 @@ public class AFManager {
 
     public void AfEvent(Context context, String eventname, Map<String, Object> map) {
         AppsFlyerLib.getInstance().trackEvent(context, eventname, map);
+    }
+
+    public void AdPurchase(Context context, String itemId, String pay_currency, String pay_amount, String purchase_type)
+    {
+        IntlGameUtil.logd(TAG, "商品ID：" + itemId);
+        IntlGameUtil.logd(TAG, "货币类型：" + pay_currency);
+        IntlGameUtil.logd(TAG, "货币钱数：" + pay_amount);
+        try {
+            AppsFlyerLib.getInstance().setCurrencyCode(pay_currency);
+            IntlGameUtil.logd(TAG, "Appsflyer Add to cart event");
+            Map<String, Object> eventValue = new HashMap<>();
+            eventValue.put("af_revenue", pay_amount);
+            eventValue.put("af_content_type", purchase_type);
+            eventValue.put("af_content_id", itemId);
+            eventValue.put("af_currency", pay_currency);
+            AppsFlyerLib.getInstance().trackEvent(context, "af_purchase", eventValue);
+        } catch (Exception var8) {
+            var8.printStackTrace();
+        }
+
     }
 }

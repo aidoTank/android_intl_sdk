@@ -44,11 +44,12 @@ public class GoogleSDK {
     private static final int RC_SIGN_IN = 9001;
     private static WeakReference<Activity> activity;
     private static Boolean _isBind = false;
+    private static Boolean isSwitch = false;
     private static GoogleSignInOptions gso;
     public static void login(WeakReference<Activity>  _activity,Boolean isBind)
     {
         _isBind = isBind;
-
+        isSwitch = false;
         activity = _activity;
         if(IntlGame.GoogleClientId == null)
         {
@@ -66,6 +67,29 @@ public class GoogleSDK {
         _activity.get().startActivityForResult(signInIntent, RC_SIGN_IN);
         IntlGameLoading.getInstance().show(_activity.get());
     }
+
+    public static void SwitchLogin(WeakReference<Activity>  _activity)
+    {
+        _isBind = false;
+        isSwitch = true;
+        activity = _activity;
+        if(IntlGame.GoogleClientId == null)
+        {
+            Toast.makeText(_activity.get(), "googleClientId erre", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestScopes(new Scope(Scopes.DRIVE_APPFOLDER))
+                .requestEmail()
+                .requestProfile()
+                .requestServerAuthCode(IntlGame.GoogleClientId)
+                .build();
+        mGoogleSignInClient = new WeakReference<>(GoogleSignIn.getClient(_activity.get(), gso)) ;
+        Intent signInIntent = mGoogleSignInClient.get().getSignInIntent();
+        _activity.get().startActivityForResult(signInIntent, RC_SIGN_IN);
+        IntlGameLoading.getInstance().show(_activity.get());
+    }
+
     public static void logout(Activity activity)
     {
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(activity);
@@ -122,6 +146,32 @@ public class GoogleSDK {
             Log.d(TAG, "handleSignInResult: authCode "+authCode+" uid=>"+account.getId());
             // Signed in successfully.
             Session session = new Session("google",authCode,"code");
+            if(isSwitch)
+            {
+                final AuthorizeGAPI accessTokeAPI = new AuthorizeGAPI(session);
+                accessTokeAPI.setListener(new AuthorizeGAPI.IgetAccessTokenCallback() {
+                    @Override
+                    public void AfterGetAccessToken(String channel,JSONObject accountJson,String errorMsg) {
+                        if(accountJson != null)
+                        {
+                            Account userac = new Account(channel,accountJson);
+                            boolean first_authorize = userac.getIsFirstAuthorize();
+                            if(first_authorize){
+                                Map<String, Object> map = new HashMap<>();
+                                map.put("user_id", accountJson.optString("openid"));
+                                IntlGame.AfEvent(activity.get(), "af_complete_registration", map);
+                            }
+                            AccountCache.saveAccounts(activity.get(),userac);
+                            IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"),null);
+                        }else {
+                            IntlGame.iSwitchAccountListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);
+                        }
+
+                    }
+                });
+                accessTokeAPI.Excute();
+                return;
+            }
 
             if(_isBind)
             {
@@ -133,13 +183,10 @@ public class GoogleSDK {
                         {
                             IntlGameUtil.logd("GuestBindAPI","Bind success!");
                             AccountCache.saveAccounts(activity.get(),new Account("google",accountJson));
-                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.SUCCESS,errorMsg);
-                        }else if(resultCode == 10010){
-                            IntlGameUtil.logd("GuestBindAPI","Bind failed!");
-                            IntlGame.iPersonCenterListener.onComplete("bind",10010,errorMsg);
+                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.SUCCESS,null,errorMsg);
                         }else {
                             IntlGameUtil.logd("GuestBindAPI","Bind failed!");
-                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.FAILED,errorMsg);
+                            IntlGame.iPersonCenterListener.onComplete("bind",resultCode,null,errorMsg);
                         }
 
                     }
@@ -160,7 +207,6 @@ public class GoogleSDK {
                                 IntlGame.AfEvent(activity.get(), "af_complete_registration", map);
                             }
                             AccountCache.saveAccounts(activity.get(),userac);
-                            IntlGame.isFirstUseLogin = false;
                             IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"),null);
                         }else {
                             IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);
@@ -172,13 +218,23 @@ public class GoogleSDK {
             }
 
         } catch (ApiException e) {
+            if (isSwitch)
+            {
+                if (e.getStatusCode() == 12501) {
+                    IntlGame.iSwitchAccountListener.onComplete(IntlDefine.CANCEL,null, null,null);
+                } else {
+                    IntlGame.iSwitchAccountListener.onComplete(IntlDefine.FAILED, null,null,e.getMessage());
+                }
+                Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+            }
             if(_isBind)
             {
                 if (e.getStatusCode() == 12501) {
-                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.CANCEL,null);
+                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.CANCEL,null,null);
                 } else {
-                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.FAILED,e.getMessage());
+                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.FAILED,null,e.getMessage());
                 }
+                Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
             }else {
                 if (e.getStatusCode() == 12501) {
                     IntlGame.iLoginListener.onComplete(IntlDefine.CANCEL,null, null,null);

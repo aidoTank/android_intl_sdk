@@ -59,7 +59,7 @@ public class FaceBookSDK {
                 //取消登录
                 if(isBind)
                 {
-                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.CANCEL,null);
+                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.CANCEL,null,null);
                 }else {
                     IntlGame.iLoginListener.onComplete(IntlDefine.CANCEL,null, null,null);
                 }
@@ -72,7 +72,7 @@ public class FaceBookSDK {
                 //登录错误
                 if(isBind)
                 {
-                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.FAILED,error.toString());
+                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.FAILED,null,error.toString());
                 }else {
                     IntlGame.iLoginListener.onComplete(IntlDefine.FAILED, null,null,error.toString());
                 }
@@ -86,6 +86,43 @@ public class FaceBookSDK {
             LoginManager.getInstance().logInWithReadPermissions(activity.get(), Arrays.asList("public_profile"));
         } else {
             getLoginInfo(accessToken,isBind,activity);
+        }
+    }
+
+    /**
+     * 登录
+     */
+    public static void SwitchLogin(final WeakReference<Activity> activity) {
+        IntlGameLoading.getInstance().show(activity.get());
+        callbackManager = CallbackManager.Factory.create();
+        getLoginManager().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                // login success
+                AccessToken accessToken = loginResult.getAccessToken();
+                getLoginInfo(accessToken,activity);
+            }
+
+            @Override
+            public void onCancel() {
+                IntlGame.iSwitchAccountListener.onComplete(IntlDefine.CANCEL,null, null,null);
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                //登录错误
+                IntlGame.iSwitchAccountListener.onComplete(IntlDefine.FAILED, null,null,error.toString());
+            }
+        });
+        IntlGameLoading.getInstance().hide();
+        //判断当前token，如果不为空，则已经获取过权限，否则读取权限走registerCallback回调
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        Profile profile = Profile.getCurrentProfile();
+        if (accessToken == null || accessToken.isExpired() || profile == null) {
+            LoginManager.getInstance().logInWithReadPermissions(activity.get(), Arrays.asList("public_profile"));
+        } else {
+            getLoginInfo(accessToken,activity);
         }
     }
 
@@ -124,19 +161,20 @@ public class FaceBookSDK {
                                 {
                                     IntlGameUtil.logd("GuestBindAPI","Bind success!");
                                     AccountCache.saveAccounts(activity.get(),new Account("facebook",accountJson));
-                                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.SUCCESS,errorMsg);
+                                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.SUCCESS,null,errorMsg);
                                 } else if(resultCode == 10010){
                                     IntlGameUtil.logd("GuestBindAPI","Bind failed!");
-                                    IntlGame.iPersonCenterListener.onComplete("bind",10010,errorMsg);
+                                    IntlGame.iPersonCenterListener.onComplete("bind",10010,null,errorMsg);
                                 }else {
                                     IntlGameUtil.logd("GuestBindAPI","Bind failed!");
-                                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.FAILED,errorMsg);
+                                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.FAILED,null,errorMsg);
                                 }
 
                             }
                         });
                         guestBindAPI.Excute();
                     }else {
+
                         final AuthorizeFAPI accessTokeAPI = new AuthorizeFAPI(session);
                         accessTokeAPI.setListener(new AuthorizeFAPI.IgetAccessTokenCallback() {
                             @Override
@@ -153,7 +191,6 @@ public class FaceBookSDK {
                                         IntlGame.AfEvent(activity.get(), "af_complete_registration", map);
                                     }
                                     AccountCache.saveAccounts(activity.get(),userac);
-                                    IntlGame.isFirstUseLogin = false;
                                     IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"),null);
                                 }else {
                                     IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);
@@ -167,10 +204,10 @@ public class FaceBookSDK {
                     if(_isBind)
                     {
                         if(IntlGame.iPersonCenterListener != null)
-                        IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.FAILED,response.getRawResponse());
+                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.FAILED,null,response.getRawResponse());
                     }else {
                         if(IntlGame.iLoginListener != null)
-                        IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,response.getRawResponse());
+                            IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,response.getRawResponse());
                     }
                 }
             }
@@ -182,6 +219,60 @@ public class FaceBookSDK {
         request.executeAsync();
 
     }
+
+    /**
+     * 获取登录信息
+     *
+     * @param accessToken
+     */
+    private static void getLoginInfo(final AccessToken accessToken,final WeakReference<Activity> activity) {
+
+        GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
+            @Override
+            public void onCompleted(JSONObject object, final GraphResponse response) {
+                if (object != null) {
+                    Session session = new Session("facebook",accessToken.getToken());
+                    session.set_account_id(accessToken.getUserId());
+                    session.set_access_token_expire(accessToken.getDataAccessExpirationTime().getTime()/1000);
+                    final AuthorizeFAPI accessTokeAPI = new AuthorizeFAPI(session);
+                    accessTokeAPI.setListener(new AuthorizeFAPI.IgetAccessTokenCallback() {
+                        @Override
+                        public void AfterGetAccessToken(String channel,JSONObject accountJson,String errorMsg) {
+                            if(IntlGame.iSwitchAccountListener == null)
+                                return;
+                            if(accountJson != null)
+                            {
+                                Account userac = new Account(channel,accountJson);
+                                boolean first_authorize = userac.getIsFirstAuthorize();
+                                if(first_authorize){
+                                    Map<String, Object> map = new HashMap<>();
+                                    map.put("user_id", accountJson.optString("openid"));
+                                    IntlGame.AfEvent(activity.get(), "af_complete_registration", map);
+                                }
+                                AccountCache.saveAccounts(activity.get(),userac);
+                                IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"),null);
+                            }else {
+                                IntlGame.iSwitchAccountListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);
+                            }
+
+                        }
+                    });
+                    accessTokeAPI.Excute();
+                } else{
+
+                    if(IntlGame.iSwitchAccountListener != null)
+                        IntlGame.iSwitchAccountListener.onComplete(IntlDefine.FAILED,null,null,response.getRawResponse());
+                }
+            }
+        });
+
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "id,name,link,gender,birthday,email,picture,locale,updated_time,timezone,age_range,first_name,last_name");
+        request.setParameters(parameters);
+        request.executeAsync();
+
+    }
+
 
     /**
      * 是否登录成功

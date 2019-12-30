@@ -28,7 +28,6 @@ public class Guest {
             public void AfterGuestLogin(String channel, JSONObject jsonObject,String errorMsg) {
                 if(jsonObject != null){
                     AccountCache.saveAccounts(activity.get(),new Account(channel,jsonObject));
-                    IntlGame.isFirstUseLogin = false;
                     IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
                 }else {
                     IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);

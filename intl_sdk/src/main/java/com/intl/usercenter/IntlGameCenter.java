@@ -5,11 +5,13 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import com.intl.IntlGame;
 import com.intl.api.AuthorizeCheckAPI;
 import com.intl.api.RefreshAPI;
 import com.intl.entity.Account;
+import com.intl.ipa.IntlGameGooglePlayV3;
 import com.intl.loginchannel.FaceBookSDK;
 import com.intl.loginchannel.GoogleSDK;
 import com.intl.loginchannel.Guest;
@@ -26,7 +28,7 @@ import org.json.JSONObject;
 import java.lang.ref.WeakReference;
 import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Locale;
 
 /**
  * @Author: yujingliang
@@ -35,10 +37,12 @@ import java.util.Map;
 public class IntlGameCenter {
     private static final String LOGIN_CENTER_WEB_COMMAND_DOMAIN = "yc.mobilesdk.logincenter";
     private static final String PERSON_CENTER_WEB_COMMAND_DOMAIN = "yc.mobilesdk.personcenter";
+    private static final String TAG = "IntlGamePay";
     private static IntlGameCenter _instance;
     private WebSession _webSession;
     public WeakReference<Activity> activity;
     private IntlGameHandler handler;
+    private static boolean isSwitch = false;
     static class IntlGameHandler extends Handler{
         WeakReference<Activity> activity;
         IntlGameHandler(WeakReference<Activity> activity){
@@ -49,48 +53,64 @@ public class IntlGameCenter {
             HashMap Msgmap = (HashMap)msg.obj;
             WebSession.currentWebSession().forceCloseSession();
             boolean isLoginScene = false;
+            if(String.valueOf( Msgmap.get("command")).equals("ShowLoginMainPage"))
+            {
+                if(IntlGame.iPersonCenterListener !=null){
+                    isSwitch = true;
+
+                    IntlGame.iPersonCenterListener.onComplete("switchroles",IntlDefine.SUCCESS, String.valueOf((Msgmap.get("args"))),null);
+                }
+                return;
+            }
             if(String.valueOf(Msgmap.get("commandDomain")) .equals(LOGIN_CENTER_WEB_COMMAND_DOMAIN)) {
                 isLoginScene = true;
+                if(String.valueOf( Msgmap.get("command")).equals("close"))
+                {
+                    activity.get().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            IntlGameCenter.getInstance().LoginCenter(activity.get());
+                        }
+                    });
+                }
+                if(String.valueOf( Msgmap.get("command")).equals("Google"))
+                {
+                    GoogleSDK.login(this.activity,!isLoginScene);
+                }
+                if(String.valueOf( Msgmap.get("command")).equals("Facebook"))
+                {
+                    FaceBookSDK.login(activity,!isLoginScene);
+                }
+                if(String.valueOf( Msgmap.get("command")).equals("Guest"))
+                {
+                    Guest.login(activity);
+                }
             }
             if(String.valueOf(Msgmap.get("commandDomain")) .equals(PERSON_CENTER_WEB_COMMAND_DOMAIN)) {
                 isLoginScene = false;
-            }
-            switch (String.valueOf( Msgmap.get("command"))){
-                case "close":
-                    if (isLoginScene)
-                    {
-                        if(IntlGame.iLoginListener != null)
-                        {
-                            IntlGame.iLoginListener.onComplete(IntlDefine.CANCEL,"login cancel",null,null);
-                        }
-                    }
-                    else
-                    {
-                        if(IntlGame.iPersonCenterListener != null)
-                        {
-                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.CANCEL,null);
-                        }
-                    }
-                    break;
-                case "Google":
-                    GoogleSDK.login(this.activity,!isLoginScene);
-                    break;
-                case "Facebook":
-                    FaceBookSDK.login(activity,!isLoginScene);
-                    break;
-                case "Guest":
+                if(IntlGame.iPersonCenterListener != null&&String.valueOf( Msgmap.get("command")).equals("close"))
+                {
+                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.CANCEL,null,null);
+                }
+                if(String.valueOf( Msgmap.get("command")).equals("Google")){
+                    GoogleSDK.SwitchLogin(this.activity);
+                }
+                if(String.valueOf( Msgmap.get("command")).equals("Facebook")){
+                    FaceBookSDK.SwitchLogin(activity);
+                }
+                if(String.valueOf( Msgmap.get("command")).equals("Guest")){
                     Guest.login(activity);
-                    break;
-                case "Switch":
-                    if(IntlGame.iPersonCenterListener !=null){
-                        IntlGame.LoginCenterLogout(this.activity.get(),null);
-                        IntlGame.iPersonCenterListener.onComplete("switchroles",IntlDefine.SUCCESS,null);
-                    }
-                    break;
+                }
+
             }
         }
     }
 
+    public static String getLanguage(Activity activity)
+    {
+        Locale locale = activity.getResources().getConfiguration().locale;
+        return locale.getLanguage();
+    }
     public static void init(Activity activity){
 
         if (_instance == null)
@@ -110,7 +130,8 @@ public class IntlGameCenter {
         _webSession = new WebSession();
         registCommand();
     }
-    public void showLoginWebView(Activity activity,String _uri) {
+    public void showWebView(Activity activity, String _uri) {
+        Log.d(TAG, "showWebView: uri=>"+_uri);
         _webSession.showDialog(activity,
                 520,
                 315,
@@ -141,6 +162,7 @@ public class IntlGameCenter {
     private void channelLogout(Activity activity)
     {
         GoogleSDK.logout(activity);
+        FaceBookSDK.logout();
         Guest.logout();
     }
     public void onPause(){
@@ -148,30 +170,45 @@ public class IntlGameCenter {
     }
     public void onResume(){
         WebSession.setDialogVisiable(true);
+        IntlGameGooglePlayV3.onResume(activity.get());
     }
     public void onDestroy()
     {
         IntlGameLoading.getInstance().destroy();
+        IntlGameGooglePlayV3.onDestroy();
+    }
+
+    public void SetGameRoleInfo(String role_info,boolean bcreate)
+    {
+        IntlGameGooglePlayV3.SetGameRoleInfo(role_info);
+        if(bcreate)
+        {
+            //创建角色
+        }
+    }
+
+    public  void googlePlayV3(Context context, String productId) {
+        IntlGameUtil.logd(TAG, "开始调用googlePlayV3()方法");
+        IntlGameUtil.logd(TAG, "context对象：" + context);
+        IntlGameUtil.logd(TAG, ">>>>>>>>>>>>");
+        IntlGameUtil.logd(TAG, "开始调用google界面充值.");
+        IntlGameGooglePlayV3.googles(context, productId);
     }
 
     public void PersonCenter(Activity activity)
     {
         Account act = loadAccounts(activity);
         if(act !=null)
-        _webSession.showDialog(activity,520,315,Uri.parse(IntlGame.urlHost +"/usercenter.html?openid="+act.getOpenid()+"&access_token="+act.getAccessToken()),false);
+        _webSession.showDialog(activity,520,315,Uri.parse(IntlGame.urlHost +"/usercenter.html?openid="+act.getOpenid()+"&access_token="+act.getAccessToken()+"&channeltype=agl&language=cn"),false);
     }
-    public void LoginCenterFirst(final Activity activity)
+    public void LoginCenter(final Activity activity)
     {
         if (WebSession.getIsShwoingWebPage()) {
             return;
         }
         final Account account = loadAccounts(activity.getApplicationContext());
-        if (account == null||IntlGame.isLogin(activity)) {
-            if(IntlGame.isLogin(activity))
-            {
-                channelLogout(activity);
-            }
-            showLoginWebView(activity,IntlGame.urlHost +"/index.html");
+        if (account == null) {
+            showWebView(activity,IntlGame.urlHost +"/index.html?channeltype=agl&language=cn");
             return;
         }
         if(account.getAccessTokenExpire()>IntlGameUtil.getUTCTimeStr())
@@ -185,7 +222,6 @@ public class IntlGameCenter {
                     if(jsonObject != null)
                     {
                         IntlGameUtil.logd("IntlGame","AccessToken is Effective");
-                        IntlGame.isFirstUseLogin = false;
                         IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
                     }else{
                         IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);
@@ -209,7 +245,6 @@ public class IntlGameCenter {
                         setAccount(activity,account);
                         if(IntlGame.iLoginListener != null)
                         {
-                            IntlGame.isFirstUseLogin = false;
                             IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
                         }
                         try {
@@ -231,8 +266,33 @@ public class IntlGameCenter {
 
     }
 
-    public void LoginCenterSecond(final Activity activity)
+    public void changerAccount(final Activity activity,String arg)
     {
+        String ext = null;
+        String channel = null;
+        String lan = null;
+        try {
+            if(arg == null)
+            {
+                ext = "";
+            }else {
+                JSONObject jsonObject = new JSONObject(arg);
+                ext =  jsonObject.optString("extensionInfo");
+                channel =  jsonObject.optString("channel");
+                lan =  getLanguage(activity);
+
+            }
+        }catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if(ext == null)
+            ext="";
+        if(channel == null)
+            channel = "";
+        if(lan == null)
+            lan = "";
+
+        Log.d(TAG, "changerAccount: channel=>"+channel+" ext=>"+ext+" lan=>"+lan);
         if (WebSession.getIsShwoingWebPage()) {
             return;
         }
@@ -240,7 +300,7 @@ public class IntlGameCenter {
         {
             channelLogout(activity);
         }
-        showLoginWebView(activity,IntlGame.urlHost +"/index.html");
+        showWebView(activity,IntlGame.urlHost +"/index.html?channeltype="+channel+"&language="+lan+"&trans_data="+ext);
 
     }
 
@@ -258,7 +318,7 @@ public class IntlGameCenter {
                 HashMap<String,Object> map = new HashMap<>();
                 map.put("commandDomain",commandDomain);
                 map.put("command",command);
-                map.put("args",args);
+                map.put("args",args.get("trans_data"));
                 Message msg = new Message();
                 msg.obj = map;
                 handler.sendMessage(msg);

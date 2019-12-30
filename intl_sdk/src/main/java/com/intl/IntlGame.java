@@ -7,12 +7,16 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.intl.af.AFManager;
+import com.intl.ipa.IntlGameGooglePlayV3;
+import com.intl.ipa.googleplayutils;
 import com.intl.loginchannel.FaceBookSDK;
 import com.intl.loginchannel.GoogleSDK;
 import com.intl.entity.IntlDefine;
 import com.intl.usercenter.IntlGameCenter;
 import com.intl.utils.IntlGameExceptionUtil;
 import com.intl.utils.IntlGameUtil;
+
+import org.json.JSONObject;
 
 import java.util.Map;
 
@@ -22,10 +26,13 @@ import java.util.Map;
  * @Date: 2019/11/18
  */
 public class IntlGame extends Activity {
+    private static final String TAG = "IntlGame";
     public static int LogMode = 1;
     public static ILoginCenterListener iLoginListener;
     public static IPersonCenterListener iPersonCenterListener;
     public static ILogoutListener iLogoutListener;
+    public static ISwitchAccountListener iSwitchAccountListener;
+    public static googleplayutils.IGoogleInAppPurchaseV3Listener googleplayv3Listener;
     public static String GPclientid;
     public static String GPsecretid;
     public static String GooggleID = "";
@@ -33,8 +40,8 @@ public class IntlGame extends Activity {
     public static String FacebookClientId;
     public static Application application;
     public static String Game;
+    public static int retryTime = 0;
     public static String urlHost = "https://gather-auth.ycgame.com";
-    public static boolean isFirstUseLogin = true;
     public static void init(final Activity activity, String game,String devKey, final String google_clientid, final String facebook_clientid,  String gp_clientid, String gp_secret,final IInitListener iInitListener)
     {
         Game = game;
@@ -65,14 +72,16 @@ public class IntlGame extends Activity {
     public static void LoginCenter(Activity activity, ILoginCenterListener _iLoginListener)
     {
         iLoginListener = _iLoginListener;
-        if(isFirstUseLogin)
-        {
-            IntlGameCenter.getInstance().LoginCenterFirst(activity);
-        }
-        else {
-            IntlGameCenter.getInstance().LoginCenterSecond(activity);
+        IntlGameCenter.getInstance().LoginCenter(activity);
+    }
 
-        }
+    public static void googlePlayV3(Context context, String productId, googleplayutils.IGoogleInAppPurchaseV3Listener googleplayv3Listener) {
+        IntlGame.googleplayv3Listener = googleplayv3Listener;
+        IntlGameCenter.getInstance().googlePlayV3(context,productId);
+    }
+    public static void changeAccount(Activity activity, String arg, ISwitchAccountListener _iSwitchAccountListener){
+        iSwitchAccountListener = _iSwitchAccountListener;
+        IntlGameCenter.getInstance().changerAccount(activity,arg);
     }
 
     public static void PersonCenter(Activity activity, IPersonCenterListener _iPersonCenterListener)
@@ -121,15 +130,21 @@ public class IntlGame extends Activity {
     {
         IntlGameCenter.getInstance().onDestroy();
     }
-
+    public static void SetGameRoleInfo(String role_info,boolean bcreate)
+    {
+        IntlGameCenter.getInstance().SetGameRoleInfo(role_info,bcreate);
+    }
     public interface IInitListener {
         void onComplete(int code, String msg);
     }
     public interface ILoginCenterListener {
         void onComplete(int code, String openid, String token, String errorMsg);
     }
+    public interface ISwitchAccountListener{
+        void onComplete(int code, String openid, String token, String errorMsg);
+    }
     public interface IPersonCenterListener{
-        void onComplete(String type, int code, String errorMsg);
+        void onComplete(String type, int code, String arg, String errorMsg);
     }
     public interface ILogoutListener{
         void onComplete(int code, String errorMsg);
