@@ -3,8 +3,10 @@ package com.intl.webview;
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.nfc.Tag;
 
 import com.intl.utils.IntlGameLoading;
+import com.intl.utils.IntlGameUtil;
 
 import java.lang.ref.WeakReference;
 import java.util.Hashtable;
@@ -20,7 +22,7 @@ class WebPageClient extends android.webkit.WebViewClient {
     private WeakReference<IWebPage> _webBase;
 
     private ProgressDialog _progressDialog;
-
+    private static final String TAG = "WebPageClient";
     WebPageClient(IWebPage ycWebPage) {
         _webBase = new WeakReference<>(ycWebPage);
 //        _progressDialog = new ProgressDialog(_webBase.get().getContext());
@@ -53,6 +55,7 @@ class WebPageClient extends android.webkit.WebViewClient {
                 if (listener != null) {
                     WebCommandSender sender = new WebCommandSender(_webBase.get(), view, queryTable.get("identity"));//queryTable 不包含identity 返回Null
                     listener.handleCommand(sender,commandDomain,command, queryTable);
+                    IntlGameUtil.logd(TAG,commandDomain+command+queryTable.toString());
                 }
             }
             return true;

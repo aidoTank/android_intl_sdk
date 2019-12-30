@@ -51,6 +51,7 @@ public class GoogleSDK {
         _isBind = isBind;
         isSwitch = false;
         activity = _activity;
+        IntlGameUtil.logd(TAG,"=====>login _isBind:"+_isBind+" isSwitch"+isSwitch);
         if(IntlGame.GoogleClientId == null)
         {
             Toast.makeText(_activity.get(), "googleClientId erre", Toast.LENGTH_SHORT).show();
@@ -73,6 +74,7 @@ public class GoogleSDK {
         _isBind = false;
         isSwitch = true;
         activity = _activity;
+        IntlGameUtil.logd(TAG,"=====>SwitchLogin _isBind:"+_isBind+" isSwitch"+isSwitch);
         if(IntlGame.GoogleClientId == null)
         {
             Toast.makeText(_activity.get(), "googleClientId erre", Toast.LENGTH_SHORT).show();
@@ -179,14 +181,19 @@ public class GoogleSDK {
                 guestBindAPI.setListener(new GuestBindGAPI.IGuestBindCallback() {
                     @Override
                     public void AfterBind(int resultCode,JSONObject accountJson,String errorMsg) {
+                        if(IntlGame.iPersonCenterListener ==null)
+                            return;
                         if(resultCode == 0)
                         {
                             IntlGameUtil.logd("GuestBindAPI","Bind success!");
                             AccountCache.saveAccounts(activity.get(),new Account("google",accountJson));
-                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.SUCCESS,null,errorMsg);
+                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_SUCCESS,null,errorMsg);
+                        }else if(resultCode == 10010){
+                            IntlGameUtil.logd("GuestBindAPI","Bind failed!===>该账户已经绑定了游客账号");
+                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.HAVE_BIND,null,errorMsg);
                         }else {
                             IntlGameUtil.logd("GuestBindAPI","Bind failed!");
-                            IntlGame.iPersonCenterListener.onComplete("bind",resultCode,null,errorMsg);
+                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,null,errorMsg);
                         }
 
                     }
@@ -207,6 +214,7 @@ public class GoogleSDK {
                                 IntlGame.AfEvent(activity.get(), "af_complete_registration", map);
                             }
                             AccountCache.saveAccounts(activity.get(),userac);
+                            IntlGameUtil.logd(TAG,"login Success");
                             IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"),null);
                         }else {
                             IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);
@@ -226,13 +234,14 @@ public class GoogleSDK {
                     IntlGame.iSwitchAccountListener.onComplete(IntlDefine.FAILED, null,null,e.getMessage());
                 }
                 Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+                return;
             }
             if(_isBind)
             {
                 if (e.getStatusCode() == 12501) {
-                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.CANCEL,null,null);
+                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_CANCEL,null,null);
                 } else {
-                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.FAILED,null,e.getMessage());
+                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,null,e.getMessage());
                 }
                 Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
             }else {

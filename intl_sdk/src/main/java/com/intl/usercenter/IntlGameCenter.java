@@ -58,7 +58,7 @@ public class IntlGameCenter {
                 if(IntlGame.iPersonCenterListener !=null){
                     isSwitch = true;
 
-                    IntlGame.iPersonCenterListener.onComplete("switchroles",IntlDefine.SUCCESS, String.valueOf((Msgmap.get("args"))),null);
+                    IntlGame.iPersonCenterListener.onComplete("switchroles",IntlDefine.SUCCESS, String.valueOf(Msgmap.get("args")),null);
                 }
                 return;
             }
@@ -66,20 +66,35 @@ public class IntlGameCenter {
                 isLoginScene = true;
                 if(String.valueOf( Msgmap.get("command")).equals("close"))
                 {
-                    activity.get().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            IntlGameCenter.getInstance().LoginCenter(activity.get());
-                        }
-                    });
+                    if(!isSwitch)
+                    {
+                        activity.get().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                IntlGameCenter.getInstance().LoginCenter(activity.get());
+                            }
+                        });
+                    }
                 }
                 if(String.valueOf( Msgmap.get("command")).equals("Google"))
                 {
-                    GoogleSDK.login(this.activity,!isLoginScene);
+                    if(isSwitch)
+                    {
+                        GoogleSDK.SwitchLogin(this.activity);
+                    }else {
+                        GoogleSDK.login(this.activity,!isLoginScene);
+                    }
+
                 }
                 if(String.valueOf( Msgmap.get("command")).equals("Facebook"))
                 {
-                    FaceBookSDK.login(activity,!isLoginScene);
+                    if(isSwitch)
+                    {
+                        FaceBookSDK.SwitchLogin(this.activity);
+
+                    }else {
+                        FaceBookSDK.login(activity,!isLoginScene);
+                    }
                 }
                 if(String.valueOf( Msgmap.get("command")).equals("Guest"))
                 {
@@ -93,24 +108,18 @@ public class IntlGameCenter {
                     IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.CANCEL,null,null);
                 }
                 if(String.valueOf( Msgmap.get("command")).equals("Google")){
-                    GoogleSDK.SwitchLogin(this.activity);
+                    GoogleSDK.login(this.activity,!isLoginScene);
+                    //GoogleSDK.SwitchLogin(this.activity);
                 }
                 if(String.valueOf( Msgmap.get("command")).equals("Facebook")){
-                    FaceBookSDK.SwitchLogin(activity);
-                }
-                if(String.valueOf( Msgmap.get("command")).equals("Guest")){
-                    Guest.login(activity);
+                    FaceBookSDK.login(activity,!isLoginScene);
+                    //FaceBookSDK.SwitchLogin(activity);
                 }
 
             }
         }
     }
 
-    public static String getLanguage(Activity activity)
-    {
-        Locale locale = activity.getResources().getConfiguration().locale;
-        return locale.getLanguage();
-    }
     public static void init(Activity activity){
 
         if (_instance == null)
@@ -118,6 +127,11 @@ public class IntlGameCenter {
             _instance = new IntlGameCenter(activity);
 
         }
+    }
+    private static String getLanguage(Activity activity)
+    {
+        Locale locale = activity.getResources().getConfiguration().locale;
+        return locale.getLanguage();
     }
     public static IntlGameCenter getInstance() {
 
@@ -199,7 +213,7 @@ public class IntlGameCenter {
     {
         Account act = loadAccounts(activity);
         if(act !=null)
-        _webSession.showDialog(activity,520,315,Uri.parse(IntlGame.urlHost +"/usercenter.html?openid="+act.getOpenid()+"&access_token="+act.getAccessToken()+"&channeltype=agl&language=cn"),false);
+        _webSession.showDialog(activity,520,315,Uri.parse(IntlGame.urlHost +"/usercenter.html?openid="+act.getOpenid()+"&access_token="+act.getAccessToken()+"&channeltype=agl&language="+getLanguage(activity)),false);
     }
     public void LoginCenter(final Activity activity)
     {
@@ -208,7 +222,7 @@ public class IntlGameCenter {
         }
         final Account account = loadAccounts(activity.getApplicationContext());
         if (account == null) {
-            showWebView(activity,IntlGame.urlHost +"/index.html?channeltype=agl&language=cn");
+            showWebView(activity,IntlGame.urlHost +"/index.html?channeltype=agl&language="+getLanguage(activity));
             return;
         }
         if(account.getAccessTokenExpire()>IntlGameUtil.getUTCTimeStr())
@@ -278,7 +292,7 @@ public class IntlGameCenter {
             }else {
                 JSONObject jsonObject = new JSONObject(arg);
                 ext =  jsonObject.optString("extensionInfo");
-                channel =  jsonObject.optString("channel");
+                channel =  "agl";
                 lan =  getLanguage(activity);
 
             }

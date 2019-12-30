@@ -155,19 +155,19 @@ public class FaceBookSDK {
                         guestBindAPI.setListener(new GuestBindFAPI.IGuestBindCallback() {
                             @Override
                             public void AfterBind(int resultCode,JSONObject accountJson,String errorMsg) {
-                                if(IntlGame.iPersonCenterListener ==null)
+                                if(IntlGame.iLoginListener ==null)
                                     return;
                                 if(resultCode == 0)
                                 {
                                     IntlGameUtil.logd("GuestBindAPI","Bind success!");
                                     AccountCache.saveAccounts(activity.get(),new Account("facebook",accountJson));
-                                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.SUCCESS,null,errorMsg);
+                                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_SUCCESS,null,null);
                                 } else if(resultCode == 10010){
-                                    IntlGameUtil.logd("GuestBindAPI","Bind failed!");
-                                    IntlGame.iPersonCenterListener.onComplete("bind",10010,null,errorMsg);
+                                    IntlGameUtil.logd("GuestBindAPI","Bind failed!===>该账户已经绑定了游客账号");
+                                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.HAVE_BIND,null,errorMsg);
                                 }else {
                                     IntlGameUtil.logd("GuestBindAPI","Bind failed!");
-                                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.FAILED,null,errorMsg);
+                                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,null,errorMsg);
                                 }
 
                             }
@@ -204,7 +204,7 @@ public class FaceBookSDK {
                     if(_isBind)
                     {
                         if(IntlGame.iPersonCenterListener != null)
-                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.FAILED,null,response.getRawResponse());
+                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,null,response.getRawResponse());
                     }else {
                         if(IntlGame.iLoginListener != null)
                             IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,response.getRawResponse());
