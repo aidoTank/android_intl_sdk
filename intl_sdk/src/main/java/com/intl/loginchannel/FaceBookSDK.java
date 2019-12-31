@@ -250,9 +250,9 @@ public class FaceBookSDK {
                                     IntlGame.AfEvent(activity.get(), "af_complete_registration", map);
                                 }
                                 AccountCache.saveAccounts(activity.get(),userac);
-                                IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"),null);
+                                IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SWITCH_SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"),null);
                             }else {
-                                IntlGame.iSwitchAccountListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);
+                                IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SWITCH_FAILED,null,null,errorMsg);
                             }
 
                         }
@@ -261,7 +261,7 @@ public class FaceBookSDK {
                 } else{
 
                     if(IntlGame.iSwitchAccountListener != null)
-                        IntlGame.iSwitchAccountListener.onComplete(IntlDefine.FAILED,null,null,response.getRawResponse());
+                        IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SWITCH_FAILED,null,null,response.getRawResponse());
                 }
             }
         });

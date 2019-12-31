@@ -8,12 +8,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
 import com.intl.IntlGame;
-import com.intl.entity.IntlDefine;
 import com.intl.entity.Account;
+import com.intl.entity.IntlDefine;
 import com.intl.ipa.googleplayutils;
 import com.intl.usercenter.IntlGameCenter;
 import com.ycgame.t11.gp.R;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,7 +28,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        IntlGame.init(MainActivity.this,"t11","YGAaFkq3vf753xo3JeZLvX","1061953441680-6l4ts44pco3vj1ao002qe1psf8rrqjam.apps.googleusercontent.com","754170961660851","7453817292517158","EVWHPXxGEOXzbjfWxhUp4yOYgTMSJDNA", new IntlGame.IInitListener() {
+        IntlGame.init(MainActivity.this,"cn","t11","YGAaFkq3vf753xo3JeZLvX","1061953441680-6l4ts44pco3vj1ao002qe1psf8rrqjam.apps.googleusercontent.com","754170961660851","7453817292517158","EVWHPXxGEOXzbjfWxhUp4yOYgTMSJDNA", new IntlGame.IInitListener() {
             @Override
             public void onComplete(int var1, String var2) {
                 setGameRoleInfo();
@@ -180,7 +182,14 @@ public class MainActivity extends Activity {
             public void onComplete(String type, int code,String arg, String errorMsg) {
                 String msg = null;
                 if(type.equals("bind"))
-                    msg = (code ==0?"绑定成功！":(code ==1?"绑定失败！":"绑定取消！"));
+                {
+                    if(code == 10010)
+                    {
+                        msg = "该账户已经绑定！";
+                    }else {
+                        msg = "绑定失败！"+errorMsg;
+                    }
+                }
                 if(type.equals("switchroles")) {
                     msg = "点击了切换账号！之后游戏需调用Logout和重新Login！";
                     JSONObject jsonObject = new JSONObject();

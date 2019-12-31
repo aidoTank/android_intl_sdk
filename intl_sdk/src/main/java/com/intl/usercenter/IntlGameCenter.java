@@ -42,7 +42,7 @@ public class IntlGameCenter {
     private WebSession _webSession;
     public WeakReference<Activity> activity;
     private IntlGameHandler handler;
-    private static boolean isSwitch = false;
+    public static boolean isSwitch = false;
     static class IntlGameHandler extends Handler{
         WeakReference<Activity> activity;
         IntlGameHandler(WeakReference<Activity> activity){
@@ -57,7 +57,6 @@ public class IntlGameCenter {
             {
                 if(IntlGame.iPersonCenterListener !=null){
                     isSwitch = true;
-
                     IntlGame.iPersonCenterListener.onComplete("switchroles",IntlDefine.SUCCESS, String.valueOf(Msgmap.get("args")),null);
                 }
                 return;
@@ -103,10 +102,6 @@ public class IntlGameCenter {
             }
             if(String.valueOf(Msgmap.get("commandDomain")) .equals(PERSON_CENTER_WEB_COMMAND_DOMAIN)) {
                 isLoginScene = false;
-                if(IntlGame.iPersonCenterListener != null&&String.valueOf( Msgmap.get("command")).equals("close"))
-                {
-                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.CANCEL,null,null);
-                }
                 if(String.valueOf( Msgmap.get("command")).equals("Google")){
                     GoogleSDK.login(this.activity,!isLoginScene);
                     //GoogleSDK.SwitchLogin(this.activity);
@@ -213,7 +208,7 @@ public class IntlGameCenter {
     {
         Account act = loadAccounts(activity);
         if(act !=null)
-        _webSession.showDialog(activity,520,315,Uri.parse(IntlGame.urlHost +"/usercenter.html?openid="+act.getOpenid()+"&access_token="+act.getAccessToken()+"&channeltype=agl&language="+getLanguage(activity)),false);
+        _webSession.showDialog(activity,520,315,Uri.parse(IntlGame.urlHost +"/usercenter.html?openid="+act.getOpenid()+"&access_token="+act.getAccessToken()+"&channeltype=agl&language="+IntlGame.language),false);
     }
     public void LoginCenter(final Activity activity)
     {
@@ -222,7 +217,7 @@ public class IntlGameCenter {
         }
         final Account account = loadAccounts(activity.getApplicationContext());
         if (account == null) {
-            showWebView(activity,IntlGame.urlHost +"/index.html?channeltype=agl&language="+getLanguage(activity));
+            showWebView(activity,IntlGame.urlHost +"/index.html?channeltype=agl&language="+IntlGame.language);
             return;
         }
         if(account.getAccessTokenExpire()>IntlGameUtil.getUTCTimeStr())
@@ -293,7 +288,7 @@ public class IntlGameCenter {
                 JSONObject jsonObject = new JSONObject(arg);
                 ext =  jsonObject.optString("extensionInfo");
                 channel =  "agl";
-                lan =  getLanguage(activity);
+                lan =  IntlGame.language;
 
             }
         }catch (JSONException e) {
@@ -314,7 +309,7 @@ public class IntlGameCenter {
         {
             channelLogout(activity);
         }
-        showWebView(activity,IntlGame.urlHost +"/index.html?channeltype="+channel+"&language="+lan+"&trans_data="+ext);
+        showWebView(activity,IntlGame.urlHost +"/index.html?channeltype="+channel+"&language="+IntlGame.language+"&trans_data="+ext);
 
     }
 

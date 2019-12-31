@@ -2,9 +2,8 @@ package com.intl.ipa;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.Log;
-
-import androidx.annotation.Nullable;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;

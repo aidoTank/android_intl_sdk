@@ -2,11 +2,11 @@ package com.intl.loginchannel;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
 
-import androidx.annotation.NonNull;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -24,6 +24,7 @@ import com.intl.api.AuthorizeGAPI;
 import com.intl.api.GuestBindGAPI;
 import com.intl.entity.Session;
 import com.intl.usercenter.AccountCache;
+import com.intl.usercenter.IntlGameCenter;
 import com.intl.utils.IntlGameLoading;
 import com.intl.utils.IntlGameUtil;
 
@@ -44,14 +45,13 @@ public class GoogleSDK {
     private static final int RC_SIGN_IN = 9001;
     private static WeakReference<Activity> activity;
     private static Boolean _isBind = false;
-    private static Boolean isSwitch = false;
     private static GoogleSignInOptions gso;
     public static void login(WeakReference<Activity>  _activity,Boolean isBind)
     {
         _isBind = isBind;
-        isSwitch = false;
+        IntlGameCenter.isSwitch = false;
         activity = _activity;
-        IntlGameUtil.logd(TAG,"=====>login _isBind:"+_isBind+" isSwitch"+isSwitch);
+        IntlGameUtil.logd(TAG,"=====>login _isBind:"+_isBind+" isSwitch"+IntlGameCenter.isSwitch);
         if(IntlGame.GoogleClientId == null)
         {
             Toast.makeText(_activity.get(), "googleClientId erre", Toast.LENGTH_SHORT).show();
@@ -72,9 +72,8 @@ public class GoogleSDK {
     public static void SwitchLogin(WeakReference<Activity>  _activity)
     {
         _isBind = false;
-        isSwitch = true;
         activity = _activity;
-        IntlGameUtil.logd(TAG,"=====>SwitchLogin _isBind:"+_isBind+" isSwitch"+isSwitch);
+        IntlGameUtil.logd(TAG,"=====>SwitchLogin _isBind:"+_isBind+" isSwitch"+IntlGameCenter.isSwitch);
         if(IntlGame.GoogleClientId == null)
         {
             Toast.makeText(_activity.get(), "googleClientId erre", Toast.LENGTH_SHORT).show();
@@ -148,8 +147,9 @@ public class GoogleSDK {
             Log.d(TAG, "handleSignInResult: authCode "+authCode+" uid=>"+account.getId());
             // Signed in successfully.
             Session session = new Session("google",authCode,"code");
-            if(isSwitch)
+            if(IntlGameCenter.isSwitch)
             {
+                IntlGameCenter.isSwitch = false;
                 final AuthorizeGAPI accessTokeAPI = new AuthorizeGAPI(session);
                 accessTokeAPI.setListener(new AuthorizeGAPI.IgetAccessTokenCallback() {
                     @Override
@@ -164,9 +164,9 @@ public class GoogleSDK {
                                 IntlGame.AfEvent(activity.get(), "af_complete_registration", map);
                             }
                             AccountCache.saveAccounts(activity.get(),userac);
-                            IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"),null);
+                            IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SWITCH_SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"),null);
                         }else {
-                            IntlGame.iSwitchAccountListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);
+                            IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SWITCH_FAILED,null,null,errorMsg);
                         }
 
                     }
@@ -226,12 +226,13 @@ public class GoogleSDK {
             }
 
         } catch (ApiException e) {
-            if (isSwitch)
+            if (IntlGameCenter.isSwitch)
             {
+                IntlGameCenter.isSwitch = false;
                 if (e.getStatusCode() == 12501) {
-                    IntlGame.iSwitchAccountListener.onComplete(IntlDefine.CANCEL,null, null,null);
+                    IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SWITCH_CANCEL,null, null,null);
                 } else {
-                    IntlGame.iSwitchAccountListener.onComplete(IntlDefine.FAILED, null,null,e.getMessage());
+                    IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SWITCH_FAILED, null,null,e.getMessage());
                 }
                 Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
                 return;

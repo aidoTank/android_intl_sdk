@@ -41,10 +41,12 @@ public class IntlGame extends Activity {
     public static Application application;
     public static String Game;
     public static int retryTime = 0;
+    public static String language="";
     public static String urlHost = "https://gather-auth.ycgame.com";
-    public static void init(final Activity activity, String game,String devKey, final String google_clientid, final String facebook_clientid,  String gp_clientid, String gp_secret,final IInitListener iInitListener)
+    public static void init(final Activity activity,String language ,String game,String devKey, final String google_clientid, final String facebook_clientid,  String gp_clientid, String gp_secret,final IInitListener iInitListener)
     {
         Game = game;
+        IntlGame.language = language;
         GoogleClientId = google_clientid;
         FacebookClientId = facebook_clientid;
         GPclientid = gp_clientid;
