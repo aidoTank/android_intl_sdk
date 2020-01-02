@@ -186,8 +186,8 @@ public class GoogleSDK {
                         if(resultCode == 0)
                         {
                             IntlGameUtil.logd("GuestBindAPI","Bind success!");
-                            AccountCache.saveAccounts(activity.get(),new Account("google",accountJson));
-                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_SUCCESS,null,errorMsg);
+                            AccountCache.setAccountsChannel(activity.get(),"facebook");
+                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_SUCCESS,null,"绑定成功！");
                         }else if(resultCode == 10010){
                             IntlGameUtil.logd("GuestBindAPI","Bind failed!===>该账户已经绑定了游客账号");
                             IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.HAVE_BIND,null,errorMsg);
@@ -240,7 +240,7 @@ public class GoogleSDK {
             if(_isBind)
             {
                 if (e.getStatusCode() == 12501) {
-                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_CANCEL,null,null);
+                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_CANCEL,null,"绑定取消！");
                 } else {
                     IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,null,e.getMessage());
                 }

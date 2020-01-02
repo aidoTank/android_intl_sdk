@@ -37,8 +37,8 @@ public class IntlDefine {
     public static final int SWITCH_FAILED = 0x700;
 
     public static final int HAVE_BIND=10010;
-    public static final int BIND_SUCCESS = 10009;
-    public static final int BIND_CANCEL = 10008;
-    public static final int BIND_FAILED = 10000;
+    public static final int BIND_SUCCESS = SUCCESS;
+    public static final int BIND_CANCEL = CANCEL;
+    public static final int BIND_FAILED = FAILED;
 
 }

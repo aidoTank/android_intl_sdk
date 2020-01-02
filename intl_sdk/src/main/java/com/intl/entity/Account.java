@@ -42,6 +42,10 @@ public class Account {
 
     }
 
+    public void setChannel(String channel)
+    {
+        _channel = channel;
+    }
     public void setOpenid(String openid)
     {
         _openid = openid;

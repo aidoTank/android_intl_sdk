@@ -59,7 +59,7 @@ public class FaceBookSDK {
                 //取消登录
                 if(isBind)
                 {
-                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.CANCEL,null,null);
+                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_CANCEL,null,"绑定取消！");
                 }else {
                     IntlGame.iLoginListener.onComplete(IntlDefine.CANCEL,null, null,null);
                 }
@@ -72,7 +72,7 @@ public class FaceBookSDK {
                 //登录错误
                 if(isBind)
                 {
-                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.FAILED,null,error.toString());
+                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,null,error.toString());
                 }else {
                     IntlGame.iLoginListener.onComplete(IntlDefine.FAILED, null,null,error.toString());
                 }
@@ -160,8 +160,8 @@ public class FaceBookSDK {
                                 if(resultCode == 0)
                                 {
                                     IntlGameUtil.logd("GuestBindAPI","Bind success!");
-                                    AccountCache.saveAccounts(activity.get(),new Account("facebook",accountJson));
-                                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_SUCCESS,null,null);
+                                    AccountCache.setAccountsChannel(activity.get(),"facebook");
+                                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_SUCCESS,null,"绑定成功！");
                                 } else if(resultCode == 10010){
                                     IntlGameUtil.logd("GuestBindAPI","Bind failed!===>该账户已经绑定了游客账号");
                                     IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.HAVE_BIND,null,errorMsg);

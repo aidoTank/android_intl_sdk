@@ -61,6 +61,15 @@ public class AccountCache {
         }
     }
 
+    public static void setAccountsChannel(Context context, String channel)
+    {
+        Account account = loadAccount(context);
+        if (account != null) {
+            account.setChannel(channel);
+        }
+        saveAccounts(context,account);
+    }
+
     public static void cleanAccounts(Context context)
     {
         SharedPreferences preference = context.getSharedPreferences(GP_ACCOUNT_CACHE_NAME, Context.MODE_PRIVATE);
