@@ -1,4 +1,5 @@
 <resources>
-    <string name="app_name">demo</string>
+    <string name="app_name">intl_sdk</string>fb_login_protocol_scheme
     <string name="facebook_app_id">754170961660851</string>
+    <string name="fb_login_protocol_scheme">fb754170961660851</string>
 </resources>

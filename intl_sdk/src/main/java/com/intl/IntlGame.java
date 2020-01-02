@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.intl.af.AFManager;
-import com.intl.ipa.IntlGameGooglePlayV3;
+import com.intl.base.IntlGameLanguage;
 import com.intl.ipa.googleplayutils;
 import com.intl.loginchannel.FaceBookSDK;
 import com.intl.loginchannel.GoogleSDK;
@@ -15,8 +15,7 @@ import com.intl.entity.IntlDefine;
 import com.intl.usercenter.IntlGameCenter;
 import com.intl.utils.IntlGameExceptionUtil;
 import com.intl.utils.IntlGameUtil;
-
-import org.json.JSONObject;
+import com.intl.utils.LocaleManager;
 
 import java.util.Map;
 
@@ -71,6 +70,40 @@ public class IntlGame extends Activity {
             }
         });
     }
+
+    public String getLanguage(Context context) {
+        return LocaleManager.getInstance().getLanguage(context);
+    }
+
+    public void setLanguage(Context context, IntlGameLanguage  intlGameLanguage) {
+        String language;
+        switch(intlGameLanguage) {
+            case INTL_EN:
+                language = "en";
+                break;
+            case INTL_TH:
+                language = "th";
+                break;
+            case INTL_CN:
+                language = "cn";
+                break;
+            case INTL_TW:
+                language = "zh";
+                break;
+            default:
+                language = "en";
+        }
+
+        LocaleManager.getInstance().setLocale(context, language);
+    }
+    public void setLanguage(Context context, String lang) {
+        if (!lang.equals("en") && !lang.equals("vi") && !lang.equals("zh")) {
+            lang = "en";
+        }
+
+        LocaleManager.getInstance().setLocale(context, lang);
+    }
+
     public static void LoginCenter(Activity activity, ILoginCenterListener _iLoginListener)
     {
         iLoginListener = _iLoginListener;
