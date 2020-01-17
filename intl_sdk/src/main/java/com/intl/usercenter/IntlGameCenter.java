@@ -236,7 +236,7 @@ public class IntlGameCenter {
                 public void AfterCheck(final JSONObject jsonObject, String errorMsg) {
                     if(jsonObject != null)
                     {
-                        IntlGameUtil.logd("IntlGame","AccessToken is Effective");
+                        IntlGameUtil.logd("IntlGame","AccessToken is Effective,openid ="+jsonObject.optString("openid")+"...access_token ="+jsonObject.optString("access_token"));
                         IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
                     }else{
                         refreshAccessToken(activity,account);

@@ -61,9 +61,9 @@ public class FaceBookSDK {
                 //取消登录
                 if(isBind)
                 {
-                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_CANCEL,null,"绑定取消！");
+                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_CANCEL,null,MsgManager.getMsg("cancel"));
                 }else {
-                    IntlGame.iLoginListener.onComplete(IntlDefine.CANCEL,null, null,null);
+                    IntlGame.iLoginListener.onComplete(IntlDefine.CANCEL,null, null,MsgManager.getMsg("cancel"));
                 }
 
             }
@@ -108,14 +108,14 @@ public class FaceBookSDK {
 
             @Override
             public void onCancel() {
-                IntlGame.iSwitchAccountListener.onComplete(IntlDefine.CANCEL,null, null,null);
+                IntlGame.iSwitchAccountListener.onComplete(IntlDefine.CANCEL,null, null,MsgManager.getMsg("cancel"));
 
             }
 
             @Override
             public void onError(FacebookException error) {
                 //登录错误
-                IntlGame.iSwitchAccountListener.onComplete(IntlDefine.FAILED, null,null,error.toString());
+                IntlGame.iSwitchAccountListener.onComplete(IntlDefine.FAILED, null,null,MsgManager.getMsg("error_login_fb"));
             }
         });
         IntlGameLoading.getInstance().hide();
