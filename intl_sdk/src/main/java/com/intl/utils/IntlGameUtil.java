@@ -29,6 +29,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,6 +42,31 @@ public class IntlGameUtil {
     private static final String TAG = "IntlGameUtil";
     public static boolean ENABLE_LOG = true;
     private static DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm") ;
+
+    public static String getDeviceLanguage(Context context)
+    {
+        String locale = Locale.getDefault().toString().toLowerCase();
+        IntlGameUtil.logd(TAG,"Current Device Language =>" +locale);
+        if(locale.startsWith("zh_tw"))
+        {
+            locale = "tw";
+        }
+        else if(locale.startsWith("zh_cn"))
+        {
+            locale = "cn";
+        }
+        else if(locale.startsWith("en"))
+        {
+            locale = "en";
+        }else if(locale.startsWith("th")) {
+            locale = "th";
+        }else {
+            locale = "en";
+        }
+        IntlGameUtil.logd(TAG,"Select Language =>" +locale);
+        return locale;
+    }
+
     public static void getLocalGoogleAdID(final Context context, final IGgetLocalGoogleAdIdListener iGgetLocalGoogleAdIdListener){
         (new Thread(){
             public void run(){

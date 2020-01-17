@@ -23,6 +23,7 @@ import com.intl.entity.Session;
 import com.intl.usercenter.AccountCache;
 import com.intl.utils.IntlGameLoading;
 import com.intl.utils.IntlGameUtil;
+import com.intl.utils.MsgManager;
 
 import org.json.JSONObject;
 
@@ -44,6 +45,7 @@ public class FaceBookSDK {
      */
     public static void login(final WeakReference<Activity> activity, final boolean isBind) {
         IntlGameLoading.getInstance().show(activity.get());
+        logout();
         callbackManager = CallbackManager.Factory.create();
         getLoginManager().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
@@ -72,9 +74,9 @@ public class FaceBookSDK {
                 //登录错误
                 if(isBind)
                 {
-                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,null,error.toString());
+                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,null,MsgManager.getMsg("error_login_fb"));
                 }else {
-                    IntlGame.iLoginListener.onComplete(IntlDefine.FAILED, null,null,error.toString());
+                    IntlGame.iLoginListener.onComplete(IntlDefine.FAILED, null,null, MsgManager.getMsg("error_login_fb"));
                 }
             }
         });
@@ -94,6 +96,7 @@ public class FaceBookSDK {
      */
     public static void SwitchLogin(final WeakReference<Activity> activity) {
         IntlGameLoading.getInstance().show(activity.get());
+        logout();
         callbackManager = CallbackManager.Factory.create();
         getLoginManager().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
@@ -161,13 +164,13 @@ public class FaceBookSDK {
                                 {
                                     IntlGameUtil.logd("GuestBindAPI","Bind success!");
                                     AccountCache.setAccountsChannel(activity.get(),"facebook");
-                                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_SUCCESS,null,"绑定成功！");
+                                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_SUCCESS,null,MsgManager.getMsg("login_connect_account_success"));
                                 } else if(resultCode == 10010){
                                     IntlGameUtil.logd("GuestBindAPI","Bind failed!===>该账户已经绑定了游客账号");
-                                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.HAVE_BIND,null,errorMsg);
+                                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.HAVE_BIND,null,MsgManager.getMsg("already_bind"));
                                 }else {
                                     IntlGameUtil.logd("GuestBindAPI","Bind failed!");
-                                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,null,errorMsg);
+                                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,null,MsgManager.getMsg("error_login_fb"));
                                 }
 
                             }
@@ -193,7 +196,7 @@ public class FaceBookSDK {
                                     AccountCache.saveAccounts(activity.get(),userac);
                                     IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"),null);
                                 }else {
-                                    IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);
+                                    IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,MsgManager.getMsg("please_check_connect_internet"));
                                 }
 
                             }
@@ -204,10 +207,10 @@ public class FaceBookSDK {
                     if(_isBind)
                     {
                         if(IntlGame.iPersonCenterListener != null)
-                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,null,response.getRawResponse());
+                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,null,MsgManager.getMsg("error_login_fb"));
                     }else {
                         if(IntlGame.iLoginListener != null)
-                            IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,response.getRawResponse());
+                            IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,MsgManager.getMsg("error_login_fb"));
                     }
                 }
             }
@@ -252,7 +255,7 @@ public class FaceBookSDK {
                                 AccountCache.saveAccounts(activity.get(),userac);
                                 IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SWITCH_SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"),null);
                             }else {
-                                IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SWITCH_FAILED,null,null,errorMsg);
+                                IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SWITCH_FAILED,null,null,MsgManager.getMsg("please_check_connect_internet"));
                             }
 
                         }
@@ -261,7 +264,7 @@ public class FaceBookSDK {
                 } else{
 
                     if(IntlGame.iSwitchAccountListener != null)
-                        IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SWITCH_FAILED,null,null,response.getRawResponse());
+                        IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SWITCH_FAILED,null,null,MsgManager.getMsg("please_check_connect_internet"));
                 }
             }
         });

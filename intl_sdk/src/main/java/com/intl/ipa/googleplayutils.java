@@ -22,12 +22,7 @@ public class googleplayutils {
                 @Override
                 public void onComplete(int code, String msg) {
                     IntlGameUtil.logd(TAG,"code : "+code+" msg : "+msg );
-                    if(code == 0)
-                    {
-                        googleplayv3Listener.onComplete(0, "支付成功");
-                    }else{
-                        googleplayv3Listener.onComplete(1, "支付失败");
-                    }
+                    googleplayv3Listener.onComplete(code, msg);
                 }
             });
         }else {

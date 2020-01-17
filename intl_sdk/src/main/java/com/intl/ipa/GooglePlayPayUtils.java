@@ -21,6 +21,8 @@ import com.intl.af.AFManager;
 import com.intl.api.VerifyOrderAPI;
 import com.intl.utils.IntlGameLoading;
 import com.intl.utils.IntlGameUtil;
+import com.intl.utils.MsgManager;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,7 +47,8 @@ public class GooglePlayPayUtils {
         Log.d(TAG, "googlepay: role_info=>"+roleinfo);
         if(itemid == null)
         {
-            googlePayListener.onComplete(200, "商品id = null");
+            Log.e(TAG, "googlepay.error====>商品id = null");
+            googlePayListener.onComplete(1, MsgManager.getMsg("payment_error"));
             return;
         }
         itemids = itemid;
@@ -71,8 +74,10 @@ public class GooglePlayPayUtils {
                         }
 
                     }
-                } else {
-                    googlePayListener.onComplete(105, "fill");
+                } else if(billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
+                    IntlGameLoading.getInstance().hide();
+                    Log.e(TAG, "googlepay.cancel:用户取消了支付 ");
+                    googlePayListener.onComplete(12501, MsgManager.getMsg("cancel"));
                 }
 
             }
@@ -111,7 +116,8 @@ public class GooglePlayPayUtils {
                                                     IntlGameGooglePlayV3_Auth(context, token,pay_currency,pay_amounts, productId, googlePayListener, false);
                                                 }
                                             } else {
-                                                googlePayListener.onComplete(107, "查询商品信息失败");
+                                                Log.e(TAG, "googlepay.error:查询商品信息失败");
+                                                googlePayListener.onComplete(1, MsgManager.getMsg("payment_error"));
                                             }
 
                                         }
@@ -122,7 +128,10 @@ public class GooglePlayPayUtils {
                                 flag = true;
                             }
                             if(flag)
-                                googlePayListener.onComplete(104, "状态有误请重试");
+                            {
+                                Log.e(TAG, "googlepay.error:状态有误");
+                                googlePayListener.onComplete(1, MsgManager.getMsg("payment_error"));
+                            }
                         }
 
                     } else {
@@ -134,13 +143,16 @@ public class GooglePlayPayUtils {
                     }
                 } else {
                     IntlGameLoading.getInstance().hide();
-                    googlePayListener.onComplete(101, "google支付启动失败");
+                    Log.e(TAG, "googlepay.error:google支付启动失败");
+                    googlePayListener.onComplete(1, MsgManager.getMsg("googlepay_start_failed"));
                 }
 
             }
 
             public void onBillingServiceDisconnected() {
-                googlePayListener.onComplete(102, "google连接失败");
+                Log.e(TAG, "googlepay.error:google连接失败");
+                IntlGameLoading.getInstance().hide();
+                googlePayListener.onComplete(1, MsgManager.getMsg("payment_error_init_iap"));
             }
         });
     }
@@ -167,7 +179,8 @@ public class GooglePlayPayUtils {
                         mBillingClient.launchBillingFlow(context, purchaseParams);
                     }
                 } else {
-                    googlePayListener.onComplete(103, "查询商品信息失败");
+                    Log.e(TAG, "googlepay.error:查询商品信息失败");
+                    googlePayListener.onComplete(1, MsgManager.getMsg("payment_error"));
                 }
 
             }
@@ -187,11 +200,13 @@ public class GooglePlayPayUtils {
                 } else {
                     Log.d(TAG, "第"+time+"次onConsume: failed=====>token:"+purchaseToken);
                     if(time<5){
+                        Log.d(TAG, "googlepay.consume.retry retryTime="+time);
                         IntlGameGooglePlayV3_Consume(activity,token,payListener);
                     }else {
                         time = 0;
                         IntlGameLoading.getInstance().hide();
-                        IntlGame.googleplayv3Listener.onComplete(1, purchaseToken);
+                        Log.e(TAG, "googlepay.consume.retry.error: 商品消耗失败，token="+token);
+                        IntlGame.googleplayv3Listener.onComplete(1, MsgManager.getMsg("payment_error"));
                     }
                 }
 
@@ -219,7 +234,7 @@ public class GooglePlayPayUtils {
                     {
                         IntlGame.retryTime = 0;
                         IntlGameLoading.getInstance().hide();
-                        payListener.onComplete(0, "发货成功");
+                        payListener.onComplete(0, MsgManager.getMsg("payment_success"));
                         AFManager.getInstance().AdPurchase(context,productId,pay_currency,pay_amounts,"google");
                         ConsumeParams consumeParams = ConsumeParams.newBuilder().setPurchaseToken(token).build();
                         ConsumeResponseListener onConsumeListener = new ConsumeResponseListener() {
@@ -236,16 +251,19 @@ public class GooglePlayPayUtils {
                     else if(code == -1){
                         if (IntlGame.retryTime < 5)
                         {
+                            Log.d(TAG, "googlepay.verify.retry: 本次订单服务器验证重试，retryTime="+IntlGame.retryTime);
                             IntlGameGooglePlayV3_Auth(context,token,pay_currency,pay_amounts,productId,payListener,isCurrentOrder);
                         }else
                         {
-                            IntlGame.googleplayv3Listener.onComplete(1, "msg:"+result+" token:"+token);
+                            Log.e(TAG, "googlepay.verify.retry.error: 商品服务器验证失败，token="+token);
+                            IntlGame.googleplayv3Listener.onComplete(1, MsgManager.getMsg("payment_error"));
                             IntlGame.retryTime = 0;
                         }
                     }else {
                         IntlGame.retryTime = 0;
                         IntlGameLoading.getInstance().hide();
-                        IntlGame.googleplayv3Listener.onComplete(1,"msg:"+result+" token:"+token);
+                        Log.e(TAG, "googlepay.error: 商品服务器验证失败，token="+token);
+                        IntlGame.googleplayv3Listener.onComplete(1,MsgManager.getMsg("payment_error"));
                     }
                 }else {
                     if(code == 0)
@@ -256,9 +274,11 @@ public class GooglePlayPayUtils {
                     }else if(code == -1){
                         if (IntlGame.retryTime < 5)
                         {
+                            Log.d(TAG, "googlepay.verify.retry: 上次订单服务器验证重试，retryTime="+IntlGame.retryTime);
                             IntlGameGooglePlayV3_Auth(context,token,pay_currency,pay_amounts,productId,payListener,isCurrentOrder);
                         }else
                         {
+                            Log.d(TAG, "googlepay.verify.retry: 上次订单服务器验证通过，调起支付页面");
                             launchBillingFlow((Activity) context,GooglePlayPayUtils.itemids,payListener);
                             IntlGame.retryTime = 0;
                         }
@@ -266,7 +286,8 @@ public class GooglePlayPayUtils {
                     else {
                         IntlGame.retryTime = 0;
                         IntlGameLoading.getInstance().hide();
-                        IntlGame.googleplayv3Listener.onComplete(1,"msg:"+result+" token:"+token);
+                        Log.e(TAG, "googlepay.error: 上次支付商品，服务器验证失败，token="+token);
+                        IntlGame.googleplayv3Listener.onComplete(1,MsgManager.getMsg("payment_error"));
                     }
 
                 }

@@ -28,7 +28,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        IntlGame.init(MainActivity.this,"cn","t11","YGAaFkq3vf753xo3JeZLvX","1061953441680-6l4ts44pco3vj1ao002qe1psf8rrqjam.apps.googleusercontent.com","754170961660851","7453817292517158","EVWHPXxGEOXzbjfWxhUp4yOYgTMSJDNA", new IntlGame.IInitListener() {
+        IntlGame.init(MainActivity.this,"t11","YGAaFkq3vf753xo3JeZLvX","1061953441680-6l4ts44pco3vj1ao002qe1psf8rrqjam.apps.googleusercontent.com","754170961660851","7453817292517158","EVWHPXxGEOXzbjfWxhUp4yOYgTMSJDNA", new IntlGame.IInitListener() {
             @Override
             public void onComplete(int var1, String var2) {
                 setGameRoleInfo();
@@ -63,7 +63,8 @@ public class MainActivity extends Activity {
         gameLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pay(MainActivity.this);
+                //pay(MainActivity.this);
+                IntlGame.setLanguage(MainActivity.this,"tw");
             }
         });
 
@@ -107,7 +108,7 @@ public class MainActivity extends Activity {
             public void onComplete(int code,String openid,String token,String msg) {
                 if(code == IntlDefine.SUCCESS)
                 {
-                    UpdateUI("已登录:"+token);
+                    UpdateUI("已登录:token="+token+"...openid="+openid);
                 }else if(code == IntlDefine.CANCEL)
                 {
                     UpdateUI("LoginCenterFirst cancel");
@@ -183,12 +184,7 @@ public class MainActivity extends Activity {
                 String msg = null;
                 if(type.equals("bind"))
                 {
-                    if(code == 10010)
-                    {
-                        msg = "该账户已经绑定！";
-                    }else {
-                        msg = "绑定失败！"+errorMsg;
-                    }
+                    msg = errorMsg;
                 }
                 if(type.equals("switchroles")) {
                     msg = "点击了切换账号！之后游戏需调用Logout和重新Login！";

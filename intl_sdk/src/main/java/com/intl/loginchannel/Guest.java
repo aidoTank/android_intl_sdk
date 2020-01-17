@@ -8,6 +8,7 @@ import com.intl.entity.Account;
 import com.intl.api.AuthorizeGUAPI;
 import com.intl.entity.Session;
 import com.intl.usercenter.AccountCache;
+import com.intl.utils.MsgManager;
 
 import org.json.JSONObject;
 
@@ -30,7 +31,7 @@ public class Guest {
                     AccountCache.saveAccounts(activity.get(),new Account(channel,jsonObject));
                     IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
                 }else {
-                    IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);
+                    IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null, MsgManager.getMsg("please_check_connect_internet"));
                 }
             }
         });

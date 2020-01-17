@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1,IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1,user-scalable=no">
+    <meta name="applicable-device" content="mobile">
+    <title>请选择登录方式</title>
+    <meta name="Description" content="蜀门手游登录方式选择页面">
+</head>
+<style>
+*{margin:0;padding:0;text-decoration:none;}
+body{display:block;margin:0 auto;width:100%;font-family:-apple-system,"Helvetica Neue",Helvetica,"Nimbus Sans L",Arial,"Liberation Sans","PingFang SC","Hiragino Sans GB","Source Han Sans CN","Source Han Sans SC","Microsoft YaHei","Wenquanyi Micro Hei","WenQuanYi Zen Hei","ST Heiti",SimHei,"WenQuanYi Zen Hei Sharp",sans-serif;}    
+.box { position:absolute;top:0%;left:50%;-webkit-transform:translate(-50%,0%);-moz-transform:translate(-50%,0%);-o-transform:translate(-50%,0%);-ms-transform:translate(-50%,0%);transform:translate(-50%,0%);margin:auto; min-width:24rem; min-height:14rem; background:#fff; text-align: center; width: 100%;}
+.box p { width: 100%; height: 3rem; line-height: 3rem; background: #4a90e2; color: #fff;font-size: 1rem; }
+.box span { margin: 0.5rem 0.5rem 0 0; position: relative; top: -3rem; right: 0; float: right; }
+.box span a { width: 1.5rem; height: 1.8rem; display: inline-block; margin: 0 0.4rem 0 0; }
+.box span a img { width: 100%; height: auto; }
+.box div { clear: both; display: block; }
+.box div a { width: 13rem; height: 3rem; display: inline-block; margin: 0 1.75rem; }
+.box div a img { width: 100%; height: auto; }
+</style>
+
+<body>
+
+    <div class="box">
+        <p>请选择登录方式</p>
+        <span>
+            <a href="#" onclick="reloadPage()">
+                <img src="./refresh@2x.png"/>
+            </a>
+            <a href="ycwebcommand://yc.mobilesdk.web/closeall" >
+                <img src="./close@2x.png"/>
+            </a>
+        </span>        
+        <div>
+            <a href="ycwebcommand://yc.mobilesdk.logincenter/Facebook" onclick="AppSDKexecute('LoginFB','')">
+                <img src="./btn_facebook.png"/>
+            </a>
+        </div>
+        <div>
+            <a href="ycwebcommand://yc.mobilesdk.logincenter/Google" onclick="AppSDKexecute('LoginGG','')">
+                <img src="./btn_google.png"/>
+            </a>
+        </div>
+        <div>
+            <a href="ycwebcommand://yc.mobilesdk.logincenter/Guest" onclick="AppSDKexecute('','')">
+                <img src="./btn_guest.png"/>
+            </a>
+        </div>
+    </div>
+
+</body>
+
+    <script>
+        function reloadPage() {
+            window.location.reload(true);
+        };
+        function AppSDKexecute(method,value) {JavaScriptInterface.javaScriptInteract(method,value);}
+    </script>
+
+
+
+</html>

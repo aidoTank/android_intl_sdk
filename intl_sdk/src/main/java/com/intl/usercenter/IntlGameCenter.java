@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
@@ -17,8 +18,10 @@ import com.intl.loginchannel.GoogleSDK;
 import com.intl.loginchannel.Guest;
 import com.intl.entity.IntlDefine;
 import com.intl.utils.IntlGameExceptionUtil;
+import com.intl.utils.IntlGameLanguageCache;
 import com.intl.utils.IntlGameLoading;
 import com.intl.utils.IntlGameUtil;
+import com.intl.utils.MsgManager;
 import com.intl.webview.WebCommandSender;
 import com.intl.webview.WebSession;
 
@@ -37,7 +40,7 @@ import java.util.Locale;
 public class IntlGameCenter {
     private static final String LOGIN_CENTER_WEB_COMMAND_DOMAIN = "yc.mobilesdk.logincenter";
     private static final String PERSON_CENTER_WEB_COMMAND_DOMAIN = "yc.mobilesdk.personcenter";
-    private static final String TAG = "IntlGamePay";
+    private static final String TAG = "IntlGameCenter";
     private static IntlGameCenter _instance;
     private WebSession _webSession;
     public WeakReference<Activity> activity;
@@ -51,9 +54,14 @@ public class IntlGameCenter {
         @Override
         public void handleMessage(Message msg){
             HashMap Msgmap = (HashMap)msg.obj;
-            WebSession.currentWebSession().forceCloseSession();
-            boolean isLoginScene = false;
-            if(String.valueOf( Msgmap.get("command")).equals("ShowLoginMainPage"))
+            if(WebSession.currentWebSession() != null)
+            {
+                WebSession.currentWebSession().forceCloseSession();
+            }
+            if(String.valueOf( Msgmap.get("command")).equals("AutoInvalidLogin")){
+                IntlGameCenter.getInstance().LoginCenter(activity.get());
+            }
+            else if(String.valueOf( Msgmap.get("command")).equals("ShowLoginMainPage"))
             {
                 if(IntlGame.iPersonCenterListener !=null){
                     isSwitch = true;
@@ -61,8 +69,7 @@ public class IntlGameCenter {
                 }
                 return;
             }
-            if(String.valueOf(Msgmap.get("commandDomain")) .equals(LOGIN_CENTER_WEB_COMMAND_DOMAIN)) {
-                isLoginScene = true;
+            else if(String.valueOf(Msgmap.get("commandDomain")) .equals(LOGIN_CENTER_WEB_COMMAND_DOMAIN)) {
                 if(String.valueOf( Msgmap.get("command")).equals("close"))
                 {
                     if(!isSwitch)
@@ -81,7 +88,7 @@ public class IntlGameCenter {
                     {
                         GoogleSDK.SwitchLogin(this.activity);
                     }else {
-                        GoogleSDK.login(this.activity,!isLoginScene);
+                        GoogleSDK.login(this.activity,false);
                     }
 
                 }
@@ -92,7 +99,7 @@ public class IntlGameCenter {
                         FaceBookSDK.SwitchLogin(this.activity);
 
                     }else {
-                        FaceBookSDK.login(activity,!isLoginScene);
+                        FaceBookSDK.login(activity,false);
                     }
                 }
                 if(String.valueOf( Msgmap.get("command")).equals("Guest"))
@@ -100,14 +107,13 @@ public class IntlGameCenter {
                     Guest.login(activity);
                 }
             }
-            if(String.valueOf(Msgmap.get("commandDomain")) .equals(PERSON_CENTER_WEB_COMMAND_DOMAIN)) {
-                isLoginScene = false;
+            else if(String.valueOf(Msgmap.get("commandDomain")) .equals(PERSON_CENTER_WEB_COMMAND_DOMAIN)) {
                 if(String.valueOf( Msgmap.get("command")).equals("Google")){
-                    GoogleSDK.login(this.activity,!isLoginScene);
+                    GoogleSDK.login(this.activity,true);
                     //GoogleSDK.SwitchLogin(this.activity);
                 }
                 if(String.valueOf( Msgmap.get("command")).equals("Facebook")){
-                    FaceBookSDK.login(activity,!isLoginScene);
+                    FaceBookSDK.login(activity,true);
                     //FaceBookSDK.SwitchLogin(activity);
                 }
 
@@ -208,7 +214,7 @@ public class IntlGameCenter {
     {
         Account act = loadAccounts(activity);
         if(act !=null)
-        _webSession.showDialog(activity,520,315,Uri.parse(IntlGame.urlHost +"/usercenter.html?openid="+act.getOpenid()+"&access_token="+act.getAccessToken()+"&channeltype=agl&language="+IntlGame.language),false);
+            _webSession.showDialog(activity,520,315,Uri.parse(IntlGame.urlHost +"/usercenter.html?openid="+act.getOpenid()+"&access_token="+act.getAccessToken()+"&channeltype=agl&language="+IntlGameLanguageCache.loadLan(activity)),false);
     }
     public void LoginCenter(final Activity activity)
     {
@@ -217,7 +223,7 @@ public class IntlGameCenter {
         }
         final Account account = loadAccounts(activity.getApplicationContext());
         if (account == null) {
-            showWebView(activity,IntlGame.urlHost +"/index.html?channeltype=agl&language="+IntlGame.language);
+            showWebView(activity,IntlGame.urlHost +"/index.html?channeltype=agl&language="+ IntlGameLanguageCache.loadLan(activity));
             return;
         }
         if(account.getAccessTokenExpire()>IntlGameUtil.getUTCTimeStr())
@@ -233,46 +239,56 @@ public class IntlGameCenter {
                         IntlGameUtil.logd("IntlGame","AccessToken is Effective");
                         IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
                     }else{
-                        IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);
+                        refreshAccessToken(activity,account);
                     }
                 }
             });
             checkAPI.Excute();
         }
         else{
-            IntlGameUtil.logd("IntlGame","AccessToken is Expired");
-            RefreshAPI refreshAPI = new RefreshAPI(account);
-            refreshAPI.setListener(new RefreshAPI.IRefreshCallback() {
-                @Override
-                public void AfterRefresh(JSONObject jsonObject,String errorMsg) {
-                    if(jsonObject != null){
-                        account.setOpenid(jsonObject.optString("openid"));
-                        account.setAccessToken(jsonObject.optString("access_token"));
-                        account.setAccessTokenExprie(jsonObject.optInt("access_token_expire"));
-                        account.setRefreshToken(jsonObject.optString("refresh_token"));
-                        account.setRefreshTokenExpire(jsonObject.optInt("refresh_token_expire"));
-                        setAccount(activity,account);
-                        if(IntlGame.iLoginListener != null)
-                        {
-                            IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
-                        }
-                        try {
-                            IntlGameUtil.logd("IntlGameLoginCenter","Refresh Account=>"+account.getJSONObj().toString());
-                        } catch (JSONException e) {
-                            IntlGameExceptionUtil.handle(e);
-                        }
-                    }else {
-                        if(IntlGame.iLoginListener != null)
-                        {
-                            IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);
-                        }
-                    }
-
-                }
-            });
-            refreshAPI.Excute();
+            refreshAccessToken(activity,account);
         }
 
+    }
+    public void refreshAccessToken(final Activity activity, final Account account)
+    {
+        IntlGameUtil.logd("IntlGame","AccessToken is Expired");
+        RefreshAPI refreshAPI = new RefreshAPI(account);
+        refreshAPI.setListener(new RefreshAPI.IRefreshCallback() {
+            @Override
+            public void AfterRefresh(JSONObject jsonObject,String errorMsg) {
+                if(jsonObject != null){
+                    account.setOpenid(jsonObject.optString("openid"));
+                    account.setAccessToken(jsonObject.optString("access_token"));
+                    account.setAccessTokenExprie(jsonObject.optInt("access_token_expire"));
+                    account.setRefreshToken(jsonObject.optString("refresh_token"));
+                    account.setRefreshTokenExpire(jsonObject.optInt("refresh_token_expire"));
+                    setAccount(activity,account);
+                    if(IntlGame.iLoginListener != null)
+                    {
+                        IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,jsonObject.optString("openid"),jsonObject.optString("access_token"),null);
+                    }
+                    try {
+                        IntlGameUtil.logd("IntlGameLoginCenter","Refresh Account=>"+account.getJSONObj().toString());
+                    } catch (JSONException e) {
+                        IntlGameExceptionUtil.handle(e);
+                    }
+                }else {
+                    AccountCache.cleanAccounts(activity);
+                    IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null, MsgManager.getMsg("autologin_invalid"));
+                    HashMap<String,Object> map = new HashMap<>();
+                    map.put("commandDomain","");
+                    map.put("command","AutoInvalidLogin");
+                    map.put("args",null);
+                    Message msg = new Message();
+                    msg.obj = map;
+                    handler.sendMessage(msg);
+
+                }
+
+            }
+        });
+        refreshAPI.Excute();
     }
 
     public void changerAccount(final Activity activity,String arg)
@@ -288,7 +304,7 @@ public class IntlGameCenter {
                 JSONObject jsonObject = new JSONObject(arg);
                 ext =  jsonObject.optString("extensionInfo");
                 channel =  "agl";
-                lan =  IntlGame.language;
+                lan =  IntlGameLanguageCache.loadLan(activity);
 
             }
         }catch (JSONException e) {
@@ -309,7 +325,16 @@ public class IntlGameCenter {
         {
             channelLogout(activity);
         }
-        showWebView(activity,IntlGame.urlHost +"/index.html?channeltype="+channel+"&language="+IntlGame.language+"&trans_data="+ext);
+        final Account account = loadAccounts(activity.getApplicationContext());
+        String openid = "";
+        String accessToken = "";
+        if(account!=null)
+        {
+            openid = account.getOpenid();
+            accessToken = account.getAccessToken();
+
+        }
+        showWebView(activity,IntlGame.urlHost +"/index.html?channeltype="+channel+"&language="+IntlGameLanguageCache.loadLan(activity)+"&trans_data="+ext+"&openid="+openid+"&access_token="+accessToken);
 
     }
 

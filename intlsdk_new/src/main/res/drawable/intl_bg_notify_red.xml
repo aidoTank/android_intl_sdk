@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval" >
+
+    <!--<gradient
+        android:angle="90"
+        android:endColor="@color/soha_backgr"
+        android:startColor="@color/soha_backgr" />-->
+
+   <!-- <padding
+        android:bottom="@dimen/soha_10dp"
+        android:left="@dimen/soha_10dp"
+        android:right="@dimen/soha_10dp"
+        android:top="@dimen/soha_10dp" />-->
+    <solid
+       android:color="@android:color/holo_red_light" />
+
+   <!-- <stroke
+        android:width="5dp"
+        android:color="@android:color/black" />-->
+
+    <!--<corners android:radius="@dimen/soha_radius_dialog"
+        android:color="@android:color/black"
+        />-->
+
+</shape>

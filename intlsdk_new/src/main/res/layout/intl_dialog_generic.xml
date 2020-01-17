@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/intl_width_dialog_generic"
+    android:layout_height="wrap_content"
+    android:background="@drawable/intl_bg_dialog"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/intl_padding_top_dialog"
+        android:layout_marginRight="@dimen/intl_padding_top_dialog"
+        android:gravity="center"
+        android:paddingTop="@dimen/intl_padding_top_dialog"
+        android:paddingBottom="@dimen/intl_10dp"
+        android:text="@string/intl_dialog_notify"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvDes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvTitle"
+        android:layout_marginLeft="@dimen/intl_padding_top_dialog"
+        android:layout_marginRight="@dimen/intl_padding_top_dialog"
+        android:gravity="center"
+        android:paddingBottom="@dimen/intl_padding_top_dialog"
+        android:text="" />
+
+
+    <View
+        android:id="@+id/vDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/tvDes"
+        android:background="@color/intl_gray" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/vDivider"
+        android:orientation="horizontal">
+
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:paddingTop="@dimen/intl_15dp"
+            android:paddingBottom="@dimen/intl_15dp"
+            android:text="@string/intl_cancel"
+            android:textAllCaps="false"
+            android:textColor="@color/intl_button_dialog_ok" />
+
+        <View
+            android:id="@+id/vDivider2"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/intl_gray" />
+
+        <Button
+            android:id="@+id/btnOk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:paddingTop="@dimen/intl_15dp"
+            android:paddingBottom="@dimen/intl_15dp"
+            android:text="@string/intl_ok"
+            android:textAllCaps="false"
+            android:textColor="@color/intl_button_dialog_ok" />
+    </LinearLayout>
+
+
+</RelativeLayout>

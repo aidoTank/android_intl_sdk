@@ -1,0 +1,7 @@
+{
+    "app_id": "4bdc77e40345c05748fcac9b2f314db9",
+    "app_id_facebook": "754170961660851",
+    "app_id_appsflyer": "DHqQWuogbamMyjfg9H4hSR",
+    "client_name" : "SG220",
+    "client_code": "SG220"
+}

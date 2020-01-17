@@ -7,15 +7,20 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.intl.af.AFManager;
-import com.intl.base.IntlGameLanguage;
+import com.intl.entity.Account;
+import com.intl.ipa.IntlGameGooglePlayV3;
 import com.intl.ipa.googleplayutils;
 import com.intl.loginchannel.FaceBookSDK;
 import com.intl.loginchannel.GoogleSDK;
 import com.intl.entity.IntlDefine;
 import com.intl.usercenter.IntlGameCenter;
+import com.intl.utils.IntlContext;
 import com.intl.utils.IntlGameExceptionUtil;
+import com.intl.utils.IntlGameLanguageCache;
 import com.intl.utils.IntlGameUtil;
-import com.intl.utils.LocaleManager;
+import com.intl.utils.MsgManager;
+
+import org.json.JSONObject;
 
 import java.util.Map;
 
@@ -40,18 +45,17 @@ public class IntlGame extends Activity {
     public static Application application;
     public static String Game;
     public static int retryTime = 0;
-    public static String language="";
     public static String urlHost = "https://gather-auth.ycgame.com";
-    public static void init(final Activity activity,String language ,String game,String devKey, final String google_clientid, final String facebook_clientid,  String gp_clientid, String gp_secret,final IInitListener iInitListener)
+    public static void init(final Activity activity,String game,String devKey, final String google_clientid, final String facebook_clientid,  String gp_clientid, String gp_secret,final IInitListener iInitListener)
     {
         Game = game;
-        IntlGame.language = language;
         GoogleClientId = google_clientid;
         FacebookClientId = facebook_clientid;
         GPclientid = gp_clientid;
         GPsecretid = gp_secret;
         try{
             IntlGameCenter.init(activity);
+            MsgManager.readParamsFromAssets(IntlContext.getApplicationContext());
         }catch (Exception e){
             IntlGameExceptionUtil.handle(e);
         }
@@ -70,38 +74,13 @@ public class IntlGame extends Activity {
             }
         });
     }
-
-    public String getLanguage(Context context) {
-        return LocaleManager.getInstance().getLanguage(context);
-    }
-
-    public void setLanguage(Context context, IntlGameLanguage  intlGameLanguage) {
-        String language;
-        switch(intlGameLanguage) {
-            case INTL_EN:
-                language = "en";
-                break;
-            case INTL_TH:
-                language = "th";
-                break;
-            case INTL_CN:
-                language = "cn";
-                break;
-            case INTL_TW:
-                language = "zh";
-                break;
-            default:
-                language = "en";
+    public static void setLanguage(Activity activity,String language)
+    {
+        if (!language.equals("cn") && !language.equals("tw") && !language.equals("en")&&!language.equals("th")) {
+            language = "en";
         }
-
-        LocaleManager.getInstance().setLocale(context, language);
-    }
-    public void setLanguage(Context context, String lang) {
-        if (!lang.equals("en") && !lang.equals("vi") && !lang.equals("zh")) {
-            lang = "en";
-        }
-
-        LocaleManager.getInstance().setLocale(context, lang);
+        Log.i(TAG, "setLanguage: lan = "+language);
+        IntlGameLanguageCache.saveLan(activity,language);
     }
 
     public static void LoginCenter(Activity activity, ILoginCenterListener _iLoginListener)

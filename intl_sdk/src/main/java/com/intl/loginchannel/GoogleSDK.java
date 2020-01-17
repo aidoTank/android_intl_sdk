@@ -27,6 +27,7 @@ import com.intl.usercenter.AccountCache;
 import com.intl.usercenter.IntlGameCenter;
 import com.intl.utils.IntlGameLoading;
 import com.intl.utils.IntlGameUtil;
+import com.intl.utils.MsgManager;
 
 import org.json.JSONObject;
 
@@ -48,6 +49,7 @@ public class GoogleSDK {
     private static GoogleSignInOptions gso;
     public static void login(WeakReference<Activity>  _activity,Boolean isBind)
     {
+        logout(_activity.get());
         _isBind = isBind;
         IntlGameCenter.isSwitch = false;
         activity = _activity;
@@ -71,6 +73,7 @@ public class GoogleSDK {
 
     public static void SwitchLogin(WeakReference<Activity>  _activity)
     {
+        logout(_activity.get());
         _isBind = false;
         activity = _activity;
         IntlGameUtil.logd(TAG,"=====>SwitchLogin _isBind:"+_isBind+" isSwitch"+IntlGameCenter.isSwitch);
@@ -110,17 +113,21 @@ public class GoogleSDK {
                             if(task.isSuccessful())
                             {
                                 Log.d(TAG, "Google logout: success");
-                                if(IntlGame.iLogoutListener != null)
-                                {
-                                    IntlGame.iLogoutListener.onComplete(IntlDefine.SUCCESS,null);
-                                }
-                            }else{
-                                Log.d(TAG, "Google logout: failed");
-                                if(IntlGame.iLogoutListener != null)
-                                {
-                                    IntlGame.iLogoutListener.onComplete(IntlDefine.FAILED,task.getException()!=null?task.getException().getMessage():null);
-                                }
                             }
+//                            if(task.isSuccessful())
+//                            {
+//                                Log.d(TAG, "Google logout: success");
+//                                if(IntlGame.iLogoutListener != null)
+//                                {
+//                                    IntlGame.iLogoutListener.onComplete(IntlDefine.SUCCESS,null);
+//                                }
+//                            }else{
+//                                Log.d(TAG, "Google logout: failed");
+//                                if(IntlGame.iLogoutListener != null)
+//                                {
+//                                    IntlGame.iLogoutListener.onComplete(IntlDefine.FAILED,task.getException()!=null?task.getException().getMessage():null);
+//                                }
+//                            }
                         }
                     });
         }
@@ -166,7 +173,7 @@ public class GoogleSDK {
                             AccountCache.saveAccounts(activity.get(),userac);
                             IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SWITCH_SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"),null);
                         }else {
-                            IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SWITCH_FAILED,null,null,errorMsg);
+                            IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SWITCH_FAILED,null,null,MsgManager.getMsg("please_check_connect_internet"));
                         }
 
                     }
@@ -187,13 +194,13 @@ public class GoogleSDK {
                         {
                             IntlGameUtil.logd("GuestBindAPI","Bind success!");
                             AccountCache.setAccountsChannel(activity.get(),"facebook");
-                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_SUCCESS,null,"绑定成功！");
+                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_SUCCESS,null,MsgManager.getMsg("login_connect_account_success"));
                         }else if(resultCode == 10010){
                             IntlGameUtil.logd("GuestBindAPI","Bind failed!===>该账户已经绑定了游客账号");
-                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.HAVE_BIND,null,errorMsg);
+                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.HAVE_BIND,null, MsgManager.getMsg("already_bind"));
                         }else {
                             IntlGameUtil.logd("GuestBindAPI","Bind failed!");
-                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,null,errorMsg);
+                            IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,null,MsgManager.getMsg("error_login_gg"));
                         }
 
                     }
@@ -217,7 +224,7 @@ public class GoogleSDK {
                             IntlGameUtil.logd(TAG,"login Success");
                             IntlGame.iLoginListener.onComplete(IntlDefine.SUCCESS,accountJson.optString("openid"),accountJson.optString("access_token"),null);
                         }else {
-                            IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,errorMsg);
+                            IntlGame.iLoginListener.onComplete(IntlDefine.FAILED,null,null,MsgManager.getMsg("please_check_connect_internet"));
                         }
 
                     }
@@ -230,9 +237,9 @@ public class GoogleSDK {
             {
                 IntlGameCenter.isSwitch = false;
                 if (e.getStatusCode() == 12501) {
-                    IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SWITCH_CANCEL,null, null,null);
+                    IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SWITCH_CANCEL,null, null,MsgManager.getMsg("cancel"));
                 } else {
-                    IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SWITCH_FAILED, null,null,e.getMessage());
+                    IntlGame.iSwitchAccountListener.onComplete(IntlDefine.SWITCH_FAILED, null,null,MsgManager.getMsg("error_login_gg"));
                 }
                 Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
                 return;
@@ -240,16 +247,16 @@ public class GoogleSDK {
             if(_isBind)
             {
                 if (e.getStatusCode() == 12501) {
-                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_CANCEL,null,"绑定取消！");
+                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_CANCEL,null,MsgManager.getMsg("cancel"));
                 } else {
-                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,null,e.getMessage());
+                    IntlGame.iPersonCenterListener.onComplete("bind",IntlDefine.BIND_FAILED,null,MsgManager.getMsg("error_login_gg"));
                 }
                 Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
             }else {
                 if (e.getStatusCode() == 12501) {
-                    IntlGame.iLoginListener.onComplete(IntlDefine.CANCEL,null, null,null);
+                    IntlGame.iLoginListener.onComplete(IntlDefine.CANCEL,null, null,MsgManager.getMsg("cancel"));
                 } else {
-                    IntlGame.iLoginListener.onComplete(IntlDefine.FAILED, null,null,e.getMessage());
+                    IntlGame.iLoginListener.onComplete(IntlDefine.FAILED, null,null,MsgManager.getMsg("error_login_gg"));
                 }
                 Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
             }

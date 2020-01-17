@@ -1,0 +1,65 @@
+{
+  "cn": {
+    "please_check_connect_internet":"请重新检查网络连接",
+    "cancel":"取消",
+    "error_login_fb":"登录Facebook出错，请重试",
+    "error_login_gg":"登录Google出错，请重试",
+    "login_connect_account_success":"绑定账号成功",
+    "payment_success": "充值成功",
+    "payment_error": "充值错误",
+    "payment_error_init_iap": "初始化IAP出错，请重试",
+    "already_bind": "该账号已经绑定了游客账号",
+    "googlepay_start_failed": "支付启动失败",
+    "googlepay_connect_faild": "支付连接失败",
+    "autologin_invalid": "自动登录已失效"
+  },
+
+  "en": {
+    "please_check_connect_internet":"en_请重新检查网络连接",
+    "cancel":"en_取消",
+    "error_login_fb":"en_登录Facebook出错，请重试",
+    "error_login_gg":"en_登录Google出错，请重试",
+    "login_connect_account_success":"en_绑定账号成功",
+    "payment_success": "en_充值成功",
+    "payment_error": "en_充值错误",
+    "payment_error_init_iap": "en_初始化IAP出错，请重试",
+    "already_bind": "en_该账号已经绑定了游客账号",
+    "googlepay_start_failed": "en_支付启动失败",
+    "googlepay_connect_faild": "en_支付连接失败",
+    "autologin_invalid": "en_自动登录已失效"
+
+  },
+
+  "tw": {
+    "please_check_connect_internet":"tw_请重新检查网络连接",
+    "cancel":"tw_取消",
+    "error_login_fb":"tw_登录Facebook出错，请重试",
+    "error_login_gg":"tw_登录Google出错，请重试",
+    "login_connect_account_success":"tw_绑定账号成功",
+    "payment_success": "tw_充值成功",
+    "payment_error": "tw_充值错误",
+    "payment_error_init_iap": "tw_初始化IAP出错，请重试",
+    "already_bind": "tw_该账号已经绑定了游客账号",
+    "googlepay_start_failed": "tw_支付启动失败",
+    "googlepay_connect_faild": "tw_支付连接失败",
+    "autologin_invalid": "tw_自动登录已失效"
+
+  },
+
+  "th": {
+    "please_check_connect_internet":"th_请重新检查网络连接",
+    "cancel":"th_取消",
+    "error_login_fb":"th_登录Facebook出错，请重试",
+    "error_login_gg":"th_登录Google出错，请重试",
+    "login_connect_account_success":"th_绑定账号成功",
+    "payment_success": "th_充值成功",
+    "payment_error": "th_充值错误",
+    "payment_error_init_iap": "th_初始化IAP出错，请重试",
+    "already_bind": "th_该账号已经绑定了游客账号",
+    "googlepay_start_failed": "th_支付启动失败",
+    "googlepay_connect_faild": "th_支付连接失败",
+    "autologin_invalid": "th_自动登录已失效"
+
+  }
+
+}

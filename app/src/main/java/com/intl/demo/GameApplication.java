@@ -3,6 +3,7 @@ package com.intl.demo;
 import android.app.Application;
 
 import com.intl.IntlGame;
+import com.intl.utils.IntlContext;
 
 /**
  * @Author: yujingliang
@@ -13,6 +14,7 @@ public class GameApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        IntlContext.setApplicationContext(this);
         IntlGame.Afinit(this);
     }
 }

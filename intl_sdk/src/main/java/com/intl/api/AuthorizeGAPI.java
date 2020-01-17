@@ -27,6 +27,7 @@ public class AuthorizeGAPI {
         try{
             jsonObject.put("request_type", session.getRequestType());
             jsonObject.put("code", session.getAuthCode());
+
         } catch (JSONException e) {
             IntlGameExceptionUtil.handle(e);
         }

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="backgr">#f7fbf9</color>
+    <color name="black">#222222</color>
+    <color name="black2">#555</color>
+    <color name="blackTranparent">#90000000</color>
+    <color name="border">#ddd</color>
+    <color name="border_edittext">#bfc0c4</color>
+    <color name="button_close">#fdfffa</color>
+    <color name="crystal">#aa000000</color>
+    <color name="darkGreen">#13b94e</color>
+    <color name="dialog_divider">#e2e2e2</color>
+    <color name="dialog_header">#f4f4f4</color>
+    <color name="divider">#f4f4f4</color>
+    <color name="facebook">#3b5ba6</color>
+    <color name="graytabpayment">#f4f4f4</color>
+    <color name="graytabtext">#888</color>
+    <color name="green">#91c54a</color>
+    <color name="green2">#92c64b</color>
+    <color name="green3">#92c641</color>
+    <color name="green_pressed">#9ec64b</color>
+    <color name="header">#92c64b</color>
+    <color name="myintl">#65bd30</color>
+    <color name="red">#FF0000</color>
+    <color name="retry">#1e7cce</color>
+    <color name="intl_backgr">#f7fbf9</color>
+    <color name="intl_button_dialog_ok">#0288d1</color>
+    <color name="intl_gray">#bfc0c4</color>
+    <color name="intl_gray_2">#888888</color>
+    <color name="intl_green">#09c176</color>
+    <color name="intl_green_disable">#b0ebd3</color>
+    <color name="intl_transparent_status">#6f000000</color>
+    <color name="text">#555</color>
+    <color name="text_link">#92c64b</color>
+    <color name="text_payment">#393937</color>
+    <color name="transparent">#00000000</color>
+    <color name="white">#ffffff</color>
+    <dimen name="explainPadding">10sp</dimen>
+    <dimen name="explainPadding2">20sp</dimen>
+    <dimen name="explainTextSize">14sp</dimen>
+    <dimen name="explainTextSizeHitder">16sp</dimen>
+    <dimen name="explainWith">270dp</dimen>
+    <dimen name="intl_10dp">10dp</dimen>
+    <dimen name="intl_15dp">15dp</dimen>
+    <dimen name="intl_16dp">16dp</dimen>
+    <dimen name="intl_2dp">2dp</dimen>
+    <dimen name="intl_3dp">3dp</dimen>
+    <dimen name="intl_40dp">40dp</dimen>
+    <dimen name="intl_50dp">50dp</dimen>
+    <dimen name="intl_5dp">5dp</dimen>
+    <dimen name="intl_check_show_banner">35dp</dimen>
+    <dimen name="intl_close_banner">30dp</dimen>
+    <dimen name="intl_dashboard_radius">70dp</dimen>
+    <dimen name="intl_heigh_img_warning">70dp</dimen>
+    <dimen name="intl_height_dialog_dashboard">320dp</dimen>
+    <dimen name="intl_height_popup_warning">40dp</dimen>
+    <dimen name="intl_login_height">410dp</dimen>
+    <dimen name="intl_login_width">350dp</dimen>
+    <dimen name="intl_margin_object">10dp</dimen>
+    <dimen name="intl_offset_hide_dashboard">20dp</dimen>
+    <dimen name="intl_padding_normal">10dp</dimen>
+    <dimen name="intl_padding_top_dialog">20dp</dimen>
+    <dimen name="intl_radius_dialog">15dp</dimen>
+    <dimen name="intl_radius_normal">2dp</dimen>
+    <dimen name="intl_round_webview">12dp</dimen>
+    <dimen name="intl_size_border_dashboard_webview">12dp</dimen>
+    <dimen name="intl_size_db_indicator">6dp</dimen>
+    <dimen name="intl_size_item_dashboard">35dp</dimen>
+    <dimen name="intl_size_popup_dashboard">45dp</dimen>
+    <dimen name="intl_stroke_normal">1dp</dimen>
+    <dimen name="intl_update_size_logo">120dp</dimen>
+    <dimen name="intl_width_dialog_dashboard">260dp</dimen>
+    <dimen name="intl_width_dialog_generic">320dp</dimen>
+    <dimen name="intl_width_img_warning">180dp</dimen>
+    <dimen name="intl_width_popup_warning">100dp</dimen>
+    <string name="gcm_defaultSenderId" translatable="false">321730718660</string>
+    <string name="please_check_connect_internet">Vui lòng kiểm tra lại kết nối mạng</string>
+    <string name="intl_app_name">SDK intl</string>
+    <string name="intl_app_not_fb_message">Ứng dụng Messenger FaceBook không tồn tại trong thiết bị của bạn</string>
+    <string name="intl_banner_show">Không hiện trong ngày hôm nay</string>
+    <string name="intl_cancel">Hủy bỏ</string>
+    <string name="intl_dashboard_exit">Bạn có muốn ẩn Dashboard hay không? Dashboard sẽ hiện lên vào lần đăng nhập kế tiếp</string>
+    <string name="intl_dialog_exit_game">Bạn có muốn thoát game?</string>
+    <string name="intl_dialog_notify">Thông báo</string>
+    <string name="intl_error_dashboard_detail_pick_image">Ảnh chọn không hợp lệ. Vui lòng chọn ảnh khác.</string>
+    <string name="intl_error_generic">Đã có lỗi xảy ra, vui lòng thử lại.</string>
+    <string name="intl_error_init">Lỗi khởi tạo SDK intl</string>
+    <string name="intl_error_login_fb">Lỗi login Facebook, vui lòng thử lại</string>
+    <string name="intl_error_login_gg">Lỗi login Google, vui lòng thử lại</string>
+    <string name="intl_exit">Thoát</string>
+    <string name="intl_fragment_payment_success">Thanh toán thành công</string>
+    <string name="intl_language_en" translatable="false">en</string>
+    <string name="intl_language_vi" translatable="false">vi</string>
+    <string name="intl_language_zh" translatable="false">zh</string>
+    <string name="intl_login_connect_account">Nối tài khoản</string>
+    <string name="intl_login_connect_account_success">Kết nối tài khoản thành công</string>
+    <string name="intl_login_des_connect_account">Bạn nên nối tài khoản để có thể được hỗ trợ tốt nhất trong quá trình chơi game </string>
+    <string name="intl_login_giveup">Bỏ qua</string>
+    <string name="intl_login_hello">Xin chào %s</string>
+    <string name="intl_ok">Đồng ý</string>
+    <string name="intl_open_app_fb">Bạn có muốn mở app Facebook không?</string>
+    <string name="intl_open_app_intl_care">Bạn có muốn mở app intlCare?</string>
+    <string name="intl_open_app_twitter">Bạn có muốn mở app Twitter</string>
+    <string name="intl_payment_error_init_iap">Khởi tạo IAP lỗi. Vui lòng thử lại!</string>
+    <string name="intl_popup_connect_account_playnow"><![CDATA[<u>Kết nối tài khoản</u>]]></string>
+    <string name="intl_popup_connect_account_playnow_2">để được hỗ trợ tốt nhất</string>
+    <string name="intl_sdk_version" translatable="false">3.2.7.2</string>
+    <string name="intl_try_again">Thử lại</string>
+    <string name="update_continue">Tiếp tục</string>
+    <string name="update_des_update">Đã có bản cập nhật mới cho %s</string>
+    <string name="update_download_now">Tải ngay bản cập nhật</string>
+    <style name="intlButtonGray" parent="@android:style/Widget.Button">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/intl_bg_button_gray</item>
+        <item name="android:singleLine">true</item>
+        <!--<item name="android:textSize">@dimen/textSizeNormal</item>-->
+        <!--<item name="android:textStyle">bold</item>-->
+        <item name="android:textColor">@color/white</item>
+    </style>
+    <style name="intlButtonGreen" parent="@android:style/Widget.Button">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/intl_bg_button_green</item>
+        <item name="android:singleLine">true</item>
+        <!--<item name="android:textSize">@dimen/textSizeNormal</item>-->
+        <!--<item name="android:textStyle">bold</item>-->
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+    <style name="intlThemeDialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+    <style name="intlThemeDialogTransparent" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+    <declare-styleable name="InkPageIndicator">
+        <attr format="dimension" name="ipi_dotDiameter"/>
+        <attr format="dimension" name="ipi_dotGap"/>
+        <attr format="integer" name="ipi_animationDuration"/>
+        <attr format="color" name="ipi_pageIndicatorColor"/>
+        <attr format="color" name="ipi_currentPageIndicatorColor"/>
+    </declare-styleable>
+</resources>

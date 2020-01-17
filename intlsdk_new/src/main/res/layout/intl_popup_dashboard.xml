@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/rl_db"
+        android:layout_width="@dimen/intl_size_popup_dashboard"
+        android:layout_height="@dimen/intl_size_popup_dashboard">
+
+        <ImageView
+            android:id="@+id/imgView"
+            android:layout_width="@dimen/intl_size_popup_dashboard"
+            android:layout_height="@dimen/intl_size_popup_dashboard"
+            android:adjustViewBounds="true" />
+
+        <ImageView
+            android:layout_marginTop="@dimen/intl_2dp"
+            android:layout_marginRight="@dimen/intl_2dp"
+            android:layout_alignParentRight="true"
+            android:id="@+id/imgNotify"
+            android:layout_width="@dimen/intl_10dp"
+            android:layout_height="@dimen/intl_10dp"
+            android:background="@drawable/intl_bg_notify_red" />
+    </RelativeLayout>
+
+    <!-- android:layout_marginTop="@dimen/intl_5dp"
+     android:layout_marginRight="@dimen/intl_5dp"-->
+
+</FrameLayout>

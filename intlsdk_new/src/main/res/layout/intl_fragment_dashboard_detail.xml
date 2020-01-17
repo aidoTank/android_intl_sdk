@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rlParent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:clickable="true">
+
+
+    <FrameLayout
+        android:id="@+id/flParent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent">
+        <!--android:background="@drawable/intl_bg_dashboard_webview"-->
+
+        <!--<androidx.cardview.widget.CardView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_marginLeft="-7dp"-->
+        <!--android:background="@android:color/transparent"-->
+        <!--card_view:cardBackgroundColor="@android:color/holo_blue_dark"-->
+        <!--card_view:cardCornerRadius="@dimen/intl_size_border_dashboard_webview"-->
+        <!--card_view:cardElevation="0dp"-->
+        <!--card_view:contentPadding="0dp">-->
+
+
+        <com.intl.sdk.dashboard.view.RoundedWebView
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent" />
+        <!--android:background="@drawable/intl_bg_dashboard_webview" />-->
+
+        <RelativeLayout
+            android:id="@+id/rl_header"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/intl_bg_header_detail_dashboard"
+            android:visibility="visible" />
+
+        <!--</androidx.cardview.widget.CardView>-->
+
+        <ProgressBar
+            android:id="@+id/progressLoading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+    </FrameLayout>
+    <!-- </androidx.cardview.widget.CardView>-->
+
+
+</RelativeLayout>
